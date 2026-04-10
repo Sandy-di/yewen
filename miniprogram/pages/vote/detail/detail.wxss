@@ -1,0 +1,402 @@
+/* pages/vote/detail/detail.wxss — 深空科技风格 */
+
+.page-vote-detail {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+
+/* 投票头部 — 深空渐变 */
+.vote-header {
+  padding: var(--space-xl) var(--space-lg);
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+}
+
+.vote-header-active {
+  background: linear-gradient(135deg, #0A1628 0%, #1B3A5C 50%, #2D1B69 100%);
+}
+
+.vote-header-ended {
+  background: linear-gradient(135deg, #1B2838 0%, #2D3748 100%);
+}
+
+.vote-status-tag {
+  margin-bottom: var(--space-sm);
+}
+
+.vote-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.3px;
+}
+
+.vote-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.meta-divider {
+  margin: 0 4rpx;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* 倒计时栏 — 发光警示 */
+.countdown-bar {
+  display: flex;
+  align-items: center;
+  padding: 20rpx var(--space-lg);
+  background: rgba(255, 215, 64, 0.08);
+  border-bottom: 1rpx solid rgba(255, 215, 64, 0.15);
+  gap: 12rpx;
+}
+
+.countdown-icon {
+  font-size: 28rpx;
+}
+
+.countdown-text {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--warning);
+  text-shadow: 0 0 8rpx rgba(255, 215, 64, 0.3);
+}
+
+.countdown-deadline {
+  margin-left: auto;
+  font-size: 24rpx;
+  color: var(--warning);
+  opacity: 0.7;
+}
+
+/* 投票描述 */
+.vote-description {
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+}
+
+.vote-time-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  padding-top: var(--space-md);
+  border-top: 1rpx solid var(--border);
+}
+
+/* 参与进度 */
+.progress-section {
+  margin-bottom: var(--space-lg);
+}
+
+.progress-section:last-child {
+  margin-bottom: 0;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.progress-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.progress-value {
+  font-size: 26rpx;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.progress-percent {
+  text-align: right;
+  font-size: 24rpx;
+  color: var(--primary);
+  font-weight: 700;
+  margin-top: var(--space-xs);
+}
+
+/* 投票选项 — 发光选中态 */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.option-item {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--space-lg);
+  border: 1rpx solid var(--border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  background: var(--bg-card-solid);
+}
+
+.option-item:active {
+  background: rgba(0, 229, 255, 0.04);
+}
+
+.option-selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 0 16rpx rgba(0, 229, 255, 0.15);
+}
+
+.option-disabled {
+  pointer-events: none;
+}
+
+.option-radio {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  margin-top: 4rpx;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.option-selected .option-radio {
+  border-color: var(--primary);
+  box-shadow: 0 0 8rpx rgba(0, 229, 255, 0.3);
+}
+
+.radio-inner {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.radio-checked {
+  background: var(--primary);
+  box-shadow: 0 0 8rpx rgba(0, 229, 255, 0.5);
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-label {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12rpx;
+}
+
+/* 选项结果条 */
+.option-result {
+  margin-top: var(--space-xs);
+}
+
+.result-bar-bg {
+  height: 12rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6rpx;
+  overflow: hidden;
+  margin-bottom: var(--space-xs);
+}
+
+.result-bar-fill {
+  height: 100%;
+  background: var(--gradient-progress);
+  border-radius: 6rpx;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 8rpx rgba(0, 229, 255, 0.3);
+}
+
+.result-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
+/* 区块链存证 */
+.chain-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.chain-hash {
+  flex: 1;
+}
+
+.chain-label {
+  display: block;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+.chain-value {
+  font-size: 24rpx;
+  color: var(--primary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  word-break: break-all;
+  text-shadow: 0 0 6rpx rgba(0, 229, 255, 0.3);
+}
+
+/* 结果公示 */
+.result-summary {
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+}
+
+.result-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* 底部操作 — 暗色底 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx var(--space-lg);
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: var(--bg-card-solid);
+  border-top: 1rpx solid var(--border);
+  display: flex;
+  gap: var(--space-sm);
+  z-index: 50;
+}
+
+/* 弹窗 — 毛玻璃遮罩 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal-content {
+  width: 600rpx;
+  background: var(--bg-card-solid);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1rpx solid var(--border);
+  box-shadow: 0 0 40rpx rgba(0, 229, 255, 0.1);
+}
+
+.modal-title {
+  padding: 40rpx var(--space-lg) 20rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 0 var(--space-lg) var(--space-lg);
+}
+
+.modal-actions {
+  display: flex;
+  border-top: 1rpx solid var(--border);
+}
+
+.modal-btn {
+  flex: 1;
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.modal-btn:active {
+  background: rgba(0, 229, 255, 0.04);
+}
+
+.modal-btn-cancel {
+  color: var(--text-secondary);
+  border-right: 1rpx solid var(--border);
+}
+
+.modal-btn-confirm {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.confirm-option {
+  margin-bottom: var(--space-lg);
+  font-size: 28rpx;
+  color: var(--text-primary);
+}
+
+.confirm-option-label {
+  font-weight: 700;
+  color: var(--primary);
+  text-shadow: 0 0 8rpx rgba(0, 229, 255, 0.3);
+}
+
+.confirm-notice {
+  font-size: 24rpx;
+  color: var(--warning);
+  line-height: 1.6;
+  padding: var(--space-md);
+  background: var(--warning-light);
+  border: 1rpx solid rgba(255, 215, 64, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+.verify-notice {
+  font-size: 28rpx;
+  line-height: 1.6;
+  margin-bottom: var(--space-md);
+  color: var(--text-primary);
+}
+
+.verify-level {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.verify-current {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.verify-desc {
+  font-size: 24rpx;
+  color: var(--text-disabled);
+}
+
+/* 骨架屏 */
+.skeleton-page {
+  padding: var(--space-md) var(--space-lg);
+}

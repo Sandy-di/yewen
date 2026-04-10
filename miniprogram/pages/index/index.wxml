@@ -1,0 +1,126 @@
+<!-- pages/index/index.wxml -->
+<view class="page-index">
+  <!-- 公告横幅 -->
+  <view class="announcement-bar" wx:if="{{showAnnouncement && latestAnnouncement}}" catchtap="onAnnouncementTap">
+    <view class="announcement-bar-dot"></view>
+    <view class="announcement-bar-text">
+      <text>{{latestAnnouncement.title}}</text>
+    </view>
+    <view class="announcement-bar-close" catchtap="onCloseAnnouncement">✕</view>
+  </view>
+
+  <!-- 社区信息头部 — 深空渐变+网格纹理 -->
+  <view class="community-header">
+    <view class="community-header-bg"></view>
+    <view class="community-header-grid"></view>
+    <view class="community-info">
+      <view class="community-name">{{communityName}}</view>
+      <view class="community-stats">
+        <text class="stat-item glow-number">512</text>
+        <text class="stat-unit">户</text>
+        <text class="stat-divider">|</text>
+        <text class="stat-item glow-number">3</text>
+        <text class="stat-unit">个进行中的投票</text>
+      </view>
+    </view>
+    <view class="header-actions">
+      <view class="role-badge" bindtap="onSwitchRole">
+        <view class="role-badge-dot"></view>
+        <text wx:if="{{currentRole === 'owner'}}">业主</text>
+        <text wx:elif="{{currentRole === 'property'}}">物业</text>
+        <text wx:elif="{{currentRole === 'committee'}}">业委会</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar" bindtap="onSearchTap">
+    <view class="search-bar-icon">🔍</view>
+    <view class="search-bar-placeholder">搜索投票标题...</view>
+  </view>
+
+  <!-- Tab 切换 — 药丸式 -->
+  <view class="tabs-pill tabs-pill-custom">
+    <view 
+      wx:for="{{tabs}}" 
+      wx:key="key"
+      class="tab-item {{currentTab === item.key ? 'tab-item-active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTabChange"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <!-- 投票列表 -->
+  <view class="vote-list" wx:if="{{!loading}}">
+    <view 
+      wx:for="{{voteList}}" 
+      wx:key="voteId"
+      class="card card-glow-top vote-card fade-in-up"
+      style="animation-delay: {{index * 80}}ms"
+      data-id="{{item.voteId}}"
+      bindtap="onVoteItemTap"
+    >
+      <!-- 投票状态标签 + 标题 -->
+      <view class="vote-card-header">
+        <view class="tag {{item.statusTagClass}}">{{item.statusLabel}}</view>
+        <view class="vote-card-title">{{item.title}}</view>
+      </view>
+
+      <!-- 投票进度（进行中显示） -->
+      <view class="vote-card-progress" wx:if="{{item.status === 'active'}}">
+        <view class="progress-info">
+          <text class="progress-text">参与：{{item.participatedCount}}户 / {{item.totalProperties}}户</text>
+          <text class="progress-rate glow-number">{{item.participationRate}}%</text>
+        </view>
+        <view class="progress-bar">
+          <view class="progress-bar-fill" style="width: {{item.participationRate}}%"></view>
+        </view>
+        <view class="vote-card-deadline">
+          <text class="deadline-text">截止：{{item.endTimeFormatted}}</text>
+          <text class="remain-time">{{item.remainTime}}</text>
+        </view>
+      </view>
+
+      <!-- 已结束投票结果 -->
+      <view class="vote-card-result" wx:if="{{item.status === 'ended'}}">
+        <view class="result-badge {{item.result === 'passed' ? 'result-pass' : 'result-fail'}}">
+          {{item.result === 'passed' ? '✓ 通过' : '✕ 未通过'}}
+        </view>
+        <text class="result-participation">参与：{{item.participatedCount}}户</text>
+      </view>
+
+      <!-- 底部信息 -->
+      <view class="vote-card-footer">
+        <text class="vote-card-meta">L{{item.verificationLevel}}</text>
+        <text class="vote-card-meta">{{item.voteType === 'double_majority' ? '双过半' : '双四分之三'}}</text>
+        <view class="vote-card-action">查看详情 →</view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{voteList.length === 0}}">
+      <view class="empty-state-icon-circle">
+        <text class="empty-state-icon-text">◎</text>
+      </view>
+      <view class="empty-state-title">暂无投票</view>
+      <view class="empty-state-desc">当前没有符合筛选条件的投票</view>
+    </view>
+  </view>
+
+  <!-- 加载骨架屏 -->
+  <view class="skeleton-list" wx:if="{{loading}}">
+    <view class="card skeleton-card" wx:for="{{[1,2,3]}}" wx:key="*this">
+      <view class="skeleton" style="width: 60%; height: 36rpx; margin-bottom: 20rpx;"></view>
+      <view class="skeleton" style="width: 100%; height: 24rpx; margin-bottom: 16rpx;"></view>
+      <view class="skeleton" style="width: 80%; height: 16rpx; margin-bottom: 16rpx;"></view>
+      <view class="skeleton" style="width: 100%; height: 16rpx;"></view>
+    </view>
+  </view>
+
+  <!-- 发起投票悬浮按钮（业委会角色可见） -->
+  <view class="fab" wx:if="{{currentRole === 'committee'}}" bindtap="onCreateVote">
+    <text>+</text>
+  </view>
+</view>

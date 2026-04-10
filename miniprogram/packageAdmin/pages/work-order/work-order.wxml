@@ -1,0 +1,23 @@
+<!-- packageAdmin/pages/work-order/work-order.wxml -->
+<view class="page-work-order">
+  <view class="tabs-pill tabs-pill-custom">
+    <view wx:for="{{tabs}}" wx:key="key" class="tab-item {{currentTab === item.key ? 'tab-item-active' : ''}}" data-key="{{item.key}}" bindtap="onTabChange">{{item.label}}</view>
+  </view>
+  <view class="order-list" wx:if="{{!loading}}" style="padding: 24rpx 32rpx;">
+    <view wx:for="{{orderList}}" wx:key="orderId" class="card order-card" data-id="{{item.orderId}}" bindtap="onOrderTap">
+      <view class="order-header">
+        <view class="tag {{item.statusTagClass}}">{{item.statusLabel}}</view>
+        <view class="order-type">{{item.categoryLabel}} · {{item.subCategory}}</view>
+      </view>
+      <view class="order-desc">{{item.description}}</view>
+      <view class="order-footer">
+        <text class="order-time">{{item.createdAt}}</text>
+        <view class="btn btn-primary btn-sm" wx:if="{{item.status === 'submitted'}}" data-id="{{item.orderId}}" catchtap="onAcceptOrder">接单</view>
+      </view>
+    </view>
+    <view class="empty-state" wx:if="{{orderList.length === 0}}">
+      <view class="empty-state-icon">📋</view>
+      <view class="empty-state-title">暂无工单</view>
+    </view>
+  </view>
+</view>

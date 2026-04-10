@@ -1,0 +1,174 @@
+<!-- pages/repair/detail/detail.wxml -->
+<view class="page-repair-detail" wx:if="{{!loading}}">
+  <!-- 状态头部 -->
+  <view class="status-header status-{{order.status}}">
+    <view class="status-icon">{{statusIcon}}</view>
+    <view class="status-info">
+      <view class="status-label">{{statusLabel}}</view>
+      <view class="status-time" wx:if="{{order.status === 'processing'}}">处理中，请耐心等待</view>
+      <view class="status-time" wx:if="{{order.status === 'pending_check'}}">物业已完成维修，请验收</view>
+      <view class="status-time" wx:if="{{order.status === 'submitted'}}">等待物业接单</view>
+    </view>
+    <view class="tag {{statusTagClass}}">{{statusLabel}}</view>
+  </view>
+
+  <!-- 报修信息 -->
+  <view class="card">
+    <view class="card-title">报修信息</view>
+    <view class="info-list">
+      <view class="info-row">
+        <text class="info-label">报修类型</text>
+        <text class="info-value">{{categoryLabel}} · {{order.subCategory}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">报修位置</text>
+        <text class="info-value">{{order.propertyName}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">提交时间</text>
+        <text class="info-value">{{order.createdAt}}</text>
+      </view>
+      <view class="info-row" wx:if="{{order.slaDeadline}}">
+        <text class="info-label">SLA时限</text>
+        <text class="info-value">24小时</text>
+      </view>
+    </view>
+
+    <view class="divider"></view>
+
+    <view class="repair-desc">
+      <view class="desc-label">问题描述</view>
+      <view class="desc-content">{{order.description}}</view>
+    </view>
+
+    <view class="repair-photos" wx:if="{{order.photos.length > 0}}">
+      <view class="desc-label">现场照片</view>
+      <view class="photo-grid">
+        <image 
+          wx:for="{{order.photos}}" 
+          wx:key="*this"
+          class="repair-photo" 
+          src="{{item}}" 
+          mode="aspectFill"
+          data-url="{{item}}"
+          data-urls="{{order.photos}}"
+          bindtap="onPreviewPhoto"
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- 接单信息 -->
+  <view class="card" wx:if="{{order.acceptedBy}}">
+    <view class="card-title">接单信息</view>
+    <view class="worker-info">
+      <view class="worker-avatar">👷</view>
+      <view class="worker-detail">
+        <view class="worker-name">{{order.acceptedBy}}</view>
+        <view class="worker-time" wx:if="{{order.estimatedTime}}">预计上门：{{order.estimatedTime}}</view>
+      </view>
+      <view class="btn btn-ghost btn-sm" bindtap="onCallWorker">📞 联系</view>
+    </view>
+  </view>
+
+  <!-- 处理进度 -->
+  <view class="card">
+    <view class="card-title">处理进度</view>
+    <view class="timeline">
+      <view 
+        wx:for="{{order.timeline}}" 
+        wx:key="index"
+        class="timeline-item"
+      >
+        <view class="timeline-dot {{index === order.timeline.length - 1 ? 'timeline-dot-active' : 'timeline-dot-success'}}"></view>
+        <view class="timeline-time">{{item.time}}</view>
+        <view class="timeline-content">{{item.content}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 完工信息（待验收/已完结） -->
+  <view class="card" wx:if="{{order.completionNote}}">
+    <view class="card-title">维修结果</view>
+    <view class="completion-note">{{order.completionNote}}</view>
+    <view class="photo-grid" wx:if="{{order.completionPhotos.length > 0}}">
+      <image 
+        wx:for="{{order.completionPhotos}}" 
+        wx:key="*this"
+        class="repair-photo" 
+        src="{{item}}" 
+        mode="aspectFill"
+        data-url="{{item}}"
+        data-urls="{{order.completionPhotos}}"
+        bindtap="onPreviewPhoto"
+      />
+    </view>
+  </view>
+
+  <!-- 评价信息（已完结） -->
+  <view class="card" wx:if="{{order.rating}}">
+    <view class="card-title">业主评价</view>
+    <view class="rating-stars">
+      <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this" class="star {{item <= order.rating ? 'star-active' : ''}}">★</text>
+    </view>
+    <view class="rating-comment" wx:if="{{order.ratingComment}}">{{order.ratingComment}}</view>
+  </view>
+
+  <!-- 底部操作区 -->
+  <view class="bottom-actions" wx:if="{{order.status === 'submitted' || order.status === 'pending_check' || order.status === 'completed'}}">
+    <view class="btn btn-ghost" wx:if="{{order.status === 'submitted'}}" bindtap="onCancel">取消工单</view>
+    <view class="btn btn-ghost" wx:if="{{order.status === 'submitted'}}" bindtap="onUrge">催单</view>
+    <view class="btn btn-success" wx:if="{{order.status === 'pending_check'}}" bindtap="onAccept">验收通过</view>
+    <view class="btn btn-warning" wx:if="{{order.status === 'pending_check'}}" bindtap="onShowRework">申请复修</view>
+    <view class="btn btn-primary" wx:if="{{order.status === 'completed' && !order.rating}}" bindtap="onShowRating">评价</view>
+  </view>
+
+  <!-- 评价弹窗 -->
+  <view class="modal-mask" wx:if="{{showRatingModal}}" bindtap="onCloseModal">
+    <view class="modal-content" catchtap>
+      <view class="modal-title">评价服务</view>
+      <view class="modal-body">
+        <view class="rating-stars-large">
+          <text 
+            wx:for="{{[1,2,3,4,5]}}" 
+            wx:key="*this" 
+            class="star-lg {{item <= rating ? 'star-lg-active' : ''}}"
+            data-score="{{item}}"
+            bindtap="onRatingChange"
+          >★</text>
+        </view>
+        <textarea 
+          class="form-textarea" 
+          placeholder="说说您的感受（选填）"
+          maxlength="200"
+          value="{{ratingComment}}"
+          bindinput="onRatingCommentInput"
+        />
+      </view>
+      <view class="modal-actions">
+        <view class="modal-btn modal-btn-cancel" bindtap="onCloseModal">取消</view>
+        <view class="modal-btn modal-btn-confirm" bindtap="onSubmitRating">提交评价</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 复修弹窗 -->
+  <view class="modal-mask" wx:if="{{showReworkModal}}" bindtap="onCloseModal">
+    <view class="modal-content" catchtap>
+      <view class="modal-title">申请复修</view>
+      <view class="modal-body">
+        <textarea 
+          class="form-textarea" 
+          placeholder="请描述复修原因..."
+          maxlength="200"
+          value="{{reworkReason}}"
+          bindinput="onReworkReasonInput"
+        />
+      </view>
+      <view class="modal-actions">
+        <view class="modal-btn modal-btn-cancel" bindtap="onCloseModal">取消</view>
+        <view class="modal-btn modal-btn-confirm" bindtap="onSubmitRework">提交</view>
+      </view>
+    </view>
+  </view>
+</view>

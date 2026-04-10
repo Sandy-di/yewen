@@ -1,0 +1,350 @@
+/* pages/index/index.wxss — 深空科技风格 */
+
+.page-index {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+/* ============================================
+   公告横幅
+   ============================================ */
+.announcement-bar {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(124, 77, 255, 0.08) 100%);
+  border-bottom: 1rpx solid rgba(0, 229, 255, 0.15);
+  gap: 12rpx;
+}
+
+.announcement-bar-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: var(--glow-primary);
+  flex-shrink: 0;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.announcement-bar-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--text-primary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.announcement-bar-close {
+  font-size: 24rpx;
+  color: var(--text-disabled);
+  padding: var(--space-xs);
+  flex-shrink: 0;
+}
+
+/* ============================================
+   社区信息头部 — 深空渐变+网格纹理
+   ============================================ */
+.community-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.community-header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-header);
+  z-index: 0;
+}
+
+/* 头部渐变漂移 */
+.community-header-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #0A1628 0%, #1B3A5C 30%, #2D1B69 60%, #1B3A5C 100%);
+  background-size: 400% 400%;
+  animation: gradientDrift 8s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+/* 头部网格纹理 */
+.community-header-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.04) 1px, transparent 1px);
+  background-size: 40rpx 40rpx;
+  z-index: 1;
+  animation: gridPulse 6s ease-in-out infinite;
+}
+
+.community-info {
+  position: relative;
+  z-index: 2;
+}
+
+.community-name {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.5px;
+  margin-bottom: var(--space-xs);
+}
+
+.community-stats {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.65);
+  display: flex;
+  align-items: center;
+}
+
+.stat-item {
+  color: var(--primary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 8rpx rgba(0, 229, 255, 0.4);
+}
+
+.stat-unit {
+  margin-left: 4rpx;
+}
+
+.stat-divider {
+  margin: 0 12rpx;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.header-actions {
+  position: relative;
+  z-index: 2;
+}
+
+.role-badge {
+  background: rgba(0, 229, 255, 0.12);
+  border: 1rpx solid rgba(0, 229, 255, 0.25);
+  padding: 10rpx 24rpx;
+  border-radius: var(--radius-lg);
+  font-size: 24rpx;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.role-badge-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 8rpx rgba(0, 229, 255, 0.5);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* ============================================
+   搜索栏
+   ============================================ */
+.search-bar {
+  margin: var(--space-md) var(--space-lg) 0;
+  display: flex;
+  align-items: center;
+  height: 72rpx;
+  background: var(--bg-card-solid);
+  border-radius: 36rpx;
+  padding: 0 var(--space-md);
+  border: 1rpx solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.search-bar-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+  opacity: 0.5;
+}
+
+.search-bar-placeholder {
+  font-size: 28rpx;
+  color: var(--text-disabled);
+}
+
+/* ============================================
+   Tab 切换 — 药丸式
+   ============================================ */
+.tabs-pill-custom {
+  margin: var(--space-md) var(--space-lg) 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid var(--border);
+}
+
+/* ============================================
+   投票列表
+   ============================================ */
+.vote-list {
+  padding: var(--space-md) var(--space-lg);
+}
+
+.vote-card {
+  margin-bottom: var(--space-md);
+}
+
+.vote-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: 20rpx;
+}
+
+.vote-card-title {
+  flex: 1;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+  letter-spacing: -0.1px;
+}
+
+.vote-card-progress {
+  margin-bottom: 20rpx;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.progress-text {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.progress-rate {
+  font-size: 30rpx;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.vote-card-deadline {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12rpx;
+}
+
+.deadline-text {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.remain-time {
+  font-size: 24rpx;
+  color: var(--warning);
+  font-weight: 600;
+  text-shadow: 0 0 8rpx rgba(255, 215, 64, 0.3);
+}
+
+.vote-card-result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.result-badge {
+  font-size: 28rpx;
+  font-weight: 700;
+  padding: 6rpx 20rpx;
+  border-radius: var(--radius-xs);
+  letter-spacing: 1px;
+}
+
+.result-pass {
+  background: var(--success-light);
+  color: var(--success);
+  box-shadow: var(--glow-success);
+  border: 1rpx solid rgba(0, 230, 118, 0.2);
+}
+
+.result-fail {
+  background: var(--error-light);
+  color: var(--error);
+  box-shadow: var(--glow-error);
+  border: 1rpx solid rgba(255, 82, 82, 0.2);
+}
+
+.result-participation {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.vote-card-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1rpx solid var(--border);
+}
+
+.vote-card-meta {
+  font-size: 20rpx;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4rpx 12rpx;
+  border-radius: var(--radius-xs);
+  border: 1rpx solid var(--border);
+}
+
+.vote-card-action {
+  margin-left: auto;
+  font-size: 26rpx;
+  color: var(--primary);
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* ============================================
+   空状态
+   ============================================ */
+.empty-state-icon-circle {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 2rpx solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.empty-state-icon-text {
+  font-size: 48rpx;
+  color: var(--text-disabled);
+}
+
+/* ============================================
+   骨架屏
+   ============================================ */
+.skeleton-card {
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+  background: var(--bg-card-solid);
+  border: 1rpx solid var(--border);
+}

@@ -1,0 +1,115 @@
+/* pages/finance/report/report.wxss — 深空科技风格 */
+
+.page-finance-report {
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.type-tabs {
+  display: flex;
+  margin: 0 var(--space-lg);
+  gap: var(--space-sm);
+}
+
+.type-tab {
+  flex: 1;
+  text-align: center;
+  padding: var(--space-sm) 0;
+  border-radius: var(--radius-sm);
+  font-size: 28rpx;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border: 1rpx solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.type-tab-active {
+  color: #FFFFFF;
+  border-color: transparent;
+}
+
+.income-active {
+  background: var(--success);
+  box-shadow: 0 0 12rpx rgba(0, 230, 118, 0.3);
+}
+
+.expense-active {
+  background: var(--error);
+  box-shadow: 0 0 12rpx rgba(255, 82, 82, 0.3);
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.item-form {
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.item-form-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: var(--space-sm);
+}
+
+.item-type-badge {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.badge-income {
+  background: var(--success);
+  box-shadow: 0 0 8rpx rgba(0, 230, 118, 0.3);
+}
+
+.badge-expense {
+  background: var(--error);
+  box-shadow: 0 0 8rpx rgba(255, 82, 82, 0.3);
+}
+
+.item-form-index {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.item-remove {
+  font-size: 28rpx;
+  color: var(--text-disabled);
+  padding: 4rpx var(--space-xs);
+}
+
+.add-item-btn {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  border: 2rpx dashed rgba(0, 229, 255, 0.3);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  color: var(--primary);
+  font-size: 28rpx;
+  transition: all 0.2s ease;
+}
+
+.add-item-btn:active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.15);
+}
+
+.submit-section {
+  padding: 40rpx 0;
+}

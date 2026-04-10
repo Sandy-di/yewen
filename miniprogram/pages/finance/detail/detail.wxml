@@ -1,0 +1,101 @@
+<!-- pages/finance/detail/detail.wxml -->
+<view class="page-finance-detail" wx:if="{{!loading}}">
+  <!-- 月份头部 -->
+  <view class="detail-header">
+    <view class="detail-month">{{report.month}}</view>
+    <view class="tag {{report.status === 'published' ? 'tag-success' : 'tag-warning'}}">
+      {{report.status === 'published' ? '已公示' : '待审批'}}
+    </view>
+  </view>
+
+  <!-- 收支总览 -->
+  <view class="card">
+    <view class="summary-grid">
+      <view class="summary-item">
+        <view class="summary-label">总收入</view>
+        <view class="summary-value text-income">{{totalIncome}}</view>
+      </view>
+      <view class="summary-item">
+        <view class="summary-label">总支出</view>
+        <view class="summary-value text-expense">{{totalExpense}}</view>
+      </view>
+    </view>
+    <view class="summary-meta">
+      <text>提交人：{{report.submittedBy}}</text>
+      <text>提交时间：{{report.submittedAt}}</text>
+    </view>
+  </view>
+
+  <!-- 收入分类 -->
+  <view class="card" wx:if="{{incomeCategories.length > 0}}">
+    <view class="card-title">收入明细</view>
+    <view class="category-list">
+      <view wx:for="{{incomeCategories}}" wx:key="category" class="category-item">
+        <view class="category-info">
+          <view class="category-name">{{item.category}}</view>
+          <view class="category-count">{{item.count}}笔</view>
+        </view>
+        <view class="category-amount text-income">{{item.amountFmt}}</view>
+        <view class="category-bar-bg">
+          <view class="category-bar-fill" style="width: {{item.percent}}%"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 收入饼图模拟 -->
+    <view class="pie-chart-placeholder">
+      <view class="pie-chart">
+        <view class="pie-center">
+          <text class="pie-total">{{totalIncome}}</text>
+          <text class="pie-label">总收入</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 支出分类 -->
+  <view class="card" wx:if="{{expenseCategories.length > 0}}">
+    <view class="card-title">支出明细</view>
+    <view class="category-list">
+      <view wx:for="{{expenseCategories}}" wx:key="category" class="category-item">
+        <view class="category-info">
+          <view class="category-name">{{item.category}}</view>
+          <view class="category-count">{{item.count}}笔</view>
+        </view>
+        <view class="category-amount text-expense">{{item.amountFmt}}</view>
+        <view class="category-bar-bg">
+          <view 
+            class="category-bar-fill" 
+            style="width: {{item.percent}}%"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 详细条目 -->
+  <view class="card">
+    <view class="card-title">收支流水</view>
+    <view class="detail-list">
+      <view wx:for="{{incomeItems}}" wx:key="index" class="detail-row">
+        <view class="detail-row-left">
+          <view class="detail-type income-dot">收</view>
+          <view class="detail-desc">
+            <view class="detail-category">{{item.category}}</view>
+            <view class="detail-note">{{item.description}}</view>
+          </view>
+        </view>
+        <view class="detail-amount text-income">+{{item.amountFmt}}</view>
+      </view>
+      <view wx:for="{{expenseItems}}" wx:key="index" class="detail-row">
+        <view class="detail-row-left">
+          <view class="detail-type expense-dot">支</view>
+          <view class="detail-desc">
+            <view class="detail-category">{{item.category}}</view>
+            <view class="detail-note">{{item.description}}</view>
+          </view>
+        </view>
+        <view class="detail-amount text-expense">-{{item.amountFmt}}</view>
+      </view>
+    </view>
+  </view>
+</view>

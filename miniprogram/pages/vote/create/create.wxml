@@ -1,0 +1,140 @@
+<!-- pages/vote/create/create.wxml -->
+<view class="page-vote-create">
+  <view class="container">
+    <!-- 投票标题 -->
+    <view class="card">
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 投票标题</view>
+        <input 
+          class="form-input" 
+          placeholder="请输入投票标题" 
+          maxlength="100"
+          value="{{form.title}}"
+          bindinput="onTitleInput"
+        />
+        <view class="form-hint">{{form.title.length}}/100字</view>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label">投票说明</view>
+        <textarea 
+          class="form-textarea" 
+          placeholder="请输入投票详细说明（选填）"
+          maxlength="2000"
+          value="{{form.description}}"
+          bindinput="onDescInput"
+        />
+        <view class="form-hint">{{form.description.length}}/2000字</view>
+      </view>
+    </view>
+
+    <!-- 核验等级 -->
+    <view class="card">
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 核验等级</view>
+        <view class="form-picker" bindtap="togglePicker" data-type="Verify">
+          <view class="form-picker-value">L{{form.verificationLevel}} {{verifyLevels[form.verificationLevel-1].label}}</view>
+          <view class="form-picker-arrow">▼</view>
+        </view>
+        <view class="form-hint">{{verifyLevels[form.verificationLevel-1].desc}}</view>
+        
+        <!-- 核验等级选择器 -->
+        <view class="picker-panel" wx:if="{{showVerifyPicker}}">
+          <view 
+            wx:for="{{verifyLevels}}" 
+            wx:key="value"
+            class="picker-option {{form.verificationLevel === item.value ? 'picker-option-active' : ''}}"
+            data-value="{{item.value}}"
+            bindtap="onVerifyLevelChange"
+          >
+            <view class="picker-option-main">L{{item.value}} {{item.label}}</view>
+            <view class="picker-option-desc">{{item.desc}}</view>
+            <view class="picker-option-check" wx:if="{{form.verificationLevel === item.value}}">✓</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 表决类型 -->
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 表决类型</view>
+        <view class="form-picker" bindtap="togglePicker" data-type="Type">
+          <view class="form-picker-value">{{form.voteType === 'double_majority' ? '双过半' : '双四分之三'}}</view>
+          <view class="form-picker-arrow">▼</view>
+        </view>
+        
+        <view class="picker-panel" wx:if="{{showTypePicker}}">
+          <view 
+            wx:for="{{voteTypes}}" 
+            wx:key="value"
+            class="picker-option {{form.voteType === item.value ? 'picker-option-active' : ''}}"
+            data-value="{{item.value}}"
+            bindtap="onVoteTypeChange"
+          >
+            <view class="picker-option-main">{{item.label}}</view>
+            <view class="picker-option-desc">{{item.desc}}</view>
+            <view class="picker-option-check" wx:if="{{form.voteType === item.value}}">✓</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 投票时间 -->
+    <view class="card">
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 开始时间</view>
+        <view class="form-picker" bindtap="togglePicker" data-type="Start">
+          <view class="form-picker-value {{form.startTime ? '' : 'form-picker-placeholder'}}">
+            {{form.startTime || '请选择开始时间'}}
+          </view>
+          <view class="form-picker-arrow">📅</view>
+        </view>
+        <picker mode="date" value="{{form.startTime}}" start="{{minDate}}" bindchange="onStartTimeChange" wx:if="{{showStartPicker}}">
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 结束时间</view>
+        <view class="form-picker" bindtap="togglePicker" data-type="End">
+          <view class="form-picker-value {{form.endTime ? '' : 'form-picker-placeholder'}}">
+            {{form.endTime || '请选择结束时间'}}
+          </view>
+          <view class="form-picker-arrow">📅</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 投票选项 -->
+    <view class="card">
+      <view class="card-title">投票选项</view>
+      <view class="options-form-list">
+        <view wx:for="{{form.options}}" wx:key="id" class="option-form-item">
+          <view class="option-form-index">{{index + 1}}</view>
+          <input 
+            class="option-form-input" 
+            placeholder="选项内容"
+            value="{{item.label}}"
+            data-idx="{{index}}"
+            bindinput="onOptionInput"
+            maxlength="50"
+          />
+          <view 
+            class="option-form-remove" 
+            data-idx="{{index}}"
+            bindtap="onRemoveOption"
+            wx:if="{{form.options.length > 2}}"
+          >✕</view>
+        </view>
+      </view>
+      <view class="add-option-btn" bindtap="onAddOption" wx:if="{{form.options.length < 5}}">
+        <text>+ 添加选项</text>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <view class="btn btn-primary btn-block" bindtap="onSubmit" disabled="{{submitting}}">
+        {{submitting ? '正在提交...' : '发起投票'}}
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,147 @@
+<!-- pages/vote/verify/verify.wxml -->
+<view class="page-verify">
+  <!-- 核验等级选择 -->
+  <view wx:if="{{step === 'select'}}" class="verify-select">
+    <view class="verify-header">
+      <view class="verify-header-icon">🔐</view>
+      <view class="verify-header-title">身份核验</view>
+      <view class="verify-header-desc">本次投票需要完成L{{requiredLevel}}核验</view>
+    </view>
+
+    <view class="verify-levels">
+      <view 
+        wx:for="{{[1,2,3,4]}}" 
+        wx:key="*this"
+        class="level-card {{currentLevel >= item ? 'level-done' : ''}} {{requiredLevel === item ? 'level-required' : ''}}"
+      >
+        <view class="level-badge">
+          <text wx:if="{{currentLevel >= item}}">✓</text>
+          <text wx:else>L{{item}}</text>
+        </view>
+        <view class="level-info">
+          <view class="level-name">{{VERIFY_LEVEL_MAP[item].label || 'L' + item}}</view>
+          <view class="level-desc">{{VERIFY_LEVEL_MAP[item].desc || ''}}</view>
+        </view>
+        <view class="level-status">
+          <text wx:if="{{currentLevel >= item}}" class="status-done">已通过</text>
+          <text wx:elif="{{requiredLevel === item}}" class="status-required">需要核验</text>
+          <text wx:else class="status-optional">选填</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="btn btn-primary btn-block" bindtap="onStartVerify">
+      {{currentLevel >= requiredLevel ? '已通过核验' : '开始L' + requiredLevel + '核验'}}
+    </view>
+    <view class="btn btn-ghost btn-block" bindtap="onGoBack" style="margin-top: 16rpx;">稍后再说</view>
+  </view>
+
+  <!-- 核验表单 -->
+  <view wx:if="{{step === 'form'}}" class="verify-form">
+    <view class="verify-step-header">
+      <view class="step-badge">L{{requiredLevel}}</view>
+      <view class="step-title">{{verifyInfo.label}}</view>
+      <view class="step-desc">{{verifyInfo.desc}}</view>
+    </view>
+
+    <!-- L1 手机核验 -->
+    <view class="card" wx:if="{{requiredLevel === 1}}">
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 手机号</view>
+        <input class="form-input" type="number" maxlength="11" placeholder="请输入手机号" value="{{phone}}" bindinput="onPhoneInput" />
+      </view>
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 验证码</view>
+        <view class="sms-row">
+          <input class="form-input sms-input" type="number" maxlength="6" placeholder="请输入验证码" value="{{smsCode}}" bindinput="onSmsCodeInput" />
+          <view class="sms-btn {{smsCountdown > 0 ? 'sms-btn-disabled' : ''}}" bindtap="onSendSms">
+            {{smsCountdown > 0 ? smsCountdown + 's后重发' : '获取验证码'}}
+          </view>
+        </view>
+      </view>
+      <view class="btn btn-primary btn-block" bindtap="onSubmitL1">验证</view>
+    </view>
+
+    <!-- L2 房产核验 -->
+    <view class="card" wx:if="{{requiredLevel === 2}}">
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 楼栋</view>
+        <input class="form-input" placeholder="如：3栋" value="{{building}}" bindinput="onBuildingInput" />
+      </view>
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 单元</view>
+        <input class="form-input" placeholder="如：1单元" value="{{unit}}" bindinput="onUnitInput" />
+      </view>
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 房号</view>
+        <input class="form-input" placeholder="如：502" value="{{roomNo}}" bindinput="onRoomInput" />
+      </view>
+      <view class="verify-tip">系统将自动比对您的手机号和房产信息</view>
+      <view class="btn btn-primary btn-block" bindtap="onSubmitL2">提交核验</view>
+    </view>
+
+    <!-- L3 双重核验 -->
+    <view class="card" wx:if="{{requiredLevel === 3}}">
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 姓名</view>
+        <input class="form-input" placeholder="请输入真实姓名" value="{{realName}}" bindinput="onRealNameInput" />
+      </view>
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 身份证号</view>
+        <input class="form-input" type="idcard" maxlength="18" placeholder="请输入身份证号" value="{{idCard}}" bindinput="onIdCardInput" />
+      </view>
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 房产证照片</view>
+        <view class="upload-area">
+          <view wx:for="{{propertyCertPhotos}}" wx:key="*this" class="upload-item">
+            <image src="{{item}}" mode="aspectFill" />
+            <view class="upload-delete" data-idx="{{index}}" bindtap="onRemovePhoto">✕</view>
+          </view>
+          <view class="upload-add" bindtap="onChoosePhoto" wx:if="{{propertyCertPhotos.length < 3}}">
+            <view class="upload-add-icon">+</view>
+            <text>上传照片</text>
+          </view>
+        </view>
+        <view class="form-hint">支持jpg/png，每张不超过5MB，最多3张</view>
+      </view>
+      <view class="verify-tip">物业+业委会将在3个工作日内完成审核</view>
+      <view class="btn btn-primary btn-block" bindtap="onSubmitL3">提交核验</view>
+    </view>
+
+    <!-- L4 人脸核验 -->
+    <view class="card" wx:if="{{requiredLevel === 4}}">
+      <view class="face-verify-area">
+        <view class="face-icon">👤</view>
+        <view class="face-desc">将使用微信人脸核身能力进行身份验证</view>
+        <view class="face-notice">请确保光线充足，面部无遮挡</view>
+        <view class="btn btn-primary btn-block" bindtap="onStartFaceVerify">开始人脸核验</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 核验中 -->
+  <view wx:if="{{step === 'verifying'}}" class="verify-loading">
+    <view class="loading-icon">
+      <view class="loading-spinner"></view>
+    </view>
+    <view class="loading-title">正在核验...</view>
+    <view class="loading-desc">请稍候，正在验证您的身份信息</view>
+  </view>
+
+  <!-- 核验成功 -->
+  <view wx:if="{{step === 'success'}}" class="verify-result">
+    <view class="result-icon success-icon">✅</view>
+    <view class="result-title">核验通过</view>
+    <view class="result-desc">您已通过L{{requiredLevel}}身份核验，可以参与本次投票</view>
+    <view class="btn btn-primary btn-block" bindtap="onGoBack">返回投票</view>
+  </view>
+
+  <!-- 核验失败 -->
+  <view wx:if="{{step === 'fail'}}" class="verify-result">
+    <view class="result-icon fail-icon">❌</view>
+    <view class="result-title">核验失败</view>
+    <view class="result-desc">身份信息验证未通过，请检查信息是否正确</view>
+    <view class="btn btn-primary btn-block" bindtap="onRetry">重新核验</view>
+    <view class="btn btn-ghost btn-block" bindtap="onGoBack" style="margin-top: 16rpx;">稍后再说</view>
+  </view>
+</view>

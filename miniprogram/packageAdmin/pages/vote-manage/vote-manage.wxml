@@ -1,0 +1,25 @@
+<!-- packageAdmin/pages/vote-manage/vote-manage.wxml -->
+<view class="page-vote-manage">
+  <view class="tabs-pill tabs-pill-custom">
+    <view 
+      wx:for="{{tabs}}" wx:key="key"
+      class="tab-item {{currentTab === item.key ? 'tab-item-active' : ''}}"
+      data-key="{{item.key}}" bindtap="onTabChange"
+    >{{item.label}}</view>
+  </view>
+  <view class="vote-list" wx:if="{{!loading}}">
+    <view wx:for="{{voteList}}" wx:key="voteId" class="card vote-card" data-id="{{item.voteId}}" bindtap="onVoteTap">
+      <view class="vote-header">
+        <view class="tag {{item.statusTagClass}}">{{item.statusLabel}}</view>
+        <view class="vote-title">{{item.title}}</view>
+      </view>
+      <view class="vote-meta">参与：{{item.participatedCount}}/{{item.totalProperties}}户 ({{item.participationRate}}%)</view>
+      <view class="vote-meta">截止：{{item.endTime}}</view>
+    </view>
+    <view class="empty-state" wx:if="{{voteList.length === 0}}">
+      <view class="empty-state-icon">🗳️</view>
+      <view class="empty-state-title">暂无投票</view>
+    </view>
+  </view>
+  <view class="fab" bindtap="onCreateVote"><text>+</text></view>
+</view>

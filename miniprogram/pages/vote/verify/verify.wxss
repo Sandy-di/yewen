@@ -1,0 +1,294 @@
+/* pages/vote/verify/verify.wxss — 深空科技风格 */
+
+.page-verify {
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.verify-select,
+.verify-form,
+.verify-loading,
+.verify-result {
+  padding: 40rpx var(--space-lg);
+}
+
+/* 核验选择头部 */
+.verify-header {
+  text-align: center;
+  margin-bottom: 48rpx;
+}
+
+.verify-header-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.verify-header-title {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 12rpx;
+}
+
+.verify-header-desc {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+/* 等级卡片 — 发光边框 */
+.verify-levels {
+  margin-bottom: 40rpx;
+}
+
+.level-card {
+  display: flex;
+  align-items: center;
+  padding: 28rpx var(--space-sm);
+  background: var(--bg-card-solid);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-sm);
+  border: 1rpx solid var(--border);
+  gap: 20rpx;
+}
+
+.level-done {
+  border-color: var(--success);
+  background: var(--success-light);
+  box-shadow: 0 0 12rpx rgba(0, 230, 118, 0.15);
+}
+
+.level-required {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.15);
+}
+
+.level-badge {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.level-done .level-badge {
+  background: var(--success);
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 0 12rpx rgba(0, 230, 118, 0.3);
+}
+
+.level-required .level-badge {
+  background: var(--primary);
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.3);
+}
+
+.level-info {
+  flex: 1;
+}
+
+.level-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4rpx;
+}
+
+.level-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.level-status {
+  flex-shrink: 0;
+  font-size: 24rpx;
+}
+
+.status-done {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.status-required {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.status-optional {
+  color: var(--text-disabled);
+}
+
+/* 核验步骤头部 */
+.verify-step-header {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+  box-shadow: 0 0 16rpx rgba(0, 229, 255, 0.3);
+}
+
+.step-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.step-desc {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+/* 验证码行 */
+.sms-row {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.sms-input {
+  flex: 1;
+}
+
+.sms-btn {
+  height: 88rpx;
+  padding: 0 var(--space-md);
+  background: var(--primary);
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.3);
+}
+
+.sms-btn-disabled {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-disabled);
+  box-shadow: none;
+}
+
+.verify-tip {
+  font-size: 24rpx;
+  color: var(--warning);
+  padding: var(--space-md);
+  background: var(--warning-light);
+  border: 1rpx solid rgba(255, 215, 64, 0.2);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-lg);
+}
+
+/* 人脸核验 */
+.face-verify-area {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.face-icon {
+  font-size: 120rpx;
+  margin-bottom: var(--space-lg);
+}
+
+.face-desc {
+  font-size: 28rpx;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.face-notice {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-bottom: 40rpx;
+}
+
+/* 加载状态 */
+.verify-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 200rpx;
+}
+
+.loading-icon {
+  margin-bottom: var(--space-lg);
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  box-shadow: 0 0 16rpx rgba(0, 229, 255, 0.2);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12rpx;
+}
+
+.loading-desc {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+/* 结果页 */
+.verify-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 160rpx;
+}
+
+.result-icon {
+  font-size: 120rpx;
+  margin-bottom: var(--space-lg);
+}
+
+.result-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.result-desc {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 60rpx;
+  line-height: 1.6;
+}

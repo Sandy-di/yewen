@@ -1,0 +1,240 @@
+/* pages/vote/result/result.wxss — 深空科技风格 */
+
+.page-result {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+
+.result-header {
+  padding: 60rpx var(--space-lg);
+  text-align: center;
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-pass {
+  background: linear-gradient(135deg, #0A1628 0%, #0D3320 100%);
+}
+
+.result-fail {
+  background: linear-gradient(135deg, #0A1628 0%, #3D0A0A 100%);
+}
+
+.result-badge {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.result-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  margin-bottom: 12rpx;
+  letter-spacing: -0.3px;
+}
+
+.result-vote-name {
+  font-size: 26rpx;
+  opacity: 0.6;
+}
+
+/* 统计网格 — 仪表盘 */
+.stats-grid {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.stat-box {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 56rpx;
+  font-weight: 200;
+  color: var(--primary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 16rpx rgba(0, 229, 255, 0.4);
+  margin-bottom: var(--space-xs);
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  margin-bottom: 4rpx;
+  letter-spacing: 0.5px;
+}
+
+.stat-detail {
+  font-size: 22rpx;
+  color: var(--text-disabled);
+}
+
+/* 法定标准对比 */
+.standard-compare {
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--border);
+}
+
+.compare-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12rpx 0;
+}
+
+.compare-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.compare-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.compare-pass {
+  color: var(--success);
+  text-shadow: 0 0 8rpx rgba(0, 230, 118, 0.3);
+}
+
+.compare-fail {
+  color: var(--error);
+  text-shadow: 0 0 8rpx rgba(255, 82, 82, 0.3);
+}
+
+/* 投票详情选项 */
+.result-options {
+  display: flex;
+  flex-direction: column;
+  gap: 28rpx;
+}
+
+.result-option-item {
+  padding-bottom: var(--space-lg);
+  border-bottom: 1rpx solid var(--border);
+}
+
+.result-option-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.result-option-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.result-option-label {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.result-option-percent {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--primary);
+  text-shadow: 0 0 8rpx rgba(0, 229, 255, 0.3);
+}
+
+.result-option-bar {
+  height: 16rpx;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8rpx;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+}
+
+.result-option-fill {
+  height: 100%;
+  background: var(--gradient-progress);
+  border-radius: 8rpx;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 8rpx rgba(0, 229, 255, 0.3);
+}
+
+.result-option-detail {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
+/* 区块链存证 */
+.chain-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12rpx 0;
+}
+
+.chain-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  margin-right: var(--space-sm);
+}
+
+.chain-hash {
+  font-size: 24rpx;
+  color: var(--primary);
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  word-break: break-all;
+  text-align: right;
+  text-shadow: 0 0 6rpx rgba(0, 229, 255, 0.3);
+}
+
+.chain-value {
+  font-size: 26rpx;
+  color: var(--text-primary);
+}
+
+.chain-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1rpx solid var(--border);
+}
+
+/* 结果说明 */
+.result-summary-text {
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+/* 底部操作 */
+.bottom-actions-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: var(--space-sm);
+  padding: 20rpx var(--space-lg);
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: var(--bg-card-solid);
+  border-top: 1rpx solid var(--border);
+  z-index: 50;
+}
+
+.share-btn {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  line-height: 88rpx;
+}
+
+.bottom-actions-bar .btn {
+  flex: 1;
+}

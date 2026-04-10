@@ -1,0 +1,170 @@
+<!-- pages/vote/detail/detail.wxml -->
+<view class="page-vote-detail" wx:if="{{!loading}}">
+  <!-- 投票状态头部 — 深空渐变 -->
+  <view class="vote-header {{vote.status === 'active' ? 'vote-header-active' : 'vote-header-ended'}}">
+    <view class="tag {{statusTagClass}} vote-status-tag">{{statusLabel}}</view>
+    <view class="vote-title">{{vote.title}}</view>
+    <view class="vote-meta">
+      <text class="meta-item">核验等级：L{{vote.verificationLevel}}</text>
+      <text class="meta-divider">·</text>
+      <text class="meta-item">{{vote.voteType === 'double_majority' ? '双过半' : '双四分之三'}}</text>
+      <text class="meta-divider">·</text>
+      <text class="meta-item">{{vote.createdBy}}</text>
+    </view>
+  </view>
+
+  <!-- 倒计时（进行中时显示） — 发光警示 -->
+  <view class="countdown-bar" wx:if="{{vote.status === 'active'}}">
+    <view class="countdown-icon">⏰</view>
+    <view class="countdown-text glow-number">{{remainTime}}</view>
+    <view class="countdown-deadline">截止：{{vote.endTime}}</view>
+  </view>
+
+  <!-- 投票描述 -->
+  <view class="card">
+    <view class="card-title">投票说明</view>
+    <view class="vote-description">{{vote.description}}</view>
+    <view class="vote-time-info">
+      <text>开始：{{vote.startTime}}</text>
+      <text>结束：{{vote.endTime}}</text>
+    </view>
+  </view>
+
+  <!-- 参与进度 -->
+  <view class="card">
+    <view class="card-title">参与进度</view>
+    <view class="progress-section">
+      <view class="progress-row">
+        <text class="progress-label">户数参与</text>
+        <text class="progress-value">{{vote.participatedCount}} / {{vote.totalProperties}}户</text>
+      </view>
+      <view class="progress-bar">
+        <view class="progress-bar-fill" style="width: {{participationRate}}%"></view>
+      </view>
+      <view class="progress-percent">{{participationRate}}%</view>
+    </view>
+    <view class="progress-section">
+      <view class="progress-row">
+        <text class="progress-label">面积参与</text>
+        <text class="progress-value">{{vote.participatedArea}} / {{vote.totalArea}}㎡</text>
+      </view>
+      <view class="progress-bar">
+        <view class="progress-bar-fill" style="width: {{areaRate}}%; background: #52C41A;"></view>
+      </view>
+      <view class="progress-percent">{{areaRate}}%</view>
+    </view>
+  </view>
+
+  <!-- 投票选项 -->
+  <view class="card">
+    <view class="card-title">投票选项</view>
+    <view class="options-list">
+      <view 
+        wx:for="{{vote.options}}" 
+        wx:key="id"
+        class="option-item {{selectedOption === item.id ? 'option-selected' : ''}} {{hasVoted ? 'option-disabled' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onOptionSelect"
+      >
+        <view class="option-radio">
+          <view class="radio-inner {{selectedOption === item.id ? 'radio-checked' : ''}}"></view>
+        </view>
+        <view class="option-content">
+          <view class="option-label">{{item.label}}</view>
+          <!-- 实时结果（投票后或已结束时显示） -->
+          <view class="option-result" wx:if="{{hasVoted || vote.status === 'ended'}}">
+            <view class="result-bar-bg">
+              <view class="result-bar-fill" style="width: {{item.percentage}}%"></view>
+            </view>
+            <view class="result-stats">
+              <text>{{item.count}}票</text>
+              <text>{{item.percentage}}%</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 区块链存证（已结束时显示） -->
+  <view class="card" wx:if="{{vote.resultHash}}">
+    <view class="card-title">区块链存证</view>
+    <view class="chain-info">
+      <view class="chain-hash">
+        <text class="chain-label">存证哈希</text>
+        <text class="chain-value">{{vote.resultHash}}</text>
+      </view>
+      <view class="btn btn-ghost btn-sm" bindtap="onVerifyChain">验证存证</view>
+    </view>
+  </view>
+
+  <!-- 结果公示（已结束时显示） -->
+  <view class="card" wx:if="{{vote.status === 'ended' && vote.resultSummary}}">
+    <view class="card-title">投票结果</view>
+    <view class="result-summary">{{vote.resultSummary}}</view>
+    <view class="result-actions">
+      <view class="btn btn-ghost btn-sm" bindtap="onDownloadPDF">下载公示PDF</view>
+    </view>
+  </view>
+
+  <!-- 底部操作按钮 -->
+  <view class="bottom-actions" wx:if="{{vote.status === 'active'}}">
+    <view class="btn btn-primary btn-block" bindtap="onVoteTap">
+      {{canVote ? (hasVoted ? '已投票' : '参与投票') : '完成核验后投票'}}
+    </view>
+  </view>
+
+  <!-- 业委会操作 -->
+  <view class="bottom-actions" wx:if="{{vote.status === 'active' && currentRole === 'committee'}}">
+    <view class="btn btn-error btn-block" bindtap="onRevokeVote">撤销投票</view>
+  </view>
+
+  <!-- 投票确认弹窗 -->
+  <view class="modal-mask" wx:if="{{showVoteModal}}" bindtap="onCancelVote">
+    <view class="modal-content" catchtap>
+      <view class="modal-title">确认投票</view>
+      <view class="modal-body">
+        <view class="confirm-option">
+          您选择了：<text class="confirm-option-label">{{optionMap[selectedOption] || ''}}</text>
+        </view>
+        <view class="confirm-notice">
+          <text>⚠️ 投票为匿名提交，投票结果将写入区块链存证。在投票截止前您可以修改选择。</text>
+        </view>
+      </view>
+      <view class="modal-actions">
+        <view class="modal-btn modal-btn-cancel" bindtap="onCancelVote">取消</view>
+        <view class="modal-btn modal-btn-confirm" bindtap="onConfirmVote">确认提交</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 核验提示弹窗 -->
+  <view class="modal-mask" wx:if="{{showVerifyModal}}" bindtap="onCloseVerifyModal">
+    <view class="modal-content" catchtap>
+      <view class="modal-title">需要身份核验</view>
+      <view class="modal-body">
+        <view class="verify-notice">
+          本次投票需要完成 <text class="verify-level">L{{vote.verificationLevel}} {{verifyInfo.label}}</text> 核验才能参与。
+        </view>
+        <view class="verify-current">
+          您当前核验等级：L{{userVerifiedLevel}}
+        </view>
+        <view class="verify-desc">{{verifyInfo.desc}}</view>
+      </view>
+      <view class="modal-actions">
+        <view class="modal-btn modal-btn-cancel" bindtap="onCloseVerifyModal">稍后再说</view>
+        <view class="modal-btn modal-btn-confirm" bindtap="onGoVerify">去核验</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 加载骨架屏 -->
+<view class="skeleton-page" wx:if="{{loading}}">
+  <view class="skeleton" style="width: 100%; height: 200rpx;"></view>
+  <view class="card">
+    <view class="skeleton" style="width: 40%; height: 32rpx; margin-bottom: 24rpx;"></view>
+    <view class="skeleton" style="width: 100%; height: 24rpx; margin-bottom: 16rpx;"></view>
+    <view class="skeleton" style="width: 80%; height: 24rpx;"></view>
+  </view>
+</view>

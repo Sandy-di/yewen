@@ -1,0 +1,121 @@
+<!-- pages/finance/list/list.wxml -->
+<view class="page-finance">
+  <!-- 财务概览 — 仪表盘风格 -->
+  <view class="finance-overview">
+    <view class="finance-overview-bg"></view>
+    <view class="finance-overview-grid"></view>
+    <view class="overview-title">本月财务概览</view>
+    <view class="overview-grid">
+      <view class="overview-item">
+        <view class="overview-label">收入</view>
+        <view class="overview-value glow-number">{{summary.totalIncomeFormatted}}</view>
+      </view>
+      <view class="overview-divider"></view>
+      <view class="overview-item">
+        <view class="overview-label">支出</view>
+        <view class="overview-value glow-number">{{summary.totalExpenseFormatted}}</view>
+      </view>
+      <view class="overview-divider"></view>
+      <view class="overview-item">
+        <view class="overview-label">结余</view>
+        <view class="overview-value glow-number">{{summary.balanceFormatted}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收支模拟图表 -->
+  <view class="card card-glow-top" wx:if="{{!loading}}">
+    <view class="card-title">收支趋势</view>
+    <view class="chart-placeholder">
+      <view class="bar-chart">
+        <view class="bar-group">
+          <view class="bar bar-income" style="height: 80%;"></view>
+          <view class="bar bar-expense" style="height: 60%;"></view>
+          <view class="bar-label">2月</view>
+        </view>
+        <view class="bar-group">
+          <view class="bar bar-income" style="height: 90%;"></view>
+          <view class="bar bar-expense" style="height: 65%;"></view>
+          <view class="bar-label">3月</view>
+        </view>
+        <view class="bar-group">
+          <view class="bar bar-income" style="height: 70%;"></view>
+          <view class="bar bar-expense" style="height: 40%;"></view>
+          <view class="bar-label">4月</view>
+        </view>
+      </view>
+      <view class="chart-legend">
+        <view class="legend-item"><view class="legend-dot dot-income"></view><text>收入</text></view>
+        <view class="legend-item"><view class="legend-dot dot-expense"></view><text>支出</text></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 报表列表 -->
+  <view class="section-header">
+    <view class="section-title">收支报表</view>
+    <view class="section-action" wx:if="{{currentRole === 'property'}}" bindtap="onReportFinance">上报 +</view>
+  </view>
+  
+  <view wx:if="{{!loading}}">
+    <view 
+      wx:for="{{financeList}}" 
+      wx:key="reportId"
+      class="card finance-card fade-in-up"
+      style="animation-delay: {{index * 80}}ms"
+      data-id="{{item.reportId}}"
+      bindtap="onFinanceTap"
+    >
+      <view class="finance-card-header">
+        <view class="finance-month">{{item.month}}</view>
+        <view class="tag {{item.statusTagClass}}">{{item.statusLabel}}</view>
+      </view>
+      <view class="finance-card-body">
+        <view class="finance-stat">
+          <text class="finance-stat-label">收入</text>
+          <text class="finance-stat-value text-income glow-number">{{item.totalIncomeFormatted}}</text>
+        </view>
+        <view class="finance-stat">
+          <text class="finance-stat-label">支出</text>
+          <text class="finance-stat-value text-expense glow-number">{{item.totalExpenseFormatted}}</text>
+        </view>
+        <view class="finance-stat">
+          <text class="finance-stat-label">结余</text>
+          <text class="finance-stat-value glow-number">{{item.balanceFormatted}}</text>
+        </view>
+      </view>
+      <view class="finance-card-footer">
+        <text class="finance-meta">提交人：{{item.submittedBy}}</text>
+        <text class="finance-action">查看明细 →</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 最近公告 -->
+  <view class="section-header">
+    <view class="section-title">社区公告</view>
+    <view class="section-action" bindtap="onViewAllAnnouncements">全部 →</view>
+  </view>
+
+  <view class="card" wx:if="{{announcements.length > 0}}">
+    <view 
+      wx:for="{{announcements}}" 
+      wx:key="id"
+      class="announce-item"
+      data-id="{{item.id}}"
+      bindtap="onAnnounceTap"
+    >
+      <view class="announce-badge" wx:if="{{item.isTop}}">置顶</view>
+      <view class="announce-title">{{item.title}}</view>
+      <view class="announce-meta">{{item.publisherName}} · {{item.createdAt}}</view>
+    </view>
+  </view>
+
+  <!-- 骨架屏 -->
+  <view wx:if="{{loading}}" class="skeleton-list">
+    <view class="card" wx:for="{{[1,2]}}" wx:key="*this">
+      <view class="skeleton" style="width: 40%; height: 32rpx; margin-bottom: 20rpx;"></view>
+      <view class="skeleton" style="width: 100%; height: 24rpx;"></view>
+    </view>
+  </view>
+</view>

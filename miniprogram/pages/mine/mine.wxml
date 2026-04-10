@@ -1,0 +1,85 @@
+<!-- pages/mine/mine.wxml -->
+<view class="page-mine">
+  <!-- 用户信息头部 — 深空渐变 -->
+  <view class="user-header">
+    <view class="user-header-bg"></view>
+    <view class="user-header-grid"></view>
+    <view class="user-info" bindtap="onAvatarTap">
+      <view class="user-avatar">
+        <text class="avatar-text">{{userInfo.nickname ? userInfo.nickname[0] : '用'}}</text>
+      </view>
+      <view class="user-detail">
+        <view class="user-name">{{userInfo.nickname || '未登录'}}</view>
+        <view class="user-role">
+          <view class="role-tag">
+            <view class="role-tag-dot"></view>
+            <text>{{roleLabel}}</text>
+          </view>
+          <view class="verify-tag verify-l{{verifiedLevel}}">L{{verifiedLevel}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 房产信息 -->
+  <view class="card" wx:if="{{properties.length > 0}}">
+    <view class="card-title">我的房产</view>
+    <view class="property-list">
+      <view wx:for="{{properties}}" wx:key="propertyId" class="property-item">
+        <view class="property-main">
+          <view class="property-name">{{item.building}}{{item.unit}}{{item.roomNo}}</view>
+          <view class="property-area">{{item.usableArea}}㎡</view>
+        </view>
+        <view class="tag {{item.isDefault ? 'tag-primary' : 'tag-grey'}}">{{item.isDefault ? '默认' : '其他'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="card">
+    <view class="menu-list">
+      <view 
+        wx:for="{{menuList}}" 
+        wx:key="id"
+        class="menu-item"
+        data-menu="{{item}}"
+        bindtap="onMenuTap"
+      >
+        <view class="menu-icon">{{item.icon}}</view>
+        <view class="menu-label">{{item.label}}</view>
+        <view class="menu-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理功能（特定角色可见） -->
+  <view class="card card-glow-top" wx:if="{{currentRole === 'property' || currentRole === 'committee'}}">
+    <view class="card-title">管理功能</view>
+    <view class="menu-list">
+      <view 
+        wx:for="{{adminMenuList}}" 
+        wx:key="id"
+        class="menu-item"
+        data-menu="{{item}}"
+        bindtap="onAdminMenuTap"
+        wx:if="{{(currentRole === item.role) || (item.role === 'committee' && currentRole === 'committee')}}"
+      >
+        <view class="menu-icon">{{item.icon}}</view>
+        <view class="menu-label">{{item.label}}</view>
+        <view class="menu-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 社区信息 -->
+  <view class="card">
+    <view class="community-info-row">
+      <text class="community-label">所属小区</text>
+      <text class="community-value">翠湖花园</text>
+    </view>
+    <view class="community-info-row">
+      <text class="community-label">小区地址</text>
+      <text class="community-value">杭州市西湖区翠湖路88号</text>
+    </view>
+  </view>
+</view>

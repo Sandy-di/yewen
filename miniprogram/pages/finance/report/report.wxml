@@ -1,0 +1,63 @@
+<!-- pages/finance/report/report.wxml -->
+<view class="page-finance-report">
+  <view class="container">
+    <!-- 月份选择 -->
+    <view class="card">
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 报表月份</view>
+        <view class="form-picker" bindtap="toggleMonthPicker">
+          <view class="form-picker-value">{{form.reportMonth || '请选择月份'}}</view>
+          <view class="form-picker-arrow">📅</view>
+        </view>
+        <picker mode="date" fields="month" value="{{form.reportMonth}}" bindchange="onMonthChange" wx:if="{{monthPickerVisible}}">
+        </picker>
+      </view>
+    </view>
+
+    <!-- 收支类型切换 -->
+    <view class="type-tabs">
+      <view class="type-tab {{currentTab === 'income' ? 'type-tab-active income-active' : ''}}" data-tab="income" bindtap="onTabChange">收入</view>
+      <view class="type-tab {{currentTab === 'expense' ? 'type-tab-active expense-active' : ''}}" data-tab="expense" bindtap="onTabChange">支出</view>
+    </view>
+
+    <!-- 收支条目列表 -->
+    <view class="card">
+      <view class="items-list">
+        <view wx:for="{{form.items}}" wx:key="index" class="item-form">
+          <view class="item-form-header">
+            <view class="item-type-badge {{item.itemType === 'income' ? 'badge-income' : 'badge-expense'}}">
+              {{item.itemType === 'income' ? '收' : '支'}}
+            </view>
+            <text class="item-form-index">第{{index + 1}}条</text>
+            <view class="item-remove" data-idx="{{index}}" bindtap="onRemoveItem" wx:if="{{form.items.length > 1}}">✕</view>
+          </view>
+          <view class="item-form-body">
+            <view class="form-group">
+              <view class="form-label">类别</view>
+              <input class="form-input" placeholder="如：物业费、维修费" value="{{item.category}}" data-idx="{{index}}" bindinput="onCategoryInput" maxlength="30" />
+            </view>
+            <view class="form-group">
+              <view class="form-label">金额（元）</view>
+              <input class="form-input" type="digit" placeholder="0.00" value="{{item.amount}}" data-idx="{{index}}" bindinput="onAmountInput" />
+            </view>
+            <view class="form-group">
+              <view class="form-label">说明</view>
+              <input class="form-input" placeholder="补充说明（选填）" value="{{item.description}}" data-idx="{{index}}" bindinput="onDescInput" maxlength="200" />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="add-item-btn" bindtap="onAddItem">
+        <text>+ 添加收支记录</text>
+      </view>
+    </view>
+
+    <!-- 提交 -->
+    <view class="submit-section">
+      <view class="btn btn-primary btn-block" bindtap="onSubmit" disabled="{{submitting}}">
+        {{submitting ? '正在提交...' : '提交报表'}}
+      </view>
+    </view>
+  </view>
+</view>

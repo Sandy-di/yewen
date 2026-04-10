@@ -1,0 +1,10 @@
+/* packageAdmin/pages/vote-manage/vote-manage.wxss — 深空科技风格 */
+.page-vote-manage { min-height: 100vh; background: var(--bg-page); padding-bottom: 140rpx; }
+.page-vote-manage .tabs-pill-custom { margin: var(--space-md) var(--space-lg); background: rgba(255,255,255,0.04); border: 1rpx solid var(--border); display: flex; border-radius: var(--radius-lg); padding: 6rpx; }
+.page-vote-manage .tab-item { flex: 1; text-align: center; height: 64rpx; line-height: 64rpx; font-size: 26rpx; color: var(--text-secondary); border-radius: var(--radius-md); transition: all 0.25s; }
+.page-vote-manage .tab-item-active { color: #fff; background: var(--gradient-btn); font-weight: 600; box-shadow: var(--glow-primary); }
+.vote-list { padding: var(--space-md) var(--space-lg); }
+.vote-card { margin-bottom: var(--space-sm); }
+.vote-header { display: flex; align-items: center; gap: 12rpx; margin-bottom: 12rpx; }
+.vote-title { font-size: 30rpx; font-weight: 700; flex: 1; color: var(--text-primary); }
+.vote-meta { font-size: 24rpx; color: var(--text-secondary); margin-bottom: 4rpx; }

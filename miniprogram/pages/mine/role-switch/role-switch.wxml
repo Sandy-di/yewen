@@ -1,0 +1,24 @@
+<!-- pages/mine/role-switch/role-switch.wxml -->
+<view class="page-role-switch">
+  <view class="container">
+    <view class="switch-notice">
+      <text>⚠️ 角色切换仅用于演示和调试，实际使用时角色由系统根据身份自动分配。</text>
+    </view>
+    <view class="role-list">
+      <view 
+        wx:for="{{roles}}" 
+        wx:key="key"
+        class="card role-card {{currentRole === item.key ? 'role-active' : ''}}"
+        data-role="{{item.key}}"
+        bindtap="onRoleSelect"
+      >
+        <view class="role-icon">{{item.icon}}</view>
+        <view class="role-info">
+          <view class="role-name">{{item.label}}</view>
+          <view class="role-desc">{{item.desc}}</view>
+        </view>
+        <view class="role-check" wx:if="{{currentRole === item.key}}">✓</view>
+      </view>
+    </view>
+  </view>
+</view>

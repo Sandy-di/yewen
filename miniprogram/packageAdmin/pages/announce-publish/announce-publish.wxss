@@ -1,0 +1,8 @@
+/* packageAdmin/pages/announce-publish/announce-publish.wxss — 深空科技风格 */
+.page-announce-publish { min-height: 100vh; background: var(--bg-page); }
+.type-options { display: flex; gap: 12rpx; }
+.type-opt { padding: 12rpx 24rpx; border: 1rpx solid var(--border); border-radius: var(--radius-lg); font-size: 26rpx; color: var(--text-secondary); transition: all 0.2s ease; }
+.type-opt-active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); box-shadow: 0 0 12rpx rgba(0,229,255,0.15); }
+.setting-item { display: flex; justify-content: space-between; align-items: center; }
+.setting-label { font-size: 28rpx; color: var(--text-primary); }
+.submit-section { padding: 40rpx 0; }

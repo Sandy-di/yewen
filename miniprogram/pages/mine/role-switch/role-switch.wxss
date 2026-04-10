@@ -1,0 +1,10 @@
+/* pages/mine/role-switch/role-switch.wxss — 深空科技风格 */
+.page-role-switch { min-height: 100vh; background: var(--bg-page); }
+.switch-notice { padding: var(--space-sm) var(--space-md); background: var(--warning-light); border: 1rpx solid rgba(255,215,64,0.2); font-size: 24rpx; color: var(--warning); border-radius: var(--radius-sm); margin-bottom: var(--space-lg); line-height: 1.6; }
+.role-card { display: flex; align-items: center; gap: 20rpx; margin-bottom: var(--space-sm); border: 1rpx solid var(--border); }
+.role-active { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 16rpx rgba(0,229,255,0.15); }
+.role-icon { font-size: 48rpx; }
+.role-info { flex: 1; }
+.role-name { font-size: 30rpx; font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-xs); }
+.role-desc { font-size: 24rpx; color: var(--text-secondary); line-height: 1.5; }
+.role-check { font-size: 32rpx; color: var(--primary); font-weight: 700; text-shadow: 0 0 8rpx rgba(0,229,255,0.3); }

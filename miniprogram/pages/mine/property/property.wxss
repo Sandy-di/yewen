@@ -1,0 +1,7 @@
+/* pages/mine/property/property.wxss — 深空科技风格 */
+.page-property { min-height: 100vh; background: var(--bg-page); }
+.property-card { margin-bottom: var(--space-sm); }
+.property-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rpx; }
+.property-name { font-size: 32rpx; font-weight: 700; color: var(--text-primary); }
+.property-info { font-size: 26rpx; color: var(--text-secondary); margin-bottom: 12rpx; }
+.property-actions { display: flex; gap: 12rpx; }

@@ -1,0 +1,11 @@
+/* packageAdmin/pages/finance-approve/finance-approve.wxss — 深空科技风格 */
+.page-finance-approve { min-height: 100vh; background: var(--bg-page); }
+.approve-card { margin-bottom: var(--space-sm); }
+.approve-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); }
+.approve-month { font-size: 32rpx; font-weight: 700; color: var(--text-primary); }
+.approve-body { margin-bottom: 12rpx; }
+.approve-stat { font-size: 26rpx; color: var(--text-secondary); margin-bottom: 4rpx; }
+.text-income { color: var(--success); font-weight: 700; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace; font-variant-numeric: tabular-nums; text-shadow: 0 0 8rpx rgba(0,230,118,0.3); }
+.text-expense { color: var(--error); font-weight: 700; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace; font-variant-numeric: tabular-nums; text-shadow: 0 0 8rpx rgba(255,82,82,0.3); }
+.approve-meta { font-size: 22rpx; color: var(--text-disabled); margin-bottom: var(--space-sm); }
+.approve-actions { display: flex; gap: var(--space-sm); padding-top: var(--space-sm); border-top: 1rpx solid var(--border); }

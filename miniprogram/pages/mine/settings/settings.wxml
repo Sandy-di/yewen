@@ -1,0 +1,52 @@
+<!-- pages/mine/settings/settings.wxml -->
+<view class="page-settings">
+  <view class="container">
+    <view class="card">
+      <view class="card-title">消息通知</view>
+      <view class="setting-item">
+        <view class="setting-info">
+          <view class="setting-label">接收通知</view>
+          <view class="setting-desc">开启后可收到投票、报修等通知</view>
+        </view>
+        <switch checked="{{settings.notification}}" data-key="notification" bindchange="onSwitchChange" color="#00E5FF" />
+      </view>
+      <view class="setting-item">
+        <view class="setting-info">
+          <view class="setting-label">投票提醒</view>
+          <view class="setting-desc">有新投票时通知您</view>
+        </view>
+        <switch checked="{{settings.voteReminder}}" data-key="voteReminder" bindchange="onSwitchChange" color="#00E5FF" />
+      </view>
+      <view class="setting-item">
+        <view class="setting-info">
+          <view class="setting-label">报修进度</view>
+          <view class="setting-desc">报修状态变更时通知您</view>
+        </view>
+        <switch checked="{{settings.repairNotify}}" data-key="repairNotify" bindchange="onSwitchChange" color="#00E5FF" />
+      </view>
+      <view class="setting-item">
+        <view class="setting-info">
+          <view class="setting-label">财务公示</view>
+          <view class="setting-desc">新财务报表公示时通知您</view>
+        </view>
+        <switch checked="{{settings.financeNotify}}" data-key="financeNotify" bindchange="onSwitchChange" color="#00E5FF" />
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-title">其他</view>
+      <view class="setting-item" bindtap="onClearCache">
+        <view class="setting-info">
+          <view class="setting-label">清除缓存</view>
+        </view>
+        <view class="setting-arrow">›</view>
+      </view>
+      <view class="setting-item" bindtap="onAbout">
+        <view class="setting-info">
+          <view class="setting-label">关于</view>
+        </view>
+        <view class="setting-arrow">›</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,199 @@
+/* pages/repair/detail/detail.wxss — 深空科技风格 */
+
+.page-repair-detail {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+}
+
+/* 状态头部 — 深空渐变 */
+.status-header {
+  display: flex;
+  align-items: center;
+  padding: var(--space-lg);
+  color: #FFFFFF;
+  gap: 20rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.status-submitted { background: linear-gradient(135deg, #0A1628 0%, #1B3A5C 100%); }
+.status-accepted { background: linear-gradient(135deg, #0A1628 0%, #1B3A5C 100%); }
+.status-processing { background: linear-gradient(135deg, #0A1628 0%, #1B3A5C 50%, #2D1B69 100%); }
+.status-pending_check { background: linear-gradient(135deg, #0A1628 0%, #2D1B69 100%); }
+.status-completed { background: linear-gradient(135deg, #0A1628 0%, #0D3320 100%); }
+.status-rework { background: linear-gradient(135deg, #0A1628 0%, #3D0A0A 100%); }
+
+.status-icon {
+  font-size: 48rpx;
+}
+
+.status-info {
+  flex: 1;
+}
+
+.status-label {
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.status-time {
+  font-size: 24rpx;
+  opacity: 0.7;
+  margin-top: 4rpx;
+}
+
+/* 信息列表 */
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.info-value {
+  font-size: 26rpx;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.repair-desc {
+  margin-bottom: 20rpx;
+}
+
+.desc-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 12rpx;
+}
+
+.desc-content {
+  font-size: 28rpx;
+  color: var(--text-primary);
+  line-height: 1.8;
+}
+
+/* 照片网格 */
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.repair-photo {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: var(--radius-sm);
+  border: 1rpx solid var(--border);
+}
+
+/* 接单信息 */
+.worker-info {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.worker-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: rgba(0, 229, 255, 0.12);
+  border: 1rpx solid rgba(0, 229, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+}
+
+.worker-detail {
+  flex: 1;
+}
+
+.worker-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.worker-time {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-top: 4rpx;
+}
+
+/* 评价 */
+.rating-stars {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: 12rpx;
+}
+
+.star {
+  font-size: 32rpx;
+  color: var(--text-disabled);
+}
+
+.star-active {
+  color: var(--warning);
+  text-shadow: 0 0 8rpx rgba(255, 215, 64, 0.3);
+}
+
+.rating-comment {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.rating-stars-large {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.star-lg {
+  font-size: 56rpx;
+  color: var(--text-disabled);
+}
+
+.star-lg-active {
+  color: var(--warning);
+  text-shadow: 0 0 12rpx rgba(255, 215, 64, 0.3);
+}
+
+.completion-note {
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+/* 底部操作 */
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: var(--space-sm);
+  padding: 20rpx var(--space-lg);
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: var(--bg-card-solid);
+  border-top: 1rpx solid var(--border);
+  z-index: 50;
+}
+
+.bottom-actions .btn {
+  flex: 1;
+}

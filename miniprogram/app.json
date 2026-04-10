@@ -1,0 +1,73 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/vote/detail/detail",
+    "pages/vote/create/create",
+    "pages/vote/verify/verify",
+    "pages/vote/result/result",
+    "pages/repair/list/list",
+    "pages/repair/detail/detail",
+    "pages/repair/create/create",
+    "pages/finance/list/list",
+    "pages/finance/detail/detail",
+    "pages/finance/report/report",
+    "pages/announce/list/list",
+    "pages/announce/detail/detail",
+    "pages/mine/mine",
+    "pages/mine/property/property",
+    "pages/mine/settings/settings",
+    "pages/mine/role-switch/role-switch"
+  ],
+  "subPackages": [
+    {
+      "root": "packageAdmin",
+      "pages": [
+        "pages/vote-manage/vote-manage",
+        "pages/work-order/work-order",
+        "pages/finance-approve/finance-approve",
+        "pages/announce-publish/announce-publish"
+      ]
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#0D1B2A",
+    "navigationBarTitleText": "智慧社区",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0D1B2A"
+  },
+  "tabBar": {
+    "color": "#8899AA",
+    "selectedColor": "#00E5FF",
+    "backgroundColor": "#0F2136",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "assets/icons/home.png",
+        "selectedIconPath": "assets/icons/home-active.png"
+      },
+      {
+        "pagePath": "pages/repair/list/list",
+        "text": "报修",
+        "iconPath": "assets/icons/repair.png",
+        "selectedIconPath": "assets/icons/repair-active.png"
+      },
+      {
+        "pagePath": "pages/finance/list/list",
+        "text": "公示",
+        "iconPath": "assets/icons/finance.png",
+        "selectedIconPath": "assets/icons/finance-active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "assets/icons/mine.png",
+        "selectedIconPath": "assets/icons/mine-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

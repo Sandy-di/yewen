@@ -1,0 +1,95 @@
+<!-- pages/vote/result/result.wxml -->
+<view class="page-result" wx:if="{{!loading}}">
+  <!-- 结果头部 -->
+  <view class="result-header {{passed ? 'result-pass' : 'result-fail'}}">
+    <view class="result-badge">{{passed ? '✅' : '❌'}}</view>
+    <view class="result-title">{{passed ? '投票通过' : '投票未通过'}}</view>
+    <view class="result-vote-name">{{vote.title}}</view>
+  </view>
+
+  <!-- 参与统计 -->
+  <view class="card">
+    <view class="card-title">参与统计</view>
+    <view class="stats-grid">
+      <view class="stat-box">
+        <view class="stat-value">{{participationRate}}%</view>
+        <view class="stat-label">户数参与率</view>
+        <view class="stat-detail">{{vote.participatedCount}}/{{vote.totalProperties}}户</view>
+      </view>
+      <view class="stat-box">
+        <view class="stat-value">{{areaRate}}%</view>
+        <view class="stat-label">面积参与率</view>
+        <view class="stat-detail">{{vote.participatedArea}}/{{vote.totalArea}}㎡</view>
+      </view>
+    </view>
+
+    <!-- 法定标准对比 -->
+    <view class="standard-compare">
+      <view class="compare-row">
+        <text class="compare-label">表决类型</text>
+        <text class="compare-value">{{vote.voteType === 'double_majority' ? '双过半' : '双四分之三'}}</text>
+      </view>
+      <view class="compare-row">
+        <text class="compare-label">户数达标</text>
+        <text class="compare-value {{participationRate >= (vote.voteType === 'double_majority' ? 50 : 75) ? 'compare-pass' : 'compare-fail'}}">
+          {{participationRate >= (vote.voteType === 'double_majority' ? 50 : 75) ? '✓ 达标' : '✗ 未达标'}}
+        </text>
+      </view>
+      <view class="compare-row">
+        <text class="compare-label">面积达标</text>
+        <text class="compare-value {{areaRate >= (vote.voteType === 'double_majority' ? 50 : 75) ? 'compare-pass' : 'compare-fail'}}">
+          {{areaRate >= (vote.voteType === 'double_majority' ? 50 : 75) ? '✓ 达标' : '✗ 未达标'}}
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 投票详情 -->
+  <view class="card">
+    <view class="card-title">投票详情</view>
+    <view class="result-options">
+      <view wx:for="{{optionPercentages}}" wx:key="id" class="result-option-item">
+        <view class="result-option-header">
+          <text class="result-option-label">{{item.label}}</text>
+          <text class="result-option-percent">{{item.percentage}}%</text>
+        </view>
+        <view class="result-option-bar">
+          <view class="result-option-fill" style="width: {{item.percentage}}%"></view>
+        </view>
+        <view class="result-option-detail">
+          <text>{{item.count}}票 · {{item.area}}㎡</text>
+          <text>面积占比 {{item.areaPercentage}}%</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 区块链存证 -->
+  <view class="card" wx:if="{{vote.resultHash}}">
+    <view class="card-title">区块链存证</view>
+    <view class="chain-info-row">
+      <text class="chain-label">存证哈希</text>
+      <text class="chain-hash">{{vote.resultHash}}</text>
+    </view>
+    <view class="chain-info-row">
+      <text class="chain-label">存证时间</text>
+      <text class="chain-value">{{vote.endTime}}</text>
+    </view>
+    <view class="chain-actions">
+      <view class="btn btn-ghost btn-sm" bindtap="onVerifyChain">验证存证</view>
+      <view class="btn btn-ghost btn-sm" bindtap="onDownloadPDF">下载公示PDF</view>
+    </view>
+  </view>
+
+  <!-- 结果说明 -->
+  <view class="card" wx:if="{{vote.resultSummary}}">
+    <view class="card-title">结果说明</view>
+    <view class="result-summary-text">{{vote.resultSummary}}</view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="bottom-actions-bar">
+    <view class="btn btn-ghost" bindtap="onDownloadPDF">下载PDF</view>
+    <button class="btn btn-primary share-btn" open-type="share">分享结果</button>
+  </view>
+</view>

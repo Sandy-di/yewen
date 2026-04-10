@@ -1,0 +1,24 @@
+<!-- packageAdmin/pages/finance-approve/finance-approve.wxml -->
+<view class="page-finance-approve">
+  <view style="padding: 24rpx 32rpx;" wx:if="{{!loading}}">
+    <view wx:for="{{pendingList}}" wx:key="reportId" class="card approve-card">
+      <view class="approve-header">
+        <view class="approve-month">{{item.month}}</view>
+        <view class="tag tag-warning">待审批</view>
+      </view>
+      <view class="approve-body">
+        <view class="approve-stat"><text>收入：</text><text class="text-income">{{item.totalIncomeFormatted}}</text></view>
+        <view class="approve-stat"><text>支出：</text><text class="text-expense">{{item.totalExpenseFormatted}}</text></view>
+      </view>
+      <view class="approve-meta">提交人：{{item.submittedBy}} · {{item.submittedAt}}</view>
+      <view class="approve-actions">
+        <view class="btn btn-ghost btn-sm" data-id="{{item.reportId}}" bindtap="onReject">退回修改</view>
+        <view class="btn btn-primary btn-sm" data-id="{{item.reportId}}" bindtap="onApprove">审批通过</view>
+      </view>
+    </view>
+    <view class="empty-state" wx:if="{{pendingList.length === 0}}">
+      <view class="empty-state-icon">✅</view>
+      <view class="empty-state-title">暂无待审批报表</view>
+    </view>
+  </view>
+</view>

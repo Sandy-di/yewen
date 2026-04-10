@@ -1,0 +1,10 @@
+/* pages/mine/settings/settings.wxss — 深空科技风格 */
+.page-settings { min-height: 100vh; background: var(--bg-page); }
+.setting-item { display: flex; align-items: center; justify-content: space-between; padding: 20rpx 0; border-bottom: 1rpx solid var(--border); transition: background 0.15s; }
+.setting-item:last-child { border-bottom: none; }
+.setting-item:active { background: rgba(0,229,255,0.04); }
+.setting-info { flex: 1; }
+.setting-label { font-size: 28rpx; color: var(--text-primary); margin-bottom: 4rpx; font-weight: 500; }
+.setting-desc { font-size: 22rpx; color: var(--text-secondary); }
+.setting-arrow { font-size: 28rpx; color: var(--text-disabled); padding-left: var(--space-sm); transition: transform 0.15s; }
+.setting-item:active .setting-arrow { transform: translateX(4rpx); color: var(--primary); }

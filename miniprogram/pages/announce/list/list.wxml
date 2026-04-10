@@ -1,0 +1,58 @@
+<!-- pages/announce/list/list.wxml -->
+<view class="page-announce-list">
+  <!-- Tab切换 — 药丸式 -->
+  <view class="tabs-pill tabs-pill-custom">
+    <view 
+      wx:for="{{tabs}}" 
+      wx:key="key"
+      class="tab-item {{currentTab === item.key ? 'tab-item-active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTabChange"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <!-- 公告列表 -->
+  <view class="announce-list" wx:if="{{!loading}}">
+    <view 
+      wx:for="{{announcements}}" 
+      wx:key="id"
+      class="card announce-card fade-in"
+      data-id="{{item.id}}"
+      bindtap="onAnnounceTap"
+    >
+      <view class="announce-card-header">
+        <view class="announce-badge announce-badge-{{item.type}}" wx:if="{{item.isTop}}">置顶</view>
+        <view class="announce-type-icon">
+          <text wx:if="{{item.type === 'notice'}}">📋</text>
+          <text wx:elif="{{item.type === 'vote'}}">🗳️</text>
+          <text wx:elif="{{item.type === 'finance'}}">💰</text>
+        </view>
+        <view class="announce-card-title">{{item.title}}</view>
+      </view>
+      <view class="announce-card-content">{{item.content}}</view>
+      <view class="announce-card-footer">
+        <text class="announce-publisher">{{item.publisherName}}</text>
+        <text class="announce-time">{{item.createdAt}}</text>
+        <text class="announce-reads">{{item.readCount}}人已读</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{announcements.length === 0}}">
+      <view class="empty-state-icon">📢</view>
+      <view class="empty-state-title">暂无公告</view>
+      <view class="empty-state-desc">目前没有此类公告</view>
+    </view>
+  </view>
+
+  <!-- 骨架屏 -->
+  <view wx:if="{{loading}}" class="skeleton-list" style="padding: 24rpx 32rpx;">
+    <view class="card" wx:for="{{[1,2,3]}}" wx:key="*this">
+      <view class="skeleton" style="width: 60%; height: 32rpx; margin-bottom: 20rpx;"></view>
+      <view class="skeleton" style="width: 100%; height: 24rpx; margin-bottom: 16rpx;"></view>
+      <view class="skeleton" style="width: 40%; height: 16rpx;"></view>
+    </view>
+  </view>
+</view>

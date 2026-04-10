@@ -1,0 +1,80 @@
+/* pages/announce/detail/detail.wxss — 深空科技风格 */
+
+.page-announce-detail {
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.announce-header {
+  padding: var(--space-lg);
+  background: var(--bg-card-solid);
+  margin-bottom: var(--space-md);
+  border-bottom: 1rpx solid var(--border);
+}
+
+.announce-title {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin-bottom: 20rpx;
+  letter-spacing: -0.3px;
+}
+
+.announce-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.meta-publisher {
+  font-weight: 600;
+}
+
+.announce-body {
+  margin: 0 var(--space-lg);
+}
+
+.announce-content {
+  font-size: 30rpx;
+  line-height: 2;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+.share-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx var(--space-lg);
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: var(--bg-card-solid);
+  border-top: 1rpx solid var(--border);
+}
+
+.share-btn {
+  width: 100%;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-btn);
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: none;
+  box-shadow: var(--glow-primary);
+}
+
+.share-btn::after {
+  border: none;
+}

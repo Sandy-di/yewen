@@ -1,0 +1,29 @@
+<!-- pages/announce/detail/detail.wxml -->
+<view class="page-announce-detail" wx:if="{{!loading && announcement}}">
+  <!-- 公告头部 -->
+  <view class="announce-header">
+    <view class="announce-title">{{announcement.title}}</view>
+    <view class="announce-meta">
+      <view class="meta-row">
+        <text class="meta-publisher">{{announcement.publisherName}}</text>
+        <text class="meta-type">{{announcement.publisher}}</text>
+      </view>
+      <view class="meta-row">
+        <text class="meta-time">{{announcement.createdAt}}</text>
+        <text class="meta-reads">{{announcement.readCount}}人已读</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 公告正文 -->
+  <view class="card announce-body">
+    <view class="announce-content">{{announcement.content}}</view>
+  </view>
+
+  <!-- 底部分享 -->
+  <view class="share-bar">
+    <button class="share-btn" open-type="share">
+      📤 分享公告
+    </button>
+  </view>
+</view>

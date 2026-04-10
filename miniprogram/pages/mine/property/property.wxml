@@ -1,0 +1,50 @@
+<!-- pages/mine/property/property.wxml -->
+<view class="page-property">
+  <view class="container">
+    <view class="property-list">
+      <view wx:for="{{properties}}" wx:key="propertyId" class="card property-card">
+        <view class="property-header">
+          <view class="property-name">{{item.building}}{{item.unit}}{{item.roomNo}}</view>
+          <view class="tag {{item.isDefault ? 'tag-primary' : 'tag-grey'}}">{{item.isDefault ? '默认' : '其他'}}</view>
+        </view>
+        <view class="property-info">
+          <text>建筑面积：{{item.usableArea}}㎡</text>
+        </view>
+        <view class="property-actions" wx:if="{{!item.isDefault}}">
+          <view class="btn btn-ghost btn-sm" data-idx="{{index}}" bindtap="onSetDefault">设为默认</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="btn btn-primary btn-block" bindtap="onAddProperty" style="margin-top: 24rpx;">+ 添加房产</view>
+
+    <!-- 添加房产弹窗 -->
+    <view class="modal-mask" wx:if="{{showAddForm}}" bindtap="onCloseForm">
+      <view class="modal-content" catchtap>
+        <view class="modal-title">添加房产</view>
+        <view class="modal-body">
+          <view class="form-group">
+            <view class="form-label">楼栋</view>
+            <input class="form-input" placeholder="如：3栋" data-field="building" bindinput="onFormInput" />
+          </view>
+          <view class="form-group">
+            <view class="form-label">单元</view>
+            <input class="form-input" placeholder="如：1单元" data-field="unit" bindinput="onFormInput" />
+          </view>
+          <view class="form-group">
+            <view class="form-label">房号</view>
+            <input class="form-input" placeholder="如：502" data-field="roomNo" bindinput="onFormInput" />
+          </view>
+          <view class="form-group">
+            <view class="form-label">面积（㎡）</view>
+            <input class="form-input" type="digit" placeholder="如：89.5" data-field="area" bindinput="onFormInput" />
+          </view>
+        </view>
+        <view class="modal-actions">
+          <view class="modal-btn modal-btn-cancel" bindtap="onCloseForm">取消</view>
+          <view class="modal-btn modal-btn-confirm" bindtap="onSubmitProperty">确认添加</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

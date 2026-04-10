@@ -1,0 +1,104 @@
+// pages/finance/detail/detail.js
+const { mockApi } = require('../../../utils/mock-data')
+const { formatMoney, formatDate } = require('../../../utils/util')
+
+Page({
+  data: {
+    reportId: '',
+    report: null,
+    loading: true,
+    incomeItems: [],
+    expenseItems: [],
+    totalIncome: 0,
+    totalExpense: 0,
+    incomeCategories: [],
+    expenseCategories: []
+  },
+
+  onLoad(options) {
+    this.setData({ reportId: options.reportId })
+    this.loadDetail()
+  },
+
+  async loadDetail() {
+    try {
+      const report = await mockApi.getFinanceDetail(this.data.reportId)
+      if (!report) return
+
+      const incomeItems = report.items.filter(i => i.itemType === 'income')
+      const expenseItems = report.items.filter(i => i.itemType === 'expense')
+      
+      // 按类别汇总
+      const incomeCategories = this.groupByCategory(incomeItems)
+      const expenseCategories = this.groupByCategory(expenseItems)
+
+      this.setData({
+        report,
+        loading: false,
+        incomeItems,
+        expenseItems,
+        totalIncome: formatMoney(report.totalIncome),
+        totalExpense: formatMoney(report.totalExpense),
+        incomeCategories,
+        expenseCategories
+      })
+      this.addFormattedFields()
+    } catch (e) {
+      console.error('加载财务详情失败', e)
+      this.setData({ loading: false })
+    }
+  },
+
+  groupByCategory(items) {
+    const map = {}
+    items.forEach(item => {
+      if (!map[item.category]) {
+        map[item.category] = { category: item.category, amount: 0, count: 0 }
+      }
+      map[item.category].amount += item.amount
+      map[item.category].count++
+    })
+    return Object.values(map).sort((a, b) => b.amount - a.amount)
+  },
+
+  addFormattedFields() {
+    // WXML 不支持 .toFixed()，必须在 JS 中预处理
+    const { report, incomeItems, expenseItems, incomeCategories, expenseCategories } = this.data
+    
+    const processedReport = {
+      ...report,
+      totalIncomeFmt: formatMoney(report.totalIncome),
+      totalExpenseFmt: formatMoney(report.totalExpense)
+    }
+    
+    const processedIncomeItems = incomeItems.map(item => ({
+      ...item,
+      amountFmt: '¥' + item.amount.toFixed(2)
+    }))
+    
+    const processedExpenseItems = expenseItems.map(item => ({
+      ...item,
+      amountFmt: '¥' + item.amount.toFixed(2)
+    }))
+    
+    const processedIncomeCategories = incomeCategories.map(item => ({
+      ...item,
+      amountFmt: '¥' + item.amount.toFixed(2),
+      percent: report.totalIncome > 0 ? (item.amount / report.totalIncome * 100).toFixed(0) : 0
+    }))
+    
+    const processedExpenseCategories = expenseCategories.map(item => ({
+      ...item,
+      amountFmt: '¥' + item.amount.toFixed(2),
+      percent: report.totalExpense > 0 ? (item.amount / report.totalExpense * 100).toFixed(0) : 0
+    }))
+    
+    this.setData({
+      report: processedReport,
+      incomeItems: processedIncomeItems,
+      expenseItems: processedExpenseItems,
+      incomeCategories: processedIncomeCategories,
+      expenseCategories: processedExpenseCategories
+    })
+  }
+})

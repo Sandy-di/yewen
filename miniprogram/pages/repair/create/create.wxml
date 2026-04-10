@@ -1,0 +1,98 @@
+<!-- pages/repair/create/create.wxml -->
+<view class="page-repair-create">
+  <view class="container">
+    <!-- 报修类型 -->
+    <view class="card">
+      <view class="card-title">报修类型</view>
+      <view class="category-grid">
+        <view 
+          wx:for="{{categories}}" 
+          wx:key="value"
+          class="category-item {{selectedCategory.value === item.value ? 'category-active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="onCategorySelect"
+        >
+          <view class="category-icon">{{item.icon}}</view>
+          <view class="category-label">{{item.label}}</view>
+        </view>
+      </view>
+
+      <!-- 子分类选择 -->
+      <view class="sub-categories" wx:if="{{showSubCategories && selectedCategory}}">
+        <view class="sub-title">选择具体问题</view>
+        <view class="sub-list">
+          <view 
+            wx:for="{{selectedCategory.children}}" 
+            wx:key="*this"
+            class="sub-item {{form.subCategory === item ? 'sub-active' : ''}}"
+            data-label="{{item}}"
+            bindtap="onSubCategorySelect"
+          >
+            {{item}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 问题描述 -->
+    <view class="card">
+      <view class="card-title">问题描述</view>
+      <view class="form-group">
+        <textarea 
+          class="form-textarea" 
+          placeholder="请详细描述您遇到的问题，至少10个字"
+          maxlength="500"
+          value="{{form.description}}"
+          bindinput="onDescriptionInput"
+        />
+        <view class="form-hint">{{form.description.length}}/500字</view>
+      </view>
+
+      <!-- 照片上传 -->
+      <view class="form-group">
+        <view class="form-label">现场照片（选填，最多4张）</view>
+        <view class="upload-area">
+          <view wx:for="{{form.photos}}" wx:key="*this" class="upload-item">
+            <image src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="onPreviewPhoto" />
+            <view class="upload-delete" data-idx="{{index}}" bindtap="onRemovePhoto">✕</view>
+          </view>
+          <view class="upload-add" bindtap="onChoosePhoto" wx:if="{{form.photos.length < 4}}">
+            <view class="upload-add-icon">+</view>
+            <text>拍照/选图</text>
+          </view>
+        </view>
+        <view class="form-hint">支持jpg/png，每张不超过5MB</view>
+      </view>
+    </view>
+
+    <!-- 联系方式 -->
+    <view class="card">
+      <view class="card-title">联系方式</view>
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 联系电话</view>
+        <input 
+          class="form-input" 
+          type="number" 
+          maxlength="11"
+          placeholder="请输入联系电话" 
+          value="{{form.contactPhone}}"
+          bindinput="onPhoneInput"
+        />
+      </view>
+      <view class="form-group">
+        <view class="anonymous-row">
+          <view class="anonymous-label">匿名提交</view>
+          <switch checked="{{form.isAnonymous}}" bindchange="onAnonymousChange" color="#00E5FF" />
+        </view>
+        <view class="form-hint">匿名提交后，物业无法看到您的联系方式</view>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <view class="btn btn-primary btn-block" bindtap="onSubmit" disabled="{{submitting}}">
+        {{submitting ? '正在提交...' : '提交报修'}}
+      </view>
+    </view>
+  </view>
+</view>

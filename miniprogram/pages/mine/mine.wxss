@@ -1,0 +1,260 @@
+/* pages/mine/mine.wxss — 深空科技风格 */
+
+.page-mine {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+
+/* ============================================
+   用户头部 — 深空渐变+网格
+   ============================================ */
+.user-header {
+  padding: 48rpx var(--space-lg) var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.user-header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #0A1628 0%, #1B3A5C 40%, #2D1B69 100%);
+  z-index: 0;
+}
+
+.user-header-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #0A1628 0%, #1B3A5C 30%, #2D1B69 60%, #1B3A5C 100%);
+  background-size: 400% 400%;
+  animation: gradientDrift 8s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+.user-header-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.04) 1px, transparent 1px);
+  background-size: 40rpx 40rpx;
+  z-index: 1;
+  animation: gridPulse 6s ease-in-out infinite;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  position: relative;
+  z-index: 2;
+}
+
+.user-avatar {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: rgba(0, 229, 255, 0.12);
+  border: 2rpx solid rgba(0, 229, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 20rpx rgba(0, 229, 255, 0.2);
+}
+
+.avatar-text {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--primary);
+  text-shadow: 0 0 12rpx rgba(0, 229, 255, 0.5);
+}
+
+.user-detail {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 12rpx;
+  letter-spacing: -0.3px;
+}
+
+.user-role {
+  display: flex;
+  gap: 12rpx;
+}
+
+.role-tag {
+  font-size: 22rpx;
+  padding: 6rpx 16rpx;
+  background: rgba(0, 229, 255, 0.12);
+  border: 1rpx solid rgba(0, 229, 255, 0.25);
+  border-radius: var(--radius-lg);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.role-tag-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 8rpx rgba(0, 229, 255, 0.5);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+.verify-tag {
+  font-size: 20rpx;
+  font-weight: 700;
+  padding: 6rpx 16rpx;
+  border-radius: var(--radius-lg);
+  letter-spacing: 1px;
+  border: 1rpx solid transparent;
+}
+
+.verify-l1 {
+  background: rgba(0, 230, 118, 0.15);
+  color: var(--success);
+  border-color: rgba(0, 230, 118, 0.25);
+  text-shadow: 0 0 8rpx rgba(0, 230, 118, 0.3);
+}
+
+.verify-l2 {
+  background: rgba(0, 229, 255, 0.15);
+  color: var(--primary);
+  border-color: rgba(0, 229, 255, 0.25);
+  text-shadow: 0 0 8rpx rgba(0, 229, 255, 0.3);
+}
+
+.verify-l3 {
+  background: rgba(124, 77, 255, 0.15);
+  color: var(--accent);
+  border-color: rgba(124, 77, 255, 0.25);
+  text-shadow: 0 0 8rpx rgba(124, 77, 255, 0.3);
+}
+
+.verify-l4 {
+  background: rgba(255, 82, 82, 0.15);
+  color: var(--error);
+  border-color: rgba(255, 82, 82, 0.25);
+  text-shadow: 0 0 8rpx rgba(255, 82, 82, 0.3);
+}
+
+/* ============================================
+   房产列表
+   ============================================ */
+.property-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.property-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) 20rpx;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.property-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.property-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.property-area {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   功能菜单
+   ============================================ */
+.menu-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-lg) 0;
+  border-bottom: 1rpx solid var(--border);
+  transition: background 0.15s ease;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:active {
+  background: rgba(0, 229, 255, 0.04);
+}
+
+.menu-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+  width: 44rpx;
+  text-align: center;
+}
+
+.menu-label {
+  flex: 1;
+  font-size: 30rpx;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.menu-arrow {
+  font-size: 28rpx;
+  color: var(--text-disabled);
+  transition: transform 0.15s ease;
+}
+
+.menu-item:active .menu-arrow {
+  transform: translateX(4rpx);
+  color: var(--primary);
+}
+
+/* ============================================
+   社区信息
+   ============================================ */
+.community-info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12rpx 0;
+}
+
+.community-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.community-value {
+  font-size: 26rpx;
+  color: var(--text-primary);
+}

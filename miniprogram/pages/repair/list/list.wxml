@@ -1,0 +1,84 @@
+<!-- pages/repair/list/list.wxml -->
+<view class="page-repair-list">
+  <!-- 状态Tab — 药丸式 -->
+  <view class="tabs-pill tabs-pill-custom">
+    <view 
+      wx:for="{{tabs}}" 
+      wx:key="key"
+      class="tab-item {{currentTab === item.key ? 'tab-item-active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTabChange"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <!-- 工单列表 -->
+  <view class="order-list" wx:if="{{!loading}}">
+    <view 
+      wx:for="{{orderList}}" 
+      wx:key="orderId"
+      class="card order-card fade-in-up"
+      style="animation-delay: {{index * 80}}ms"
+      data-id="{{item.orderId}}"
+      bindtap="onOrderTap"
+    >
+      <!-- 左侧状态色条 -->
+      <view class="order-status-bar {{item.status === 'pending' ? 'bar-pending' : item.status === 'processing' ? 'bar-processing' : item.status === 'completed' ? 'bar-completed' : 'bar-cancelled'}}"></view>
+      
+      <view class="order-card-content">
+        <view class="order-card-header">
+          <view class="order-type">
+            <text class="order-type-icon">{{item.categoryIcon}}</text>
+            <text class="order-type-label">{{item.subCategory || item.categoryLabel}}</text>
+          </view>
+          <view class="tag {{item.statusTagClass}}">{{item.statusLabel}}</view>
+        </view>
+        
+        <view class="order-card-desc">{{item.description}}</view>
+        
+        <view class="order-card-photos" wx:if="{{item.photos.length > 0}}">
+          <image 
+            wx:for="{{item.photos}}" 
+            wx:for-item="photo" 
+            wx:for-index="pIdx"
+            wx:key="pIdx"
+            class="order-photo" 
+            src="{{photo}}" 
+            mode="aspectFill"
+          />
+        </view>
+
+        <view class="order-card-footer">
+          <text class="order-time">{{item.createdAtFormatted}}</text>
+          <text class="order-id glow-number">{{item.orderId}}</text>
+          <view class="order-action">查看详情 →</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{orderList.length === 0}}">
+      <view class="empty-state-icon-circle">
+        <text class="empty-state-icon-text">◇</text>
+      </view>
+      <view class="empty-state-title">暂无报修记录</view>
+      <view class="empty-state-desc">遇到问题？点击下方按钮提交报修</view>
+      <view class="btn btn-primary" bindtap="onCreateRepair">提交报修</view>
+    </view>
+  </view>
+
+  <!-- 骨架屏 -->
+  <view wx:if="{{loading}}" class="skeleton-list">
+    <view class="card" wx:for="{{[1,2,3]}}" wx:key="*this">
+      <view class="skeleton" style="width: 50%; height: 32rpx; margin-bottom: 20rpx;"></view>
+      <view class="skeleton" style="width: 100%; height: 24rpx; margin-bottom: 16rpx;"></view>
+      <view class="skeleton" style="width: 60%; height: 16rpx;"></view>
+    </view>
+  </view>
+
+  <!-- 提交报修浮动按钮 -->
+  <view class="fab" bindtap="onCreateRepair">
+    <text>+</text>
+  </view>
+</view>
