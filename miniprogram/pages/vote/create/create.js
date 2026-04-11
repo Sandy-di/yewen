@@ -1,5 +1,5 @@
 // pages/vote/create/create.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { showToast, showLoading, hideLoading } = require('../../../utils/util')
 
 Page({
@@ -164,7 +164,7 @@ Page({
     showLoading('正在提交...')
 
     try {
-      const res = await mockApi.createVote(form)
+      const res = await api.createVote(form)
       hideLoading()
       if (res.success) {
         showToast('投票已发起', 'success')

@@ -1,5 +1,5 @@
 // pages/finance/list/list.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { formatMoney, getTagClass } = require('../../../utils/util')
 
 Page({
@@ -30,8 +30,8 @@ Page({
   async loadData() {
     try {
       const [financeRes, announceRes] = await Promise.all([
-        mockApi.getFinanceList(),
-        mockApi.getAnnouncementList()
+        api.getFinanceList(),
+        api.getAnnouncementList()
       ])
       
       const publishedReports = financeRes.data.filter(r => r.status === 'published')

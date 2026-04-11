@@ -1,5 +1,5 @@
 // pages/repair/detail/detail.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { formatDate, ORDER_STATUS_MAP, REPAIR_CATEGORIES, getTagClass, showToast, showLoading, hideLoading, showConfirm } = require('../../../utils/util')
 
 Page({
@@ -119,7 +119,7 @@ Page({
     }
     showLoading('正在提交...')
     try {
-      await mockApi.reworkOrder(this.data.orderId, this.data.reworkReason)
+      await api.reworkOrder(this.data.orderId, this.data.reworkReason)
       hideLoading()
       showToast('已申请复修', 'success')
       this.setData({ showReworkModal: false })

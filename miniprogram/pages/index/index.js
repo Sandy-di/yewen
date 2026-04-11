@@ -1,5 +1,5 @@
 // pages/index/index.js
-const { mockApi } = require('../../utils/mock-data')
+const api = require('../../utils/api')
 const { formatDate, formatRemainTime, VOTE_STATUS_MAP, getTagClass } = require('../../utils/util')
 
 Page({
@@ -78,7 +78,7 @@ Page({
 
   async loadLatestAnnouncement() {
     try {
-      const res = await mockApi.getAnnouncementList()
+      const res = await api.getAnnouncementList()
       const latest = res.data.find(a => a.isTop) || res.data[0]
       if (latest) {
         this.setData({ latestAnnouncement: latest })

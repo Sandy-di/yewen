@@ -1,6 +1,6 @@
 // pages/repair/create/create.js
 const { REPAIR_CATEGORIES, showToast, showLoading, hideLoading, isValidPhone } = require('../../../utils/util')
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 
 Page({
   data: {
@@ -139,7 +139,7 @@ Page({
     showLoading('正在提交...')
 
     try {
-      const res = await mockApi.submitRepair(form)
+      const res = await api.submitRepair(form)
       hideLoading()
       if (res.success) {
         this.clearDraft()

@@ -1,5 +1,5 @@
 // pages/announce/list/list.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { formatDate } = require('../../../utils/util')
 
 Page({
@@ -21,7 +21,7 @@ Page({
 
   async loadAnnouncements() {
     try {
-      const res = await mockApi.getAnnouncementList()
+      const res = await api.getAnnouncementList()
       let list = res.data
       if (this.data.currentTab !== 'all') {
         list = list.filter(a => a.type === this.data.currentTab)

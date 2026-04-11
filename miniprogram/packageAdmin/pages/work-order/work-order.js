@@ -1,5 +1,5 @@
 // packageAdmin/pages/work-order/work-order.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { ORDER_STATUS_MAP, REPAIR_CATEGORIES, getTagClass, showToast } = require('../../../utils/util')
 
 Page({
@@ -19,7 +19,7 @@ Page({
 
   async loadOrders() {
     try {
-      const res = await mockApi.getOrderList({ status: this.data.currentTab })
+      const res = await api.getOrderList({ status: this.data.currentTab })
       const orderList = res.data.map(o => ({
         ...o,
         statusLabel: ORDER_STATUS_MAP[o.status]?.label,

@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# 虚拟环境
+venv/
+.venv/
+
+# 数据库
+*.db
+*.sqlite3
+
+# 环境变量
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# WorkBuddy 内部
+.workbuddy/
+
+# 微信开发者工具
+miniprogram/node_modules/

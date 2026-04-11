@@ -1,5 +1,5 @@
 // pages/vote/result/result.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { formatDate, showToast, showLoading, hideLoading } = require('../../../utils/util')
 
 Page({
@@ -20,7 +20,7 @@ Page({
 
   async loadResult() {
     try {
-      const vote = await mockApi.getVoteDetail(this.data.voteId)
+      const vote = await api.getVoteDetail(this.data.voteId)
       if (!vote) return
       
       const passed = vote.result === 'passed'

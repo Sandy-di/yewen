@@ -1,5 +1,5 @@
 // pages/vote/detail/detail.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { formatDate, formatRemainTime, VOTE_STATUS_MAP, VERIFY_LEVEL_MAP, getTagClass, showToast, showConfirm, showLoading, hideLoading } = require('../../../utils/util')
 
 Page({
@@ -31,7 +31,7 @@ Page({
 
   async loadVoteDetail() {
     try {
-      const vote = await mockApi.getVoteDetail(this.data.voteId)
+      const vote = await api.getVoteDetail(this.data.voteId)
       if (!vote) {
         showToast('投票不存在')
         return

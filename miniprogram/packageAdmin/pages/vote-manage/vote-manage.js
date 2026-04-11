@@ -1,5 +1,5 @@
 // packageAdmin/pages/vote-manage/vote-manage.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { VOTE_STATUS_MAP, getTagClass, formatDate } = require('../../../utils/util')
 
 Page({
@@ -20,7 +20,7 @@ Page({
 
   async loadVotes() {
     try {
-      const res = await mockApi.getVoteList({ status: this.data.currentTab })
+      const res = await api.getVoteList({ status: this.data.currentTab })
       const voteList = res.data.map(v => ({
         ...v,
         statusLabel: VOTE_STATUS_MAP[v.status]?.label,

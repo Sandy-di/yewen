@@ -1,5 +1,5 @@
 // pages/repair/list/list.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { formatDate, ORDER_STATUS_MAP, REPAIR_CATEGORIES, getTagClass } = require('../../../utils/util')
 
 Page({
@@ -36,7 +36,7 @@ Page({
 
   async loadOrders() {
     try {
-      const res = await mockApi.getOrderList({ status: this.data.currentTab })
+      const res = await api.getOrderList({ status: this.data.currentTab })
       const orderList = res.data.map(order => {
         const statusInfo = ORDER_STATUS_MAP[order.status]
         const categoryInfo = REPAIR_CATEGORIES.find(c => c.value === order.category)

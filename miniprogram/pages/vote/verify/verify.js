@@ -1,6 +1,6 @@
 // pages/vote/verify/verify.js
 const { VERIFY_LEVEL_MAP, showToast, showLoading, hideLoading } = require('../../../utils/util')
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 
 Page({
   data: {
@@ -123,7 +123,7 @@ Page({
     this.setData({ step: 'verifying' })
     showLoading('核验中...')
     try {
-      const res = await mockApi.verifyIdentity(level, {})
+      const res = await api.verifyIdentity(level, {})
       hideLoading()
       if (res.success) {
         this.setData({ step: 'success', currentLevel: level })

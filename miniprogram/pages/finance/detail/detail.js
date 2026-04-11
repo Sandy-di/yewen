@@ -1,5 +1,5 @@
 // pages/finance/detail/detail.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { formatMoney, formatDate } = require('../../../utils/util')
 
 Page({
@@ -22,7 +22,7 @@ Page({
 
   async loadDetail() {
     try {
-      const report = await mockApi.getFinanceDetail(this.data.reportId)
+      const report = await api.getFinanceDetail(this.data.reportId)
       if (!report) return
 
       const incomeItems = report.items.filter(i => i.itemType === 'income')

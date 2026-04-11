@@ -1,5 +1,5 @@
 // pages/announce/detail/detail.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 
 Page({
   data: {
@@ -15,7 +15,7 @@ Page({
 
   async loadDetail() {
     try {
-      const announcement = await mockApi.getAnnouncementDetail(this.data.id)
+      const announcement = await api.getAnnouncementDetail(this.data.id)
       this.setData({ announcement, loading: false })
     } catch (e) {
       console.error('加载公告详情失败', e)

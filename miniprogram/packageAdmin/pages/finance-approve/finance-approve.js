@@ -1,5 +1,5 @@
 // packageAdmin/pages/finance-approve/finance-approve.js
-const { mockApi } = require('../../../utils/mock-data')
+const api = require('../../../utils/api')
 const { formatMoney, getTagClass, showToast, showLoading, hideLoading } = require('../../../utils/util')
 
 Page({
@@ -12,7 +12,7 @@ Page({
 
   async loadPending() {
     try {
-      const res = await mockApi.getFinanceList()
+      const res = await api.getFinanceList()
       const pendingList = res.data.filter(r => r.status === 'pending').map(r => ({
         ...r,
         totalIncomeFormatted: formatMoney(r.totalIncome),
