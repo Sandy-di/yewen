@@ -1,0 +1,115 @@
+/* packageAdmin/pages/dashboard/dashboard.wxss */
+
+.page-dashboard {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom));
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg) 0;
+}
+
+.stat-card-item {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-lg);
+  border: 1rpx solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-md), var(--shadow-inset);
+  text-align: center;
+}
+
+.stat-card-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 44%);
+  pointer-events: none;
+}
+
+.stat-icon-wrap {
+  position: relative;
+  z-index: 1;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-sm);
+}
+
+.stat-icon-order { background: var(--warning-soft); }
+.stat-icon-finance { background: var(--success-soft); }
+.stat-icon-vote { background: var(--primary-light); }
+.stat-icon-user { background: var(--accent-light); }
+
+.stat-icon-text {
+  font-size: 36rpx;
+  line-height: 1;
+}
+
+.stat-card-item .stat-value {
+  position: relative;
+  z-index: 1;
+  font-size: 52rpx;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.stat-card-item .stat-label {
+  position: relative;
+  z-index: 1;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  letter-spacing: 0.8px;
+}
+
+.stat-sub {
+  position: relative;
+  z-index: 1;
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  color: var(--text-muted);
+}
+
+.quick-actions {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+}
+
+.quick-action-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  padding: var(--space-md) var(--space-sm);
+  border: 1rpx solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--gradient-surface);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
+}
+
+.quick-action-item:active {
+  background: var(--bg-pressed);
+}
+
+.quick-action-icon {
+  font-size: 40rpx;
+  line-height: 1;
+}
+
+.quick-action-label {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}

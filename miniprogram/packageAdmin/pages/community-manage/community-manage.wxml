@@ -1,0 +1,55 @@
+<!-- packageAdmin/pages/community-manage/community-manage.wxml -->
+<view class="page-community-manage">
+  <view wx:if="{{loading && communityList.length === 0}}" style="padding: 128rpx 0; text-align: center; color: var(--text-muted);">加载中...</view>
+
+  <view style="padding: 24rpx 32rpx;" wx:else>
+    <view wx:for="{{communityList}}" wx:key="id" class="card community-card" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="onCommunityTap">
+      <view class="community-header">
+        <view class="community-name">{{item.name}}</view>
+        <view class="tag tag-primary">{{item.totalUnits}} 户</view>
+      </view>
+      <view class="community-info">
+        <view class="community-info-item">面积：{{item.totalArea}} m²</view>
+        <view class="community-info-item" wx:if="{{item.address}}">地址：{{item.address}}</view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{communityList.length === 0 && !loading}}">
+      <view class="empty-state-icon">🏘️</view>
+      <view class="empty-state-title">暂无社区</view>
+    </view>
+  </view>
+
+  <view class="fab" bindtap="onCreateCommunity">+</view>
+
+  <!-- 编辑/创建弹窗 -->
+  <view class="modal-mask" wx:if="{{showEditDialog}}" bindtap="onCancelEdit">
+    <view class="modal-dialog" catchtap="">
+      <view class="modal-title">{{editingId ? '编辑社区' : '创建社区'}}</view>
+      <view class="modal-body">
+        <view class="form-group">
+          <view class="form-label">社区名称 <text style="color:var(--error)">*</text></view>
+          <input class="form-input" placeholder="请输入社区名称" value="{{editForm.name}}" data-field="name" bindinput="onEditInput" />
+        </view>
+        <view style="display:flex;gap:24rpx">
+          <view class="form-group" style="flex:1">
+            <view class="form-label">总户数</view>
+            <input class="form-input" type="number" placeholder="0" value="{{editForm.totalUnits}}" data-field="totalUnits" bindinput="onEditInput" />
+          </view>
+          <view class="form-group" style="flex:1">
+            <view class="form-label">总面积(m²)</view>
+            <input class="form-input" type="digit" placeholder="0" value="{{editForm.totalArea}}" data-field="totalArea" bindinput="onEditInput" />
+          </view>
+        </view>
+        <view class="form-group">
+          <view class="form-label">地址</view>
+          <input class="form-input" placeholder="请输入社区地址" value="{{editForm.address}}" data-field="address" bindinput="onEditInput" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <view class="modal-btn modal-btn-cancel" bindtap="onCancelEdit">取消</view>
+        <view class="modal-btn modal-btn-confirm" bindtap="{{editingId ? 'onSubmitEdit' : 'onSubmitCreate'}}">{{editingId ? '保存' : '创建'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

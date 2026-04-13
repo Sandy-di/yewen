@@ -90,7 +90,7 @@ Page({
     }
     showLoading('正在提交...')
     try {
-      const res = await mockApi.submitVote(this.data.voteId, this.data.selectedOption)
+      const res = await api.submitVote(this.data.voteId, this.data.selectedOption)
       if (res.success) {
         hideLoading()
         showToast('投票提交成功', 'success')

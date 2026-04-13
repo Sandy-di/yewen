@@ -1,7 +1,37 @@
-/* pages/mine/property/property.wxss — 深空科技风格 */
-.page-property { min-height: 100vh; background: var(--bg-page); }
-.property-card { margin-bottom: var(--space-sm); }
-.property-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rpx; }
-.property-name { font-size: 32rpx; font-weight: 700; color: var(--text-primary); }
-.property-info { font-size: 26rpx; color: var(--text-secondary); margin-bottom: 12rpx; }
-.property-actions { display: flex; gap: 12rpx; }
+/* pages/mine/property/property.wxss */
+
+.page-property {
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.property-card {
+  margin-bottom: var(--space-sm);
+}
+
+.property-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  margin-bottom: 14rpx;
+}
+
+.property-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.property-info {
+  margin-bottom: 16rpx;
+  font-size: 26rpx;
+  color: var(--text-secondary);
+}
+
+.property-actions {
+  display: flex;
+  gap: 12rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid rgba(152, 162, 179, 0.14);
+}

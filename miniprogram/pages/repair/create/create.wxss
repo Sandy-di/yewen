@@ -25,13 +25,13 @@
 }
 
 .category-item:active {
-  background: rgba(0, 229, 255, 0.04);
+  background: rgba(102, 125, 150, 0.06);
 }
 
 .category-active {
   border-color: var(--primary);
   background: var(--primary-light);
-  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.15);
+  box-shadow: 0 12rpx 24rpx rgba(102, 125, 150, 0.10);
 }
 
 .category-icon {
@@ -79,7 +79,7 @@
 }
 
 .sub-item:active {
-  background: rgba(0, 229, 255, 0.04);
+  background: rgba(102, 125, 150, 0.06);
 }
 
 .sub-active {

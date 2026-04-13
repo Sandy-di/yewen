@@ -283,7 +283,7 @@ const mockApi = {
     if (params.status && params.status !== 'all') {
       list = list.filter(v => v.status === params.status)
     }
-    return { data: list, total: list.length }
+    return { data: list, total: list.length, page: params.page || 1, pageSize: params.pageSize || 20 }
   },
 
   // 获取投票详情
@@ -306,7 +306,7 @@ const mockApi = {
     if (params.status && params.status !== 'all') {
       list = list.filter(o => o.status === params.status)
     }
-    return { data: list, total: list.length }
+    return { data: list, total: list.length, page: params.page || 1, pageSize: params.pageSize || 20 }
   },
 
   // 获取工单详情
@@ -323,9 +323,9 @@ const mockApi = {
   },
 
   // 获取财务报表列表
-  async getFinanceList() {
+  async getFinanceList(params = {}) {
     await mockDelay()
-    return { data: mockFinanceRecords, total: mockFinanceRecords.length }
+    return { data: mockFinanceRecords, total: mockFinanceRecords.length, page: params.page || 1, pageSize: params.pageSize || 20 }
   },
 
   // 获取财务报表详情
@@ -336,9 +336,9 @@ const mockApi = {
   },
 
   // 获取公告列表
-  async getAnnouncementList() {
+  async getAnnouncementList(params = {}) {
     await mockDelay()
-    return { data: mockAnnouncements, total: mockAnnouncements.length }
+    return { data: mockAnnouncements, total: mockAnnouncements.length, page: params.page || 1, pageSize: params.pageSize || 20 }
   },
 
   // 获取公告详情
@@ -376,6 +376,139 @@ const mockApi = {
   async createVote(data) {
     await mockDelay(1000)
     return { success: true, voteId: 'V' + Date.now() }
+  },
+
+  // 文件上传
+  async uploadFile(filePath) {
+    await mockDelay()
+    return { success: true, url: '/uploads/mock-image.jpg', filename: 'mock-image.jpg' }
+  },
+
+  // 社区列表
+  async getCommunityList(params = {}) {
+    await mockDelay()
+    return {
+      data: [],
+      total: 0,
+      page: 1,
+      pageSize: 20
+    }
+  },
+
+  // 社区详情
+  async getCommunityDetail(communityId) {
+    await mockDelay()
+    return null
+  },
+
+  // 仪表盘统计
+  async getDashboard() {
+    await mockDelay()
+    return {
+      totalUsers: 456,
+      totalVotes: 3,
+      activeVotes: 2,
+      totalOrders: 156,
+      pendingOrders: 12,
+      processingOrders: 8,
+      totalFinance: 6,
+      pendingFinance: 1,
+      totalAnnouncements: 15
+    }
+  },
+
+  // 社区概览
+  async getOverview() {
+    await mockDelay()
+    return {
+      communityName: '',
+      totalUnits: 0,
+      totalArea: 0,
+      totalOwners: 0,
+      recentOrders: 0,
+      activeVotes: 0
+    }
+  },
+
+  // 财务审批
+  async approveFinance(reportId) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 财务拒绝
+  async rejectFinance(reportId, reason) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 创建公告
+  async createAnnouncement(data) {
+    await mockDelay()
+    return { success: true, id: 'A' + Date.now() }
+  },
+
+  // 编辑公告
+  async updateAnnouncement(id, data) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 删除公告
+  async deleteAnnouncement(id) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 完成工单
+  async completeOrder(orderId, note, completionPhotos) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 开始处理工单
+  async processOrder(orderId) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 用户列表
+  async getUserList(params = {}) {
+    await mockDelay()
+    return {
+      data: [
+        { id: 'U001', nickname: '张业主', phone: '138****5678', role: 'owner', verifiedLevel: 3, communityId: 'C20260410001', isActive: true, createdAt: '2026-01-15' },
+        { id: 'U002', nickname: '李物业', phone: '139****1234', role: 'property', verifiedLevel: 2, communityId: 'C20260410001', isActive: true, createdAt: '2026-02-20' },
+        { id: 'U003', nickname: '王委员', phone: '137****9012', role: 'committee', verifiedLevel: 4, communityId: 'C20260410001', isActive: true, createdAt: '2026-01-10' }
+      ],
+      total: 3,
+      page: 1,
+      pageSize: 20
+    }
+  },
+
+  // 修改用户角色
+  async updateUserRole(userId, role) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 启用/禁用用户
+  async toggleUserActive(userId, isActive) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 创建社区
+  async createCommunity(data) {
+    await mockDelay()
+    return { success: true, id: 'C' + Date.now() }
+  },
+
+  // 更新社区
+  async updateCommunity(communityId, data) {
+    await mockDelay()
+    return { success: true }
   }
 }
 

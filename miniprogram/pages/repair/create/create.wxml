@@ -82,7 +82,7 @@
       <view class="form-group">
         <view class="anonymous-row">
           <view class="anonymous-label">匿名提交</view>
-          <switch checked="{{form.isAnonymous}}" bindchange="onAnonymousChange" color="#00E5FF" />
+          <switch checked="{{form.isAnonymous}}" bindchange="onAnonymousChange" color="#667D96" />
         </view>
         <view class="form-hint">匿名提交后，物业无法看到您的联系方式</view>
       </view>

@@ -1,10 +1,73 @@
-/* pages/mine/role-switch/role-switch.wxss — 深空科技风格 */
-.page-role-switch { min-height: 100vh; background: var(--bg-page); }
-.switch-notice { padding: var(--space-sm) var(--space-md); background: var(--warning-light); border: 1rpx solid rgba(255,215,64,0.2); font-size: 24rpx; color: var(--warning); border-radius: var(--radius-sm); margin-bottom: var(--space-lg); line-height: 1.6; }
-.role-card { display: flex; align-items: center; gap: 20rpx; margin-bottom: var(--space-sm); border: 1rpx solid var(--border); }
-.role-active { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 16rpx rgba(0,229,255,0.15); }
-.role-icon { font-size: 48rpx; }
-.role-info { flex: 1; }
-.role-name { font-size: 30rpx; font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-xs); }
-.role-desc { font-size: 24rpx; color: var(--text-secondary); line-height: 1.5; }
-.role-check { font-size: 32rpx; color: var(--primary); font-weight: 700; text-shadow: 0 0 8rpx rgba(0,229,255,0.3); }
+/* pages/mine/role-switch/role-switch.wxss */
+
+.page-role-switch {
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.switch-notice {
+  padding: 22rpx 24rpx;
+  margin-bottom: var(--space-lg);
+  border: 1rpx solid rgba(194, 154, 99, 0.16);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FBF5EC 100%);
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--warning);
+  box-shadow: var(--shadow-sm);
+}
+
+.role-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.role-card {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.role-active {
+  border-color: rgba(102, 125, 150, 0.22);
+  box-shadow: 0 14rpx 28rpx rgba(102, 125, 150, 0.10), inset 0 1rpx 0 rgba(255, 255, 255, 0.96);
+}
+
+.role-icon {
+  font-size: 48rpx;
+  line-height: 1;
+}
+
+.role-info {
+  flex: 1;
+}
+
+.role-name {
+  margin-bottom: 6rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.role-desc {
+  font-size: 24rpx;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.role-check {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--primary-strong);
+}
+
+.role-disabled {
+  opacity: 0.45;
+  pointer-events: auto;
+}
+
+.role-lock {
+  font-size: 28rpx;
+  opacity: 0.6;
+}

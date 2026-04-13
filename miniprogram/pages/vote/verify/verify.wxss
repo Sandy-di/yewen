@@ -54,13 +54,13 @@
 .level-done {
   border-color: var(--success);
   background: var(--success-light);
-  box-shadow: 0 0 12rpx rgba(0, 230, 118, 0.15);
+  box-shadow: 0 12rpx 24rpx rgba(111, 154, 126, 0.10);
 }
 
 .level-required {
   border-color: var(--primary);
   background: var(--primary-light);
-  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.15);
+  box-shadow: 0 12rpx 24rpx rgba(102, 125, 150, 0.10);
 }
 
 .level-badge {
@@ -82,14 +82,14 @@
   background: var(--success);
   color: #FFFFFF;
   border-color: transparent;
-  box-shadow: 0 0 12rpx rgba(0, 230, 118, 0.3);
+  box-shadow: 0 10rpx 20rpx rgba(111, 154, 126, 0.16);
 }
 
 .level-required .level-badge {
   background: var(--primary);
   color: #FFFFFF;
   border-color: transparent;
-  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.3);
+  box-shadow: 0 10rpx 20rpx rgba(102, 125, 150, 0.16);
 }
 
 .level-info {
@@ -145,7 +145,7 @@
   font-size: 28rpx;
   font-weight: 700;
   margin-bottom: var(--space-sm);
-  box-shadow: 0 0 16rpx rgba(0, 229, 255, 0.3);
+  box-shadow: 0 12rpx 24rpx rgba(102, 125, 150, 0.18);
 }
 
 .step-title {
@@ -183,7 +183,7 @@
   justify-content: center;
   white-space: nowrap;
   flex-shrink: 0;
-  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.3);
+  box-shadow: 0 12rpx 24rpx rgba(102, 125, 150, 0.16);
 }
 
 .sms-btn-disabled {
@@ -197,7 +197,7 @@
   color: var(--warning);
   padding: var(--space-md);
   background: var(--warning-light);
-  border: 1rpx solid rgba(255, 215, 64, 0.2);
+  border: 1rpx solid rgba(194, 154, 99, 0.16);
   border-radius: var(--radius-sm);
   margin-bottom: var(--space-lg);
 }
@@ -245,7 +245,7 @@
   border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-  box-shadow: 0 0 16rpx rgba(0, 229, 255, 0.2);
+  box-shadow: 0 12rpx 24rpx rgba(102, 125, 150, 0.12);
 }
 
 @keyframes spin {

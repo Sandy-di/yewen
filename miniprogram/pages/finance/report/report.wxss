@@ -31,12 +31,12 @@
 
 .income-active {
   background: var(--success);
-  box-shadow: 0 0 12rpx rgba(0, 230, 118, 0.3);
+  box-shadow: 0 12rpx 24rpx rgba(111, 154, 126, 0.18);
 }
 
 .expense-active {
   background: var(--error);
-  box-shadow: 0 0 12rpx rgba(255, 82, 82, 0.3);
+  box-shadow: 0 12rpx 24rpx rgba(183, 124, 122, 0.18);
 }
 
 .items-list {
@@ -73,12 +73,12 @@
 
 .badge-income {
   background: var(--success);
-  box-shadow: 0 0 8rpx rgba(0, 230, 118, 0.3);
+  box-shadow: 0 8rpx 16rpx rgba(111, 154, 126, 0.16);
 }
 
 .badge-expense {
   background: var(--error);
-  box-shadow: 0 0 8rpx rgba(255, 82, 82, 0.3);
+  box-shadow: 0 8rpx 16rpx rgba(183, 124, 122, 0.16);
 }
 
 .item-form-index {
@@ -96,7 +96,7 @@
 .add-item-btn {
   margin-top: 20rpx;
   padding: 20rpx;
-  border: 2rpx dashed rgba(0, 229, 255, 0.3);
+  border: 2rpx dashed rgba(102, 125, 150, 0.24);
   border-radius: var(--radius-sm);
   text-align: center;
   color: var(--primary);
@@ -107,9 +107,79 @@
 .add-item-btn:active {
   border-color: var(--primary);
   background: var(--primary-light);
-  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.15);
+  box-shadow: 0 12rpx 24rpx rgba(102, 125, 150, 0.10);
 }
 
 .submit-section {
   padding: 40rpx 0;
+}
+
+/* 附件 */
+.attachment-tip {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  margin-bottom: 16rpx;
+}
+
+.attachment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 16rpx;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1rpx solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.attachment-icon {
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.attachment-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.attachment-name {
+  font-size: 26rpx;
+  color: var(--primary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attachment-size {
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-top: 4rpx;
+}
+
+.attachment-remove {
+  font-size: 28rpx;
+  color: var(--text-disabled);
+  padding: 4rpx 12rpx;
+}
+
+.add-attachment-btn {
+  margin-top: 12rpx;
+  padding: 20rpx;
+  border: 2rpx dashed rgba(102, 125, 150, 0.24);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  color: var(--primary);
+  font-size: 28rpx;
+}
+
+.add-attachment-btn:active {
+  border-color: var(--primary);
+  background: var(--primary-light);
 }

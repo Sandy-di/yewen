@@ -12,7 +12,8 @@ Page({
     totalIncome: 0,
     totalExpense: 0,
     incomeCategories: [],
-    expenseCategories: []
+    expenseCategories: [],
+    attachments: []
   },
 
   onLoad(options) {
@@ -32,6 +33,14 @@ Page({
       const incomeCategories = this.groupByCategory(incomeItems)
       const expenseCategories = this.groupByCategory(expenseItems)
 
+      // 处理附件
+      const attachments = (report.attachments || []).map(a => ({
+        ...a,
+        isPdf: a.name && a.name.endsWith('.pdf'),
+        isDoc: a.name && (a.name.endsWith('.doc') || a.name.endsWith('.docx')),
+        sizeLabel: a.size ? (a.size >= 1024 * 1024 ? (a.size / 1024 / 1024).toFixed(1) + 'MB' : (a.size / 1024).toFixed(1) + 'KB') : ''
+      }))
+
       this.setData({
         report,
         loading: false,
@@ -40,7 +49,8 @@ Page({
         totalIncome: formatMoney(report.totalIncome),
         totalExpense: formatMoney(report.totalExpense),
         incomeCategories,
-        expenseCategories
+        expenseCategories,
+        attachments
       })
       this.addFormattedFields()
     } catch (e) {
@@ -100,5 +110,21 @@ Page({
       incomeCategories: processedIncomeCategories,
       expenseCategories: processedExpenseCategories
     })
+  },
+
+  onAttachmentTap(e) {
+    const { url, name } = e.currentTarget.dataset
+    if (!url) return
+    // 图片预览，文档复制链接
+    const ext = (name || '').split('.').pop().toLowerCase()
+    const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+    if (imageExts.includes(ext)) {
+      wx.previewImage({ current: url, urls: [url] })
+    } else {
+      wx.setClipboardData({
+        data: url,
+        success: () => wx.showToast({ title: '链接已复制', icon: 'success' })
+      })
+    }
   }
 })

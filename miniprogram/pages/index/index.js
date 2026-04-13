@@ -13,7 +13,7 @@ Page({
     voteList: [],
     loading: true,
     refreshing: false,
-    communityName: '翠湖花园',
+    communityName: '',
     currentRole: 'owner',
     showAnnouncement: true,
     latestAnnouncement: null
@@ -35,9 +35,11 @@ Page({
   syncRole() {
     const app = getApp()
     const role = app.globalData.currentRole || 'owner'
-    if (this.data.currentRole !== role) {
-      this.setData({ currentRole: role })
-    }
+    const communityName = app.globalData.communityInfo?.name || app.globalData.userInfo?.communityName || ''
+    const updates = {}
+    if (this.data.currentRole !== role) updates.currentRole = role
+    if (this.data.communityName !== communityName) updates.communityName = communityName
+    if (Object.keys(updates).length > 0) this.setData(updates)
   },
 
   onSwitchRole() {
@@ -54,7 +56,7 @@ Page({
 
   async loadVotes() {
     try {
-      const res = await mockApi.getVoteList({ status: this.data.currentTab })
+      const res = await api.getVoteList({ status: this.data.currentTab })
       const voteList = res.data.map(vote => {
         const statusInfo = VOTE_STATUS_MAP[vote.status]
         const participationRate = vote.totalProperties > 0 

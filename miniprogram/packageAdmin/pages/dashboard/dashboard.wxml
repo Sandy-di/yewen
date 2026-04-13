@@ -1,0 +1,67 @@
+<!-- packageAdmin/pages/dashboard/dashboard.wxml -->
+<view class="page-dashboard">
+  <view wx:if="{{loading}}" style="padding: 128rpx 0; text-align: center; color: var(--text-muted);">加载中...</view>
+
+  <block wx:else>
+    <!-- 社区概览 -->
+    <view class="page-header fade-in" wx:if="{{overview}}">
+      <view class="page-header-title">{{overview.communityName || '未绑定社区'}}</view>
+      <view class="page-header-desc">{{overview.totalUnits}} 户 · {{overview.totalArea}} m² · {{overview.totalOwners}} 位业主</view>
+    </view>
+
+    <!-- 统计卡片 -->
+    <view class="stat-grid" wx:if="{{dashboard}}">
+      <view class="stat-card-item fade-in-up" bindtap="onNavigateTo" data-url="/packageAdmin/pages/work-order/work-order">
+        <view class="stat-icon-wrap stat-icon-order">
+          <text class="stat-icon-text">🔧</text>
+        </view>
+        <view class="stat-value glow-number">{{dashboard.pendingOrders || 0}}</view>
+        <view class="stat-label">待处理工单</view>
+        <view class="stat-sub" wx:if="{{dashboard.processingOrders}}">处理中 {{dashboard.processingOrders}}</view>
+      </view>
+
+      <view class="stat-card-item fade-in-up" style="animation-delay: 0.08s;" bindtap="onNavigateTo" data-url="/packageAdmin/pages/finance-approve/finance-approve">
+        <view class="stat-icon-wrap stat-icon-finance">
+          <text class="stat-icon-text">💰</text>
+        </view>
+        <view class="stat-value glow-number">{{dashboard.pendingFinance || 0}}</view>
+        <view class="stat-label">待审批财务</view>
+      </view>
+
+      <view class="stat-card-item fade-in-up" style="animation-delay: 0.16s;" bindtap="onNavigateTo" data-url="/packageAdmin/pages/vote-manage/vote-manage">
+        <view class="stat-icon-wrap stat-icon-vote">
+          <text class="stat-icon-text">🗳️</text>
+        </view>
+        <view class="stat-value glow-number">{{dashboard.activeVotes || 0}}</view>
+        <view class="stat-label">进行中投票</view>
+      </view>
+
+      <view class="stat-card-item fade-in-up" style="animation-delay: 0.24s;">
+        <view class="stat-icon-wrap stat-icon-user">
+          <text class="stat-icon-text">👥</text>
+        </view>
+        <view class="stat-value glow-number">{{dashboard.totalUsers || 0}}</view>
+        <view class="stat-label">总用户数</view>
+      </view>
+    </view>
+
+    <!-- 快捷入口 -->
+    <view class="section-header">
+      <view class="section-title">快捷操作</view>
+    </view>
+    <view class="quick-actions">
+      <view class="quick-action-item" bindtap="onNavigateTo" data-url="/packageAdmin/pages/announce-publish/announce-publish">
+        <view class="quick-action-icon">📢</view>
+        <view class="quick-action-label">发布公告</view>
+      </view>
+      <view class="quick-action-item" bindtap="onNavigateTo" data-url="/packageAdmin/pages/community-manage/community-manage">
+        <view class="quick-action-icon">🏘️</view>
+        <view class="quick-action-label">社区管理</view>
+      </view>
+      <view class="quick-action-item" bindtap="onNavigateTo" data-url="/packageAdmin/pages/user-manage/user-manage">
+        <view class="quick-action-icon">👤</view>
+        <view class="quick-action-label">用户管理</view>
+      </view>
+    </view>
+  </block>
+</view>

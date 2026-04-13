@@ -7,15 +7,27 @@ from app.config import get_settings
 
 settings = get_settings()
 
+# SQLite 和 PostgreSQL 连接参数不同
+connect_args = {}
+engine_kwargs = {}
+
+if "sqlite" in settings.DATABASE_URL:
+    connect_args = {"check_same_thread": False}
+else:
+    # PostgreSQL 连接池配置
+    engine_kwargs = {
+        "pool_size": 10,
+        "max_overflow": 20,
+        "pool_timeout": 30,
+        "pool_recycle": 3600,
+        "pool_pre_ping": True,
+    }
+
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
-    # SQLite 需要 check_same_thread=False
-    connect_args=(
-        {"check_same_thread": False}
-        if "sqlite" in settings.DATABASE_URL
-        else {}
-    ),
+    connect_args=connect_args,
+    **engine_kwargs,
 )
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -41,7 +53,6 @@ async def get_db() -> AsyncSession:
 
 async def init_db():
     """初始化数据库 — 创建所有表"""
-    # 确保所有模型已注册
     import app.models  # noqa: F401
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

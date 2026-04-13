@@ -2,7 +2,7 @@
 
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class VoteOptionOut(BaseModel):
@@ -16,7 +16,7 @@ class VoteOptionOut(BaseModel):
 
 
 class VoteOptionCreate(BaseModel):
-    label: str
+    label: str = Field(..., min_length=1, max_length=100)
 
 
 class VoteListOut(BaseModel):
@@ -50,18 +50,18 @@ class VoteDetailOut(VoteListOut):
 
 class VoteCreate(BaseModel):
     """创建投票"""
-    title: str
-    description: str = ""
-    verificationLevel: int = 1
-    voteType: str = "double_majority"
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str = Field("", max_length=5000)
+    verificationLevel: int = Field(1, ge=1, le=4)
+    voteType: str = Field("double_majority", pattern="^(double_majority|double_three_quarters|simple)$")
     startTime: Optional[datetime] = None
     endTime: Optional[datetime] = None
-    options: List[VoteOptionCreate] = []
+    options: List[VoteOptionCreate] = Field(..., min_length=2)
 
 
 class VoteSubmit(BaseModel):
     """提交投票"""
-    optionId: str
+    optionId: str = Field(..., min_length=1)
 
 
 class VoteSubmitResponse(BaseModel):

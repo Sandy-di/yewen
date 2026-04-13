@@ -1,11 +1,58 @@
-/* packageAdmin/pages/finance-approve/finance-approve.wxss — 深空科技风格 */
-.page-finance-approve { min-height: 100vh; background: var(--bg-page); }
-.approve-card { margin-bottom: var(--space-sm); }
-.approve-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-sm); }
-.approve-month { font-size: 32rpx; font-weight: 700; color: var(--text-primary); }
-.approve-body { margin-bottom: 12rpx; }
-.approve-stat { font-size: 26rpx; color: var(--text-secondary); margin-bottom: 4rpx; }
-.text-income { color: var(--success); font-weight: 700; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace; font-variant-numeric: tabular-nums; text-shadow: 0 0 8rpx rgba(0,230,118,0.3); }
-.text-expense { color: var(--error); font-weight: 700; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace; font-variant-numeric: tabular-nums; text-shadow: 0 0 8rpx rgba(255,82,82,0.3); }
-.approve-meta { font-size: 22rpx; color: var(--text-disabled); margin-bottom: var(--space-sm); }
-.approve-actions { display: flex; gap: var(--space-sm); padding-top: var(--space-sm); border-top: 1rpx solid var(--border); }
+/* packageAdmin/pages/finance-approve/finance-approve.wxss */
+
+.page-finance-approve {
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.approve-card {
+  margin-bottom: var(--space-md);
+}
+
+.approve-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-bottom: 14rpx;
+}
+
+.approve-month {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.approve-body {
+  margin-bottom: 12rpx;
+}
+
+.approve-stat {
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.text-income,
+.text-expense {
+  font-weight: 700;
+  font-family: "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.approve-meta {
+  margin-bottom: 18rpx;
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
+.approve-actions {
+  display: flex;
+  gap: 16rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid rgba(152, 162, 179, 0.14);
+}
+
+.approve-actions .btn {
+  flex: 1;
+}

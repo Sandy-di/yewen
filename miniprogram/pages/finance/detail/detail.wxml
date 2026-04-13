@@ -98,4 +98,19 @@
       </view>
     </view>
   </view>
+
+  <!-- 附件列表 -->
+  <view class="card" wx:if="{{attachments.length > 0}}">
+    <view class="card-title">📎 附件</view>
+    <view class="attachment-list">
+      <view wx:for="{{attachments}}" wx:key="index" class="attachment-item" data-url="{{item.url}}" data-name="{{item.name}}" bindtap="onAttachmentTap">
+        <view class="attachment-icon">{{item.isPdf ? '📄' : item.isDoc ? '📝' : '🖼️'}}</view>
+        <view class="attachment-info">
+          <view class="attachment-name">{{item.name}}</view>
+          <view class="attachment-size">{{item.sizeLabel}}</view>
+        </view>
+        <view class="attachment-arrow">›</view>
+      </view>
+    </view>
+  </view>
 </view>

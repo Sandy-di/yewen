@@ -5,29 +5,34 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-*.egg
 
-# 虚拟环境
+# Virtual environment
 venv/
 .venv/
+env/
 
-# 数据库
+# Database
 *.db
-*.sqlite3
 
-# 环境变量
-.env
+# Uploads
+server/uploads/
 
 # IDE
-.vscode/
 .idea/
+.vscode/
+*.swp
+*.swo
 
 # OS
 .DS_Store
 Thumbs.db
 
-# WorkBuddy 内部
-.workbuddy/
+# Env
+.env
+.env.local
 
-# 微信开发者工具
-miniprogram/node_modules/
+# Logs
+*.log
+
+# CodeBuddy
+.codebuddy/

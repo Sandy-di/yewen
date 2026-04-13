@@ -1,71 +1,54 @@
-/* pages/finance/list/list.wxss — 深空科技风格 */
+/* pages/finance/list/list.wxss */
 
 .page-finance {
   min-height: 100vh;
   background: var(--bg-page);
-  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(124rpx + env(safe-area-inset-bottom));
 }
 
-/* ============================================
-   财务概览 — 仪表盘风格
-   ============================================ */
 .finance-overview {
-  padding: var(--space-xl) var(--space-lg) var(--space-lg);
   position: relative;
   overflow: hidden;
+  margin: var(--space-md) var(--space-lg) 0;
+  padding: 34rpx var(--space-lg) 30rpx;
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 100%);
+  box-shadow: var(--shadow-lg), var(--shadow-inset);
 }
 
 .finance-overview-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--gradient-header);
-  z-index: 0;
-}
-
-.finance-overview-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #0A1628 0%, #1B3A5C 30%, #2D1B69 60%, #1B3A5C 100%);
-  background-size: 400% 400%;
-  animation: gradientDrift 8s ease-in-out infinite;
-  opacity: 0.6;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(102, 125, 150, 0.16) 0%, rgba(102, 125, 150, 0) 48%);
 }
 
 .finance-overview-grid {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-image:
-    linear-gradient(rgba(0, 229, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 229, 255, 0.04) 1px, transparent 1px);
-  background-size: 40rpx 40rpx;
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  background-size: 42rpx 42rpx;
+  opacity: 0.3;
+}
+
+.overview-title,
+.overview-grid {
+  position: relative;
   z-index: 1;
-  animation: gridPulse 6s ease-in-out infinite;
 }
 
 .overview-title {
+  margin-bottom: 24rpx;
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.55);
-  margin-bottom: var(--space-lg);
+  color: var(--text-secondary);
   letter-spacing: 1px;
-  position: relative;
-  z-index: 2;
 }
 
 .overview-grid {
   display: flex;
   align-items: center;
-  position: relative;
-  z-index: 2;
 }
 
 .overview-item {
@@ -74,42 +57,34 @@
 }
 
 .overview-label {
+  margin-bottom: 10rpx;
   font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: var(--space-xs);
-  letter-spacing: 1px;
+  color: var(--text-secondary);
 }
 
 .overview-value {
-  font-size: 36rpx;
-  font-weight: 200;
-  color: #FFFFFF;
-  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 12rpx rgba(0, 229, 255, 0.4);
+  font-size: 38rpx;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .overview-divider {
   width: 1rpx;
-  height: 60rpx;
-  background: rgba(0, 229, 255, 0.15);
-  box-shadow: 0 0 8rpx rgba(0, 229, 255, 0.1);
+  height: 72rpx;
+  background: rgba(148, 163, 184, 0.2);
 }
 
-/* ============================================
-   图表
-   ============================================ */
 .chart-placeholder {
-  padding: var(--space-md) 0;
+  padding-top: 4rpx;
 }
 
 .bar-chart {
+  height: 240rpx;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  height: 240rpx;
   gap: 48rpx;
-  padding: 0 40rpx;
+  padding: 0 24rpx;
 }
 
 .bar-group {
@@ -120,20 +95,18 @@
 }
 
 .bar {
-  width: 40rpx;
-  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
-  transition: height 0.5s ease;
-  position: relative;
+  width: 42rpx;
+  border-radius: 18rpx 18rpx 6rpx 6rpx;
 }
 
 .bar-income {
-  background: linear-gradient(180deg, #00E676 0%, #00C853 100%);
-  box-shadow: 0 0 12rpx rgba(0, 230, 118, 0.3);
+  background: linear-gradient(180deg, #A7C0B0 0%, #6F9A7E 100%);
+  box-shadow: 0 8rpx 16rpx rgba(111, 154, 126, 0.18);
 }
 
 .bar-expense {
-  background: linear-gradient(180deg, #FF5252 0%, #D32F2F 100%);
-  box-shadow: 0 0 12rpx rgba(255, 82, 82, 0.3);
+  background: linear-gradient(180deg, #D3A39F 0%, #B77C7A 100%);
+  box-shadow: 0 8rpx 16rpx rgba(183, 124, 122, 0.18);
 }
 
 .bar-label {
@@ -144,14 +117,14 @@
 .chart-legend {
   display: flex;
   justify-content: center;
-  gap: var(--space-lg);
+  gap: 28rpx;
   margin-top: 20rpx;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 10rpx;
   font-size: 24rpx;
   color: var(--text-secondary);
 }
@@ -159,54 +132,26 @@
 .legend-dot {
   width: 16rpx;
   height: 16rpx;
-  border-radius: 4rpx;
+  border-radius: 6rpx;
 }
 
 .dot-income {
   background: var(--success);
-  box-shadow: 0 0 8rpx rgba(0, 230, 118, 0.4);
 }
 
 .dot-expense {
   background: var(--error);
-  box-shadow: 0 0 8rpx rgba(255, 82, 82, 0.4);
 }
 
-/* ============================================
-   区块标题
-   ============================================ */
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-lg) var(--space-lg) 0;
-}
-
-.section-title {
-  font-size: 30rpx;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.2px;
-}
-
-.section-action {
-  font-size: 26rpx;
-  color: var(--primary);
-  font-weight: 500;
-}
-
-/* ============================================
-   财务卡片
-   ============================================ */
 .finance-card {
-  margin: var(--space-sm) var(--space-lg);
+  margin: var(--space-sm) var(--space-lg) 0;
 }
 
 .finance-card-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  justify-content: space-between;
+  margin-bottom: 18rpx;
 }
 
 .finance-month {
@@ -217,97 +162,84 @@
 
 .finance-card-body {
   display: flex;
-  gap: var(--space-md);
-  margin-bottom: var(--space-md);
+  gap: 20rpx;
+  margin-bottom: 18rpx;
 }
 
 .finance-stat {
   flex: 1;
+  padding: 22rpx 18rpx;
+  border: 1rpx solid rgba(148, 163, 184, 0.14);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 100%);
 }
 
 .finance-stat-label {
+  display: block;
+  margin-bottom: 6rpx;
   font-size: 22rpx;
   color: var(--text-secondary);
-  display: block;
-  margin-bottom: 4rpx;
-  letter-spacing: 0.5px;
 }
 
 .finance-stat-value {
   font-size: 28rpx;
   font-weight: 600;
-  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
-  font-variant-numeric: tabular-nums;
-}
-
-.text-income {
-  color: var(--success);
-  text-shadow: 0 0 8rpx rgba(0, 230, 118, 0.3);
-}
-
-.text-expense {
-  color: var(--error);
-  text-shadow: 0 0 8rpx rgba(255, 82, 82, 0.3);
 }
 
 .finance-card-footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding-top: var(--space-md);
-  border-top: 1rpx solid var(--border);
+  justify-content: space-between;
+  gap: 20rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid rgba(152, 162, 179, 0.16);
 }
 
-.finance-meta {
-  font-size: 24rpx;
-  color: var(--text-disabled);
+.finance-meta,
+.announce-meta {
+  font-size: 22rpx;
+  color: var(--text-secondary);
 }
 
 .finance-action {
-  font-size: 26rpx;
-  color: var(--primary);
+  font-size: 24rpx;
+  color: var(--primary-strong);
   font-weight: 600;
 }
 
-/* ============================================
-   公告项
-   ============================================ */
 .announce-item {
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid var(--border);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-xs);
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid rgba(152, 162, 179, 0.14);
+}
+
+.announce-item:first-child {
+  padding-top: 0;
 }
 
 .announce-item:last-child {
+  padding-bottom: 0;
   border-bottom: none;
 }
 
 .announce-badge {
-  font-size: 20rpx;
+  display: inline-flex;
+  min-height: 42rpx;
+  padding: 0 14rpx;
+  margin-bottom: 12rpx;
+  border-radius: 999rpx;
+  background: var(--warning-soft);
   color: var(--warning);
-  background: var(--warning-light);
-  border: 1rpx solid rgba(255, 215, 64, 0.2);
-  padding: 2rpx 12rpx;
-  border-radius: var(--radius-xs);
+  font-size: 20rpx;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  text-shadow: 0 0 8rpx rgba(255, 215, 64, 0.3);
 }
 
 .announce-title {
+  margin-bottom: 8rpx;
   font-size: 28rpx;
+  font-weight: 700;
   color: var(--text-primary);
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.announce-meta {
-  width: 100%;
-  font-size: 22rpx;
-  color: var(--text-disabled);
+.skeleton-list {
+  padding: var(--space-md) var(--space-lg);
 }

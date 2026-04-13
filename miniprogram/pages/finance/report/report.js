@@ -1,4 +1,5 @@
 // pages/finance/report/report.js
+const api = require('../../../utils/api')
 const { showToast, showLoading, hideLoading } = require('../../../utils/util')
 
 Page({
@@ -7,7 +8,8 @@ Page({
       reportMonth: '',
       items: [
         { itemType: 'income', category: '', amount: '', description: '' }
-      ]
+      ],
+      attachments: []
     },
     currentTab: 'income',
     submitting: false,
@@ -69,6 +71,50 @@ Page({
     this.setData({ 'form.items': items })
   },
 
+  onAddAttachment() {
+    wx.chooseMessageFile({
+      count: 1,
+      type: 'file',
+      extension: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx'],
+      success: async (res) => {
+        const file = res.tempFiles[0]
+        if (file.size > 10 * 1024 * 1024) {
+          showToast('文件不能超过10MB')
+          return
+        }
+        showLoading('上传中...')
+        try {
+          const result = await api.uploadFile(file.path)
+          const name = file.name || result.filename || '附件'
+          const ext = name.split('.').pop().toLowerCase()
+          const attachment = {
+            name,
+            url: result.url,
+            size: file.size,
+            isPdf: ext === 'pdf',
+            isDoc: ext === 'doc' || ext === 'docx',
+            sizeLabel: file.size >= 1024 * 1024
+              ? (file.size / 1024 / 1024).toFixed(1) + 'MB'
+              : (file.size / 1024).toFixed(1) + 'KB'
+          }
+          const attachments = this.data.form.attachments.concat(attachment)
+          this.setData({ 'form.attachments': attachments })
+          hideLoading()
+        } catch (err) {
+          hideLoading()
+          showToast('上传失败')
+        }
+      }
+    })
+  },
+
+  onRemoveAttachment(e) {
+    const idx = e.currentTarget.dataset.idx
+    const attachments = this.data.form.attachments
+    attachments.splice(idx, 1)
+    this.setData({ 'form.attachments': attachments })
+  },
+
   async onSubmit() {
     const { form } = this.data
     if (!form.reportMonth) {
@@ -89,11 +135,32 @@ Page({
     this.setData({ submitting: true })
     showLoading('正在提交...')
 
-    setTimeout(() => {
+    try {
+      const submitItems = validItems.map(i => ({
+        itemType: i.itemType,
+        category: i.category,
+        amount: Number(i.amount),
+        description: i.description || ''
+      }))
+      const submitAttachments = (form.attachments || []).map(a => ({
+        name: a.name,
+        url: a.url,
+        size: a.size
+      }))
+      await api.createFinanceReport({
+        month: form.reportMonth,
+        title: `${form.reportMonth} 物业收支报表`,
+        items: submitItems,
+        attachments: submitAttachments
+      })
       hideLoading()
       showToast('报表已提交，等待业委会审批', 'success')
       setTimeout(() => wx.navigateBack(), 1500)
+    } catch (err) {
+      hideLoading()
+      showToast(err.message || '提交失败')
+    } finally {
       this.setData({ submitting: false })
-    }, 1000)
+    }
   }
 })

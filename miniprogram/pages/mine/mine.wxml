@@ -72,14 +72,18 @@
   </view>
 
   <!-- 社区信息 -->
-  <view class="card">
+  <view class="card" wx:if="{{communityName}}">
     <view class="community-info-row">
       <text class="community-label">所属小区</text>
-      <text class="community-value">翠湖花园</text>
+      <text class="community-value">{{communityName}}</text>
     </view>
-    <view class="community-info-row">
-      <text class="community-label">小区地址</text>
-      <text class="community-value">杭州市西湖区翠湖路88号</text>
+  </view>
+
+  <!-- 未绑定社区提示 -->
+  <view class="card" wx:if="{{!communityName}}">
+    <view class="community-info-row" bindtap="onBindCommunity">
+      <text class="community-label">所属小区</text>
+      <text class="community-value" style="color:var(--primary)">点击选择社区 ›</text>
     </view>
   </view>
 </view>

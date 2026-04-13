@@ -26,7 +26,7 @@ Page({
 
   async loadOrderDetail() {
     try {
-      const order = await mockApi.getOrderDetail(this.data.orderId)
+      const order = await api.getOrderDetail(this.data.orderId)
       if (!order) {
         showToast('工单不存在')
         return
@@ -93,7 +93,7 @@ Page({
   async onSubmitRating() {
     showLoading('正在提交...')
     try {
-      await mockApi.rateOrder(this.data.orderId, this.data.rating, this.data.ratingComment)
+      await api.rateOrder(this.data.orderId, this.data.rating, this.data.ratingComment)
       hideLoading()
       showToast('评价提交成功', 'success')
       this.setData({ showRatingModal: false })

@@ -33,17 +33,17 @@
 
 .bar-pending {
   background: var(--warning);
-  box-shadow: 0 0 12rpx rgba(255, 215, 64, 0.4);
+  box-shadow: 0 10rpx 18rpx rgba(194, 154, 99, 0.18);
 }
 
 .bar-processing {
   background: var(--primary);
-  box-shadow: 0 0 12rpx rgba(0, 229, 255, 0.4);
+  box-shadow: 0 10rpx 18rpx rgba(102, 125, 150, 0.18);
 }
 
 .bar-completed {
   background: var(--success);
-  box-shadow: 0 0 12rpx rgba(0, 230, 118, 0.4);
+  box-shadow: 0 10rpx 18rpx rgba(111, 154, 126, 0.18);
 }
 
 .bar-cancelled {

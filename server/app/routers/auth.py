@@ -1,75 +1,79 @@
 """认证路由 — 微信登录 + 用户信息"""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models import User, Community
-from app.middleware.auth import create_token, get_current_user
-from app.schemas.auth import LoginRequest, LoginResponse, ProfileResponse
+from app.models import User
+from app.middleware.auth import get_current_user, create_token
+from app.middleware.rate_limit import limiter
+from app.schemas.auth import LoginRequest, LoginResponse, ProfileResponse, IdentitiesInfo
+from app.services.auth_service import AuthService
 from app.utils.wechat import code2session
+from app.utils.logger import get_logger
+from app.config import get_settings
 
 router = APIRouter()
+logger = get_logger("auth")
 
 
 @router.post("/login", response_model=LoginResponse)
-async def login(req: LoginRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit("10/minute")
+async def login(request: Request, req: LoginRequest, db: AsyncSession = Depends(get_db)):
     """
     微信登录流程：
     1. 小程序 wx.login() 获取 code
     2. 后端用 code 换取 openid
     3. 查找/创建用户，返回 JWT token
     """
+    settings = get_settings()
+    openid = None
+    unionid = None
+
     try:
         wx_data = await code2session(req.code)
         openid = wx_data["openid"]
         unionid = wx_data.get("unionid")
     except Exception:
-        # 开发模式：如果没有配置微信 appid/secret，使用 code 作为 openid
-        from app.config import get_settings
-        settings = get_settings()
         if not settings.WX_APPID:
+            # 开发模式：使用 code 作为 openid
             openid = f"dev_{req.code}"
             unionid = None
         else:
             raise
 
-    # 查找用户
+    service = AuthService(db)
+    return await service.login_with_openid(openid, unionid)
+
+
+@router.post("/dev-token", response_model=LoginResponse, include_in_schema=True)
+async def dev_token(openid: str, db: AsyncSession = Depends(get_db)):
+    """
+    【开发模式】直接用 openid 获取 token。
+    仅在 DEBUG=True 时可用，方便本地测试种子数据用户。
+    """
+    settings = get_settings()
+    if not settings.DEBUG:
+        raise HTTPException(status_code=404, detail="Not Found")
+
     result = await db.execute(select(User).where(User.openid == openid))
     user = result.scalar_one_or_none()
-    is_new = False
-
     if not user:
-        # 自动注册：查找默认社区
-        comm_result = await db.execute(select(Community).limit(1))
-        community = comm_result.scalar_one_or_none()
-
-        user = User(
-            openid=openid,
-            unionid=unionid,
-            nickname="新用户",
-            role="owner",
-            verified_level=0,
-            community_id=community.id if community else None,
-        )
-        db.add(user)
-        await db.flush()
-        is_new = True
+        raise HTTPException(status_code=404, detail=f"用户不存在: {openid}")
 
     token = create_token(user.id, user.role)
-
     return LoginResponse(
         token=token,
         user_id=user.id,
         role=user.role,
         nickname=user.nickname,
-        is_new=is_new,
+        is_new=False,
     )
 
 
 @router.get("/profile", response_model=ProfileResponse)
-async def get_profile(current_user: User = Depends(get_current_user)):
+async def get_profile(current_user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     """获取当前用户信息"""
     properties = []
     for p in current_user.properties:
@@ -82,6 +86,22 @@ async def get_profile(current_user: User = Depends(get_current_user)):
             "isDefault": p.is_default,
         })
 
+    # 显式查询社区名称（避免 lazy loading 在 async 上下文中的问题）
+    community_name = None
+    if current_user.community_id:
+        from app.models import Community
+        comm_result = await db.execute(select(Community).where(Community.id == current_user.community_id))
+        comm = comm_result.scalar_one_or_none()
+        if comm:
+            community_name = comm.name
+
+    # 计算身份（叠加关系：业委会成员同时也是业主）
+    identities = IdentitiesInfo(
+        isOwner=current_user.role in ("owner", "committee"),
+        isProperty=current_user.role == "property",
+        isCommittee=current_user.role == "committee",
+    )
+
     return ProfileResponse(
         userId=current_user.id,
         openid=current_user.openid,
@@ -91,5 +111,7 @@ async def get_profile(current_user: User = Depends(get_current_user)):
         role=current_user.role,
         verifiedLevel=current_user.verified_level,
         communityId=current_user.community_id,
+        communityName=community_name,
+        identities=identities,
         properties=properties,
     )

@@ -1,6 +1,6 @@
 """工单模型 — RepairOrder + OrderTimeline"""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import String, Integer, Float, DateTime, ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
@@ -31,8 +31,8 @@ class RepairOrder(Base):
     rating_comment: Mapped[str] = mapped_column(Text, default="")
     sla_level: Mapped[int] = mapped_column(Integer, default=24)  # 小时
     sla_deadline: Mapped[datetime] = mapped_column(DateTime, nullable=True, default=None)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
     # 关系
     community = relationship("Community", back_populates="orders")
@@ -49,7 +49,7 @@ class OrderTimeline(Base):
     order_id: Mapped[str] = mapped_column(String(32), ForeignKey("repair_orders.id"), nullable=False, index=True)
     content: Mapped[str] = mapped_column(String(500), nullable=False)
     type: Mapped[str] = mapped_column(String(30), nullable=False)  # submitted / accepted / processing / completed / verified
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # 关系
     order = relationship("RepairOrder", back_populates="timelines")

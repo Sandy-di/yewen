@@ -1,4 +1,5 @@
 // packageAdmin/pages/announce-publish/announce-publish.js
+const api = require('../../../utils/api')
 const { showToast, showLoading, hideLoading } = require('../../../utils/util')
 
 Page({
@@ -28,12 +29,24 @@ Page({
     if (!form.content.trim()) { showToast('请输入公告内容'); return }
 
     this.setData({ submitting: true })
-    showLoading('发布中...')
-    setTimeout(() => {
+    try {
+      showLoading('发布中...')
+      await api.createAnnouncement({
+        title: form.title,
+        content: form.content,
+        type: form.type,
+        publisher: '物业',
+        publisherName: '',
+        isTop: form.isTop
+      })
       hideLoading()
       showToast('公告已发布', 'success')
       setTimeout(() => wx.navigateBack(), 1500)
+    } catch (err) {
+      hideLoading()
+      showToast(err.message || '发布失败')
+    } finally {
       this.setData({ submitting: false })
-    }, 800)
+    }
   }
 })

@@ -1,7 +1,7 @@
 """JWT 认证中间件 + 角色权限"""
 
-from datetime import datetime, timedelta
-from typing import Optional, List
+from datetime import datetime, timedelta, timezone
+from typing import List
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
@@ -18,7 +18,7 @@ security = HTTPBearer()
 
 def create_token(user_id: str, role: str) -> str:
     """生成 JWT token"""
-    expire = datetime.utcnow() + timedelta(hours=settings.JWT_EXPIRE_HOURS)
+    expire = datetime.now(timezone.utc) + timedelta(hours=settings.JWT_EXPIRE_HOURS)
     payload = {
         "sub": user_id,
         "role": role,
@@ -53,6 +53,8 @@ async def get_current_user(
     user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=401, detail="用户不存在")
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="用户已被禁用")
 
     return user
 

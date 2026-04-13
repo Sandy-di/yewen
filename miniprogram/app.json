@@ -16,31 +16,35 @@
     "pages/mine/mine",
     "pages/mine/property/property",
     "pages/mine/settings/settings",
-    "pages/mine/role-switch/role-switch"
+    "pages/mine/role-switch/role-switch",
+    "pages/mine/community-select/community-select"
   ],
   "subPackages": [
     {
       "root": "packageAdmin",
       "pages": [
+        "pages/dashboard/dashboard",
         "pages/vote-manage/vote-manage",
         "pages/work-order/work-order",
         "pages/finance-approve/finance-approve",
-        "pages/announce-publish/announce-publish"
+        "pages/announce-publish/announce-publish",
+        "pages/community-manage/community-manage",
+        "pages/user-manage/user-manage"
       ]
     }
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#0D1B2A",
+    "navigationBarBackgroundColor": "#F4F5F7",
     "navigationBarTitleText": "智慧社区",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#0D1B2A"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F4F5F7"
   },
   "tabBar": {
-    "color": "#8899AA",
-    "selectedColor": "#00E5FF",
-    "backgroundColor": "#0F2136",
-    "borderStyle": "black",
+    "color": "#96A0AD",
+    "selectedColor": "#667D96",
+    "backgroundColor": "#FBFBFC",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/index/index",

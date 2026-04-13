@@ -1,6 +1,6 @@
 """公告模型 — Announcement + AnnouncementRead"""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import String, Integer, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
@@ -19,7 +19,7 @@ class Announcement(Base):
     publisher_name: Mapped[str] = mapped_column(String(50), default="")
     is_top: Mapped[bool] = mapped_column(Boolean, default=False)
     created_by: Mapped[str] = mapped_column(String(32), ForeignKey("users.id"), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # 关系
     community = relationship("Community", back_populates="announcements")
@@ -33,7 +33,7 @@ class AnnouncementRead(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: gen_id("AR"))
     announcement_id: Mapped[str] = mapped_column(String(32), ForeignKey("announcements.id"), nullable=False, index=True)
     user_id: Mapped[str] = mapped_column(String(32), ForeignKey("users.id"), nullable=False, index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     # 关系
     announcement = relationship("Announcement", back_populates="reads")

@@ -7,6 +7,7 @@ from app.models.vote import Vote, VoteOption, VoteRecord
 from app.models.order import RepairOrder, OrderTimeline
 from app.models.finance import FinanceReport, FinanceItem
 from app.models.announcement import Announcement, AnnouncementRead
+from app.models.role_log import RoleChangeLog
 
 __all__ = [
     "Community",
@@ -22,4 +23,5 @@ __all__ = [
     "FinanceItem",
     "Announcement",
     "AnnouncementRead",
+    "RoleChangeLog",
 ]

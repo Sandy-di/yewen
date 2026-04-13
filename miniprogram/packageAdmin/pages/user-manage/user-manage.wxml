@@ -1,0 +1,37 @@
+<!-- packageAdmin/pages/user-manage/user-manage.wxml -->
+<view class="page-user-manage">
+  <!-- 标签切换 -->
+  <view class="tabs-pill" style="margin: 24rpx 32rpx 0;">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="key"
+      class="tab-item {{currentTab === item.key ? 'tab-item-active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTabChange"
+    >{{item.label}}</view>
+  </view>
+
+  <view style="padding: 0 32rpx;" wx:if="{{!loading || userList.length > 0}}">
+    <view wx:for="{{userList}}" wx:key="id" class="card user-card" data-user="{{item}}" bindtap="onUserTap">
+      <view class="user-header">
+        <view class="user-avatar">{{item.roleIcon}}</view>
+        <view class="user-info">
+          <view class="user-name">{{item.nickname || '未设置昵称'}}</view>
+          <view class="user-phone">{{item.phone || '未绑定手机'}}</view>
+        </view>
+        <view class="tag {{item.isActive ? 'tag-success' : 'tag-error'}}">{{item.isActive ? '正常' : '已禁用'}}</view>
+      </view>
+      <view class="user-meta">
+        <view class="user-role-badge">{{item.roleLabel}}</view>
+        <view class="user-verified" wx:if="{{item.verifiedLevel > 0}}">L{{item.verifiedLevel}} 核验</view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{userList.length === 0 && !loading}}">
+      <view class="empty-state-icon">👥</view>
+      <view class="empty-state-title">暂无用户</view>
+    </view>
+  </view>
+
+  <view wx:if="{{loading && userList.length === 0}}" style="padding: 128rpx 0; text-align: center; color: var(--text-muted);">加载中...</view>
+</view>

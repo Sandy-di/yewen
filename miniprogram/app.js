@@ -1,6 +1,7 @@
 // app.js
 App({
   onLaunch() {
+    this.initApiConfig()
     // 检查登录状态
     this.checkLoginStatus()
     // 获取系统信息
@@ -10,14 +11,28 @@ App({
   globalData: {
     userInfo: null,
     currentRole: 'owner', // owner | property | committee
-    communityInfo: {
-      name: '翠湖花园',
-      totalUnits: 512,
-      address: '杭州市西湖区翠湖路88号'
-    },
+    communityInfo: null,  // 从后端 profile 获取
     systemInfo: null,
     apiBaseUrl: 'https://api.example.com',  // 替换为实际后端地址
     useMock: false  // 设为 true 使用模拟数据，false 使用真实后端
+  },
+
+  initApiConfig() {
+    const storedBaseUrl = wx.getStorageSync('apiBaseUrl')
+    const forceMock = !!wx.getStorageSync('forceMockApi')
+    const apiBaseUrl = storedBaseUrl || this.globalData.apiBaseUrl
+    const useMock = forceMock || this.isPlaceholderApiBaseUrl(apiBaseUrl)
+
+    this.globalData.apiBaseUrl = apiBaseUrl
+    this.globalData.useMock = useMock
+  },
+
+  isPlaceholderApiBaseUrl(url) {
+    return !url || /api\.example\.com/i.test(url)
+  },
+
+  isMockToken(token) {
+    return typeof token === 'string' && token.indexOf('mock_token_') === 0
   },
 
   // 检查登录状态
@@ -60,6 +75,11 @@ App({
   // 用 code 换取后端 token
   loginWithCode(code) {
     const baseUrl = this.globalData.apiBaseUrl
+    if (this.globalData.useMock || this.isPlaceholderApiBaseUrl(baseUrl)) {
+      console.warn('当前未配置真实后端域名，使用模拟登录')
+      this.mockLogin()
+      return
+    }
     wx.request({
       url: `${baseUrl}/api/auth/login`,
       method: 'POST',
@@ -86,6 +106,9 @@ App({
     const baseUrl = this.globalData.apiBaseUrl
     const token = wx.getStorageSync('token')
     if (!token) return
+    if (this.globalData.useMock || this.isPlaceholderApiBaseUrl(baseUrl) || this.isMockToken(token)) {
+      return
+    }
 
     wx.request({
       url: `${baseUrl}/api/auth/profile`,
@@ -102,10 +125,14 @@ App({
             avatar: profile.avatar,
             role: profile.role,
             verifiedLevel: profile.verifiedLevel,
+            communityId: profile.communityId,
+            communityName: profile.communityName,
+            identities: profile.identities || { isOwner: profile.role === 'owner' || profile.role === 'committee', isProperty: profile.role === 'property', isCommittee: profile.role === 'committee' },
             properties: profile.properties || []
           }
           this.globalData.userInfo = userInfo
           this.globalData.currentRole = userInfo.role
+          this.globalData.communityInfo = profile.communityName ? { name: profile.communityName, id: profile.communityId } : null
           wx.setStorageSync('userInfo', userInfo)
         }
       },
@@ -122,6 +149,9 @@ App({
       avatar: '',
       role: 'owner',
       verifiedLevel: 2,
+      communityId: null,
+      communityName: null,
+      identities: { isOwner: true, isProperty: false, isCommittee: false },
       properties: [
         {
           propertyId: 'P20260410001',
@@ -135,6 +165,7 @@ App({
     }
     this.globalData.userInfo = mockUser
     this.globalData.currentRole = mockUser.role
+    this.globalData.communityInfo = null
     wx.setStorageSync('userInfo', mockUser)
     wx.setStorageSync('token', 'mock_token_xxx')
   },
@@ -161,12 +192,25 @@ App({
     }
   },
 
-  // 切换角色
+  // 切换角色（需后端校验）
   switchRole(role) {
+    // 角色切换需要后端校验，只允许切换到 identities 中标记为 true 的角色
+    const identities = this.globalData.userInfo?.identities || {}
+    const allowedRoles = []
+    if (identities.isOwner) allowedRoles.push('owner')
+    if (identities.isProperty) allowedRoles.push('property')
+    if (identities.isCommittee) allowedRoles.push('committee')
+    
+    if (!allowedRoles.includes(role)) {
+      wx.showToast({ title: '无权切换到该角色', icon: 'none' })
+      return false
+    }
+    
     this.globalData.currentRole = role
     if (this.globalData.userInfo) {
       this.globalData.userInfo.role = role
       wx.setStorageSync('userInfo', this.globalData.userInfo)
     }
+    return true
   }
 })

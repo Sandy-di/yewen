@@ -1,22 +1,22 @@
-"""财务路由 — CRUD + 审批"""
+"""财务路由 — CRUD + 审批/拒绝"""
 
-from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional
 
 from app.database import get_db
-from app.models import FinanceReport, FinanceItem, User
+from app.models import User
 from app.middleware.auth import get_current_user, require_role
 from app.schemas.finance import (
-    FinanceListOut, FinanceDetailOut, FinanceItemOut,
-    FinanceCreate,
+    FinanceListOut, FinanceDetailOut, FinanceItemOut, FinanceAttachmentOut,
+    FinanceCreate, FinanceRejectRequest,
 )
+from app.services.finance_service import FinanceService
 
 router = APIRouter()
 
 
-def report_to_list_out(report: FinanceReport) -> FinanceListOut:
+def report_to_list_out(report) -> FinanceListOut:
     """ORM → 列表输出"""
     return FinanceListOut(
         reportId=report.id,
@@ -35,20 +35,22 @@ def report_to_list_out(report: FinanceReport) -> FinanceListOut:
 
 @router.get("", response_model=dict)
 async def get_finance_list(
+    status: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    pageSize: int = Query(20, ge=1, le=100),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """获取财务报表列表"""
-    query = select(FinanceReport)
-    if current_user.community_id:
-        query = query.where(FinanceReport.community_id == current_user.community_id)
-    query = query.order_by(FinanceReport.created_at.desc())
-
-    result = await db.execute(query)
-    reports = result.scalars().all()
-
-    report_outs = [report_to_list_out(r) for r in reports]
-    return {"data": report_outs, "total": len(report_outs)}
+    service = FinanceService(db)
+    reports, total = await service.get_list(
+        current_user.community_id,
+        status=status,
+        page=page,
+        page_size=pageSize,
+    )
+    report_outs = [report_to_list_out(r).model_dump() for r in reports]
+    return {"data": report_outs, "total": total, "page": page, "pageSize": pageSize}
 
 
 @router.get("/{report_id}", response_model=FinanceDetailOut)
@@ -58,8 +60,8 @@ async def get_finance_detail(
     db: AsyncSession = Depends(get_db),
 ):
     """获取财务报表详情"""
-    result = await db.execute(select(FinanceReport).where(FinanceReport.id == report_id))
-    report = result.scalar_one_or_none()
+    service = FinanceService(db)
+    report = await service.get_by_id(report_id)
     if not report:
         raise HTTPException(status_code=404, detail="报表不存在")
 
@@ -74,7 +76,16 @@ async def get_finance_detail(
         for item in report.items
     ]
 
-    return FinanceDetailOut(**base.model_dump(), items=items)
+    attachments = [
+        FinanceAttachmentOut(
+            name=a.get("name", ""),
+            url=a.get("url", ""),
+            size=a.get("size", 0),
+        )
+        for a in report.get_attachments()
+    ]
+
+    return FinanceDetailOut(**base.model_dump(), items=items, attachments=attachments)
 
 
 @router.post("")
@@ -84,39 +95,8 @@ async def create_finance_report(
     db: AsyncSession = Depends(get_db),
 ):
     """上报财务报表（仅物业）"""
-    now = datetime.now()
-
-    # 计算汇总
-    total_income = sum(i.amount for i in req.items if i.itemType == "income")
-    total_expense = sum(i.amount for i in req.items if i.itemType == "expense")
-    balance = total_income - total_expense
-
-    report = FinanceReport(
-        community_id=current_user.community_id,
-        month=req.month,
-        title=req.title,
-        status="pending",
-        submitted_by=current_user.id,
-        submitted_at=now,
-        total_income=total_income,
-        total_expense=total_expense,
-        balance=balance,
-    )
-    db.add(report)
-    await db.flush()
-
-    # 创建明细
-    for item in req.items:
-        fi = FinanceItem(
-            report_id=report.id,
-            item_type=item.itemType,
-            category=item.category,
-            amount=item.amount,
-            description=item.description,
-        )
-        db.add(fi)
-
-    await db.flush()
+    service = FinanceService(db)
+    report = await service.create(current_user, req)
     return {"success": True, "reportId": report.id}
 
 
@@ -127,25 +107,25 @@ async def approve_finance_report(
     db: AsyncSession = Depends(get_db),
 ):
     """审批财务报表（仅业委会）"""
-    result = await db.execute(select(FinanceReport).where(FinanceReport.id == report_id))
-    report = result.scalar_one_or_none()
-    if not report:
-        raise HTTPException(status_code=404, detail="报表不存在")
-    if report.status != "pending":
-        raise HTTPException(status_code=400, detail="报表已审批")
+    service = FinanceService(db)
+    try:
+        await service.approve(report_id, current_user)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"success": True}
 
-    report.status = "published"
-    report.approved_by = current_user.id
-    report.approved_at = datetime.now()
 
-    # 重新计算汇总（确保一致性）
-    total_income = sum(float(i.amount or 0) for i in report.items if i.item_type == "income")
-    total_expense = sum(float(i.amount or 0) for i in report.items if i.item_type == "expense")
-    report.total_income = total_income
-    report.total_expense = total_expense
-    report.balance = total_income - total_expense
-
-    db.add(report)
-    await db.flush()
-
+@router.post("/{report_id}/reject")
+async def reject_finance_report(
+    report_id: str,
+    req: FinanceRejectRequest,
+    current_user: User = Depends(require_role("committee")),
+    db: AsyncSession = Depends(get_db),
+):
+    """拒绝/退回财务报表（仅业委会）"""
+    service = FinanceService(db)
+    try:
+        await service.reject(report_id, current_user, req.reason)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return {"success": True}

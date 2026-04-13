@@ -1,21 +1,21 @@
-/* pages/index/index.wxss — 深空科技风格 */
+/* pages/index/index.wxss */
 
 .page-index {
   min-height: 100vh;
   background: var(--bg-page);
-  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(124rpx + env(safe-area-inset-bottom));
 }
 
-/* ============================================
-   公告横幅
-   ============================================ */
 .announcement-bar {
   display: flex;
   align-items: center;
-  padding: var(--space-sm) var(--space-lg);
-  background: linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(124, 77, 255, 0.08) 100%);
-  border-bottom: 1rpx solid rgba(0, 229, 255, 0.15);
   gap: 12rpx;
+  margin: 20rpx var(--space-lg) 0;
+  padding: 18rpx 22rpx;
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+  border-radius: 999rpx;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6F8FA 100%);
+  box-shadow: var(--shadow-sm), var(--shadow-inset);
 }
 
 .announcement-bar-dot {
@@ -23,129 +23,110 @@
   height: 12rpx;
   border-radius: 50%;
   background: var(--primary);
-  box-shadow: var(--glow-primary);
   flex-shrink: 0;
-  animation: pulseGlow 2s ease-in-out infinite;
 }
 
 .announcement-bar-text {
   flex: 1;
+  min-width: 0;
   font-size: 26rpx;
-  color: var(--text-primary);
-  overflow: hidden;
+  color: var(--text-secondary);
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .announcement-bar-close {
   font-size: 24rpx;
-  color: var(--text-disabled);
-  padding: var(--space-xs);
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
-/* ============================================
-   社区信息头部 — 深空渐变+网格纹理
-   ============================================ */
 .community-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-xl) var(--space-lg) var(--space-lg);
   position: relative;
   overflow: hidden;
+  margin: var(--space-md) var(--space-lg) 0;
+  padding: 40rpx var(--space-lg);
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 100%);
+  box-shadow: var(--shadow-lg), var(--shadow-inset);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24rpx;
 }
 
 .community-header-bg {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--gradient-header);
-  z-index: 0;
+  inset: 0;
+  background: radial-gradient(circle at right top, rgba(102, 125, 150, 0.14) 0%, rgba(102, 125, 150, 0) 42%);
 }
 
-/* 头部渐变漂移 */
-.community-header-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #0A1628 0%, #1B3A5C 30%, #2D1B69 60%, #1B3A5C 100%);
-  background-size: 400% 400%;
-  animation: gradientDrift 8s ease-in-out infinite;
-  opacity: 0.6;
-}
-
-/* 头部网格纹理 */
 .community-header-grid {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-image:
-    linear-gradient(rgba(0, 229, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 229, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
   background-size: 40rpx 40rpx;
+  opacity: 0.32;
+}
+
+.community-info,
+.header-actions {
+  position: relative;
   z-index: 1;
-  animation: gridPulse 6s ease-in-out infinite;
 }
 
 .community-info {
-  position: relative;
-  z-index: 2;
+  flex: 1;
 }
 
 .community-name {
+  margin-bottom: 14rpx;
   font-size: 44rpx;
-  font-weight: 800;
-  color: #FFFFFF;
+  font-weight: 700;
+  color: var(--text-primary);
   letter-spacing: -0.5px;
-  margin-bottom: var(--space-xs);
 }
 
 .community-stats {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.65);
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
 }
 
 .stat-item {
-  color: var(--primary);
-  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 8rpx rgba(0, 229, 255, 0.4);
+  font-size: 42rpx;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .stat-unit {
-  margin-left: 4rpx;
+  color: var(--text-secondary);
 }
 
 .stat-divider {
-  margin: 0 12rpx;
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.header-actions {
-  position: relative;
-  z-index: 2;
+  margin: 0 8rpx;
+  color: rgba(152, 162, 179, 0.72);
 }
 
 .role-badge {
-  background: rgba(0, 229, 255, 0.12);
-  border: 1rpx solid rgba(0, 229, 255, 0.25);
-  padding: 10rpx 24rpx;
-  border-radius: var(--radius-lg);
-  font-size: 24rpx;
-  color: var(--primary);
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 10rpx;
+  min-height: 56rpx;
+  padding: 0 22rpx;
+  border: 1rpx solid rgba(102, 125, 150, 0.14);
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow-sm), inset 0 1rpx 0 rgba(255, 255, 255, 0.94);
+  font-size: 24rpx;
+  color: var(--primary-strong);
 }
 
 .role-badge-dot {
@@ -153,48 +134,16 @@
   height: 10rpx;
   border-radius: 50%;
   background: var(--primary);
-  box-shadow: 0 0 8rpx rgba(0, 229, 255, 0.5);
-  animation: pulseGlow 2s ease-in-out infinite;
 }
 
-/* ============================================
-   搜索栏
-   ============================================ */
 .search-bar {
   margin: var(--space-md) var(--space-lg) 0;
-  display: flex;
-  align-items: center;
-  height: 72rpx;
-  background: var(--bg-card-solid);
-  border-radius: 36rpx;
-  padding: 0 var(--space-md);
-  border: 1rpx solid var(--border);
-  transition: all 0.2s ease;
 }
 
-.search-bar-icon {
-  font-size: 28rpx;
-  margin-right: 12rpx;
-  opacity: 0.5;
-}
-
-.search-bar-placeholder {
-  font-size: 28rpx;
-  color: var(--text-disabled);
-}
-
-/* ============================================
-   Tab 切换 — 药丸式
-   ============================================ */
 .tabs-pill-custom {
   margin: var(--space-md) var(--space-lg) 0;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1rpx solid var(--border);
 }
 
-/* ============================================
-   投票列表
-   ============================================ */
 .vote-list {
   padding: var(--space-md) var(--space-lg);
 }
@@ -206,8 +155,8 @@
 .vote-card-header {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-sm);
-  margin-bottom: 20rpx;
+  gap: 14rpx;
+  margin-bottom: 18rpx;
 }
 
 .vote-card-title {
@@ -215,136 +164,103 @@
   font-size: 32rpx;
   font-weight: 700;
   color: var(--text-primary);
-  line-height: 1.4;
-  letter-spacing: -0.1px;
+  line-height: 1.45;
 }
 
 .vote-card-progress {
-  margin-bottom: 20rpx;
+  margin-bottom: 22rpx;
+}
+
+.progress-info,
+.vote-card-deadline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .progress-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 12rpx;
 }
 
-.progress-text {
-  font-size: 26rpx;
-  color: var(--text-secondary);
-}
-
-.progress-rate {
-  font-size: 30rpx;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-}
-
-.vote-card-deadline {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 12rpx;
-}
-
+.progress-text,
 .deadline-text {
   font-size: 24rpx;
   color: var(--text-secondary);
 }
 
+.progress-rate {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.vote-card-deadline {
+  margin-top: 12rpx;
+}
+
 .remain-time {
   font-size: 24rpx;
-  color: var(--warning);
   font-weight: 600;
-  text-shadow: 0 0 8rpx rgba(255, 215, 64, 0.3);
+  color: var(--warning);
 }
 
 .vote-card-result {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-md);
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
 }
 
 .result-badge {
-  font-size: 28rpx;
-  font-weight: 700;
-  padding: 6rpx 20rpx;
-  border-radius: var(--radius-xs);
-  letter-spacing: 1px;
+  min-height: 52rpx;
+  padding: 0 18rpx;
+  border-radius: 999rpx;
+  display: inline-flex;
+  align-items: center;
+  font-size: 24rpx;
+  font-weight: 600;
 }
 
 .result-pass {
-  background: var(--success-light);
   color: var(--success);
-  box-shadow: var(--glow-success);
-  border: 1rpx solid rgba(0, 230, 118, 0.2);
+  background: var(--success-soft);
 }
 
 .result-fail {
-  background: var(--error-light);
   color: var(--error);
-  box-shadow: var(--glow-error);
-  border: 1rpx solid rgba(255, 82, 82, 0.2);
+  background: var(--error-soft);
 }
 
 .result-participation {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: var(--text-secondary);
 }
 
 .vote-card-footer {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding-top: var(--space-md);
-  border-top: 1rpx solid var(--border);
+  gap: 18rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid rgba(152, 162, 179, 0.16);
 }
 
 .vote-card-meta {
-  font-size: 20rpx;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-size: 22rpx;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 4rpx 12rpx;
-  border-radius: var(--radius-xs);
-  border: 1rpx solid var(--border);
 }
 
 .vote-card-action {
   margin-left: auto;
-  font-size: 26rpx;
-  color: var(--primary);
+  font-size: 24rpx;
+  color: var(--primary-strong);
   font-weight: 600;
-  transition: all 0.2s ease;
 }
 
-/* ============================================
-   空状态
-   ============================================ */
-.empty-state-icon-circle {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 50%;
-  border: 2rpx solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: var(--space-lg);
+.skeleton-list {
+  padding: var(--space-md) var(--space-lg);
 }
 
-.empty-state-icon-text {
-  font-size: 48rpx;
-  color: var(--text-disabled);
-}
-
-/* ============================================
-   骨架屏
-   ============================================ */
 .skeleton-card {
   padding: var(--space-lg);
-  margin-bottom: var(--space-md);
-  background: var(--bg-card-solid);
-  border: 1rpx solid var(--border);
 }

@@ -1,0 +1,48 @@
+<!-- pages/mine/community-select/community-select.wxml -->
+<view class="page-community-select">
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="搜索小区名称或地址" 
+        value="{{keyword}}" 
+        bindinput="onInput"
+        bindconfirm="onSearch"
+        confirm-type="search"
+      />
+      <text class="search-clear" wx:if="{{keyword}}" bindtap="onClearSearch">✕</text>
+    </view>
+    <button class="search-btn" bindtap="onSearch">搜索</button>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="result-area">
+    <view wx:if="{{loading}}" class="loading-tip">搜索中...</view>
+    
+    <view wx:elif="{{searched && communities.length === 0}}" class="empty-tip">
+      <text>未找到匹配的社区</text>
+      <text class="empty-sub">请确认小区名称是否正确，或联系业委会添加社区</text>
+    </view>
+
+    <view wx:else class="community-list">
+      <view 
+        wx:for="{{communities}}" 
+        wx:key="id" 
+        class="community-item"
+        data-item="{{item}}"
+        bindtap="onSelectCommunity"
+      >
+        <view class="community-name">{{item.name}}</view>
+        <view class="community-address">{{item.address || '暂无地址信息'}}</view>
+        <view class="community-meta">{{item.totalUnits || 0}}户 · {{item.totalArea || 0}}㎡</view>
+      </view>
+    </view>
+
+    <view wx:if="{{!searched && communities.length === 0}}" class="empty-tip">
+      <text class="empty-icon">🏘️</text>
+      <text>请搜索并选择您所在的小区</text>
+    </view>
+  </view>
+</view>

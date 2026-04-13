@@ -22,7 +22,7 @@
       <view class="form-group">
         <view class="setting-item">
           <view class="setting-label">置顶公告</view>
-          <switch checked="{{form.isTop}}" bindchange="onTopChange" color="#00E5FF" />
+          <switch checked="{{form.isTop}}" bindchange="onTopChange" color="#667D96" />
         </view>
       </view>
     </view>

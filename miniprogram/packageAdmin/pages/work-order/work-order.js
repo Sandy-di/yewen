@@ -35,10 +35,15 @@ Page({
     this.loadOrders()
   },
 
-  onAcceptOrder(e) {
+  async onAcceptOrder(e) {
     const id = e.currentTarget.dataset.id
-    showToast('已接单', 'success')
-    this.loadOrders()
+    try {
+      await api.acceptOrder(id)
+      showToast('已接单', 'success')
+      this.loadOrders()
+    } catch (err) {
+      showToast(err.message || '接单失败')
+    }
   },
 
   onOrderTap(e) {

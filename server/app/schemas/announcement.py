@@ -2,7 +2,7 @@
 
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AnnouncementListOut(BaseModel):
@@ -28,9 +28,17 @@ class AnnouncementDetailOut(AnnouncementListOut):
 
 class AnnouncementCreate(BaseModel):
     """创建公告"""
-    title: str
-    content: str = ""
-    type: str = "notice"  # vote / notice / finance
-    publisher: str = "物业"
-    publisherName: str = ""
+    title: str = Field(..., min_length=1, max_length=200)
+    content: str = Field("", max_length=10000)
+    type: str = Field("notice", pattern="^(vote|notice|finance)$")
+    publisher: str = Field("物业", max_length=20)
+    publisherName: str = Field("", max_length=50)
     isTop: bool = False
+
+
+class AnnouncementUpdate(BaseModel):
+    """编辑公告"""
+    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    content: Optional[str] = Field(None, max_length=10000)
+    type: Optional[str] = Field(None, pattern="^(vote|notice|finance)$")
+    isTop: Optional[bool] = None

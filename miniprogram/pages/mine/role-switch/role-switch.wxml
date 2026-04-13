@@ -2,13 +2,13 @@
 <view class="page-role-switch">
   <view class="container">
     <view class="switch-notice">
-      <text>⚠️ 角色切换仅用于演示和调试，实际使用时角色由系统根据身份自动分配。</text>
+      <text>角色由系统根据身份自动分配，您只能切换到已授权的角色视角。</text>
     </view>
     <view class="role-list">
       <view 
         wx:for="{{roles}}" 
         wx:key="key"
-        class="card role-card {{currentRole === item.key ? 'role-active' : ''}}"
+        class="card role-card {{currentRole === item.key ? 'role-active' : ''}} {{!item.allowed ? 'role-disabled' : ''}}"
         data-role="{{item.key}}"
         bindtap="onRoleSelect"
       >
@@ -18,6 +18,7 @@
           <view class="role-desc">{{item.desc}}</view>
         </view>
         <view class="role-check" wx:if="{{currentRole === item.key}}">✓</view>
+        <view class="role-lock" wx:if="{{!item.allowed}}">🔒</view>
       </view>
     </view>
   </view>

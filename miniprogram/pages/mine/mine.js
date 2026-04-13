@@ -9,6 +9,7 @@ Page({
     roleIcon: '🏠',
     verifiedLevel: 2,
     verifyLabel: '',
+    communityName: '',
     properties: [],
     menuList: [
       { id: 'my_votes', icon: '🗳️', label: '我的投票', url: '/pages/index/index' },
@@ -51,6 +52,7 @@ Page({
         roleIcon: roleInfo.icon,
         verifiedLevel: userInfo.verifiedLevel || 1,
         verifyLabel: verifyInfo.label,
+        communityName: userInfo.communityName || app.globalData.communityInfo?.name || '',
         properties: userInfo.properties || []
       })
     }
@@ -85,5 +87,9 @@ Page({
 
   onAvatarTap() {
     wx.navigateTo({ url: '/pages/mine/settings/settings' })
+  },
+
+  onBindCommunity() {
+    wx.navigateTo({ url: '/pages/mine/community-select/community-select' })
   }
 })

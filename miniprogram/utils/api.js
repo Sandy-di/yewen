@@ -1,15 +1,45 @@
 /**
- * api.js — 业问后端 API 客户端
- * 替换 mock-data.js，保持接口签名完全一致
+ * api.js — 后端 API 客户端
+ * 与 mock-data.js 保持一致的接口签名。
+ * 支持分页（page/pageSize）和新接口（上传、社区、统计）。
  */
 
-const app = getApp()
+const { mockApi } = require('./mock-data.js')
 
-// API 基础地址
-const BASE_URL = 'https://api.example.com'  // 替换为实际后端地址
+const DEFAULT_BASE_URL = 'https://api.example.com'
+const BASE_URL = wx.getStorageSync('apiBaseUrl') || DEFAULT_BASE_URL
+const FORCE_MOCK = !!wx.getStorageSync('forceMockApi')
+const USE_MOCK = FORCE_MOCK || !BASE_URL || /api\.example\.com/i.test(BASE_URL)
 
-// 是否使用模拟数据（开发时可切换）
-const USE_MOCK = false
+let hasWarnedMockFallback = false
+
+function warnMockFallback(reason) {
+  if (hasWarnedMockFallback) return
+  hasWarnedMockFallback = true
+  console.warn('API 已回退到本地 mock 数据：' + reason)
+}
+
+function shouldFallbackToMock(error) {
+  const message = String((error && error.message) || error || '')
+  return /url not in domain list|request:fail|network|timeout|fail/i.test(message)
+}
+
+async function callWithFallback(methodName, realCall, args = []) {
+  if (USE_MOCK) {
+    warnMockFallback('当前仍在使用占位域名或已开启 forceMockApi。')
+    return mockApi[methodName](...args)
+  }
+
+  try {
+    return await realCall()
+  } catch (error) {
+    if (mockApi[methodName] && shouldFallbackToMock(error)) {
+      warnMockFallback((error && error.message) || '请求失败')
+      return mockApi[methodName](...args)
+    }
+    throw error
+  }
+}
 
 // 获取请求头（带 token）
 function getHeaders() {
@@ -30,7 +60,6 @@ function request(url, options = {}) {
       header: { ...getHeaders(), ...options.header },
       success(res) {
         if (res.statusCode === 401) {
-          // token 过期，重新登录
           wx.removeStorageSync('token')
           wx.removeStorageSync('userInfo')
           const app = getApp()
@@ -54,107 +83,160 @@ function request(url, options = {}) {
   })
 }
 
+// 构建查询字符串
+function buildQuery(params = {}) {
+  const parts = []
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') {
+      parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    }
+  }
+  return parts.length > 0 ? '?' + parts.join('&') : ''
+}
+
 // ============================================================
-// API 接口 — 与 mockApi 签名完全一致
+// API 接口 — 与 mockApi 签名一致 + 新增接口
 // ============================================================
 
 const api = {
   // ---------- 投票 ----------
   async getVoteList(params = {}) {
-    const query = params.status && params.status !== 'all' ? `?status=${params.status}` : ''
-    return request(`/api/votes${query}`)
+    return callWithFallback('getVoteList', () => {
+      const query = buildQuery({
+        status: params.status && params.status !== 'all' ? params.status : undefined,
+        keyword: params.keyword || undefined,
+        page: params.page || 1,
+        pageSize: params.pageSize || 20,
+      })
+      return request(`/api/votes${query}`)
+    }, [params])
   },
 
   async getVoteDetail(voteId) {
     try {
-      return await request(`/api/votes/${voteId}`)
+      return await callWithFallback('getVoteDetail', () => request(`/api/votes/${voteId}`), [voteId])
     } catch {
       return null
     }
   },
 
   async submitVote(voteId, optionId) {
-    const res = await request(`/api/votes/${voteId}/submit`, {
-      method: 'POST',
-      data: { optionId },
-    })
-    return { success: true, txHash: res.txHash || '' }
+    return callWithFallback('submitVote', async () => {
+      const res = await request(`/api/votes/${voteId}/submit`, {
+        method: 'POST',
+        data: { optionId },
+      })
+      return { success: true, txHash: res.txHash || '' }
+    }, [voteId, optionId])
   },
 
   async createVote(data) {
-    const res = await request('/api/votes', {
-      method: 'POST',
-      data,
-    })
-    return { success: true, voteId: res.voteId }
+    return callWithFallback('createVote', async () => {
+      const res = await request('/api/votes', {
+        method: 'POST',
+        data,
+      })
+      return { success: true, voteId: res.voteId }
+    }, [data])
   },
 
   // ---------- 报修工单 ----------
   async getOrderList(params = {}) {
-    const query = params.status && params.status !== 'all' ? `?status=${params.status}` : ''
-    return request(`/api/orders${query}`)
+    return callWithFallback('getOrderList', () => {
+      const query = buildQuery({
+        status: params.status && params.status !== 'all' ? params.status : undefined,
+        category: params.category || undefined,
+        keyword: params.keyword || undefined,
+        page: params.page || 1,
+        pageSize: params.pageSize || 20,
+      })
+      return request(`/api/orders${query}`)
+    }, [params])
   },
 
   async getOrderDetail(orderId) {
     try {
-      return await request(`/api/orders/${orderId}`)
+      return await callWithFallback('getOrderDetail', () => request(`/api/orders/${orderId}`), [orderId])
     } catch {
       return null
     }
   },
 
   async submitRepair(data) {
-    const res = await request('/api/orders', {
-      method: 'POST',
-      data,
-    })
-    return { success: true, orderId: res.orderId }
+    return callWithFallback('submitRepair', async () => {
+      const res = await request('/api/orders', {
+        method: 'POST',
+        data,
+      })
+      return { success: true, orderId: res.orderId }
+    }, [data])
   },
 
   async rateOrder(orderId, rating, comment) {
-    await request(`/api/orders/${orderId}/rate`, {
-      method: 'POST',
-      data: { rating, comment },
-    })
-    return { success: true }
+    return callWithFallback('rateOrder', async () => {
+      await request(`/api/orders/${orderId}/rate`, {
+        method: 'POST',
+        data: { rating, comment },
+      })
+      return { success: true }
+    }, [orderId, rating, comment])
   },
 
   async acceptOrder(orderId) {
-    await request(`/api/orders/${orderId}/accept`, {
-      method: 'POST',
-    })
-    return { success: true }
+    return callWithFallback('acceptOrder', async () => {
+      await request(`/api/orders/${orderId}/accept`, {
+        method: 'POST',
+      })
+      return { success: true }
+    }, [orderId])
   },
 
   async reworkOrder(orderId, reason) {
-    await request(`/api/orders/${orderId}/rework`, {
-      method: 'POST',
-      data: { reason },
-    })
-    return { success: true }
+    return callWithFallback('reworkOrder', async () => {
+      await request(`/api/orders/${orderId}/rework`, {
+        method: 'POST',
+        data: { reason },
+      })
+      return { success: true }
+    }, [orderId, reason])
   },
 
   // ---------- 财务 ----------
-  async getFinanceList() {
-    return request('/api/finance')
+  async getFinanceList(params = {}) {
+    return callWithFallback('getFinanceList', () => {
+      const query = buildQuery({
+        status: params.status && params.status !== 'all' ? params.status : undefined,
+        page: params.page || 1,
+        pageSize: params.pageSize || 20,
+      })
+      return request(`/api/finance${query}`)
+    }, [params])
   },
 
   async getFinanceDetail(reportId) {
     try {
-      return await request(`/api/finance/${reportId}`)
+      return await callWithFallback('getFinanceDetail', () => request(`/api/finance/${reportId}`), [reportId])
     } catch {
       return null
     }
   },
 
   // ---------- 公告 ----------
-  async getAnnouncementList() {
-    return request('/api/announcements')
+  async getAnnouncementList(params = {}) {
+    return callWithFallback('getAnnouncementList', () => {
+      const query = buildQuery({
+        type: params.type && params.type !== 'all' ? params.type : undefined,
+        keyword: params.keyword || undefined,
+        page: params.page || 1,
+        pageSize: params.pageSize || 20,
+      })
+      return request(`/api/announcements${query}`)
+    }, [params])
   },
 
   async getAnnouncementDetail(id) {
     try {
-      return await request(`/api/announcements/${id}`)
+      return await callWithFallback('getAnnouncementDetail', () => request(`/api/announcements/${id}`), [id])
     } catch {
       return null
     }
@@ -162,18 +244,213 @@ const api = {
 
   // ---------- 身份核验 ----------
   async verifyIdentity(level, data) {
-    await request('/api/users/verify', {
-      method: 'POST',
-      data: { level, data },
+    return callWithFallback('verifyIdentity', async () => {
+      await request('/api/users/verify', {
+        method: 'POST',
+        data: { level, data },
+      })
+      return { success: true, verifiedLevel: level }
+    }, [level, data])
+  },
+
+  // ---------- 文件上传（新增） ----------
+  async uploadFile(filePath) {
+    if (USE_MOCK) {
+      warnMockFallback('文件上传使用模拟模式')
+      return { success: true, url: '/uploads/mock-image.jpg', filename: 'mock-image.jpg' }
+    }
+    return new Promise((resolve, reject) => {
+      const token = wx.getStorageSync('token')
+      wx.uploadFile({
+        url: `${BASE_URL}/api/upload`,
+        filePath,
+        name: 'file',
+        header: { 'Authorization': token ? `Bearer ${token}` : '' },
+        success(res) {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            const data = JSON.parse(res.data)
+            resolve({ success: true, url: data.url, filename: data.filename })
+          } else {
+            reject(new Error('上传失败'))
+          }
+        },
+        fail(err) {
+          reject(new Error(err.errMsg || '上传失败'))
+        },
+      })
     })
-    return { success: true, verifiedLevel: level }
+  },
+
+  // ---------- 社区管理（新增） ----------
+  async getCommunityList(params = {}) {
+    return callWithFallback('getCommunityList', () => {
+      const query = buildQuery({
+        page: params.page || 1,
+        pageSize: params.pageSize || 20,
+      })
+      return request(`/api/communities${query}`)
+    }, [params])
+  },
+
+  async getCommunityDetail(communityId) {
+    try {
+      return await callWithFallback('getCommunityDetail', () => request(`/api/communities/${communityId}`), [communityId])
+    } catch {
+      return null
+    }
+  },
+
+  // ---------- 数据统计（新增） ----------
+  async getDashboard() {
+    return callWithFallback('getDashboard', () => request('/api/stats/dashboard'), [])
+  },
+
+  async getOverview() {
+    return callWithFallback('getOverview', () => request('/api/stats/overview'), [])
+  },
+
+  // ---------- 财务审批 ----------
+  async approveFinance(reportId) {
+    return callWithFallback('approveFinance', async () => {
+      await request(`/api/finance/${reportId}/approve`, { method: 'POST' })
+      return { success: true }
+    }, [reportId])
+  },
+
+  async rejectFinance(reportId, reason) {
+    return callWithFallback('rejectFinance', async () => {
+      await request(`/api/finance/${reportId}/reject`, {
+        method: 'POST',
+        data: { reason },
+      })
+      return { success: true }
+    }, [reportId, reason])
+  },
+
+  // ---------- 公告管理 ----------
+  async createAnnouncement(data) {
+    return callWithFallback('createAnnouncement', async () => {
+      const res = await request('/api/announcements', {
+        method: 'POST',
+        data,
+      })
+      return { success: true, id: res.id }
+    }, [data])
+  },
+
+  async updateAnnouncement(id, data) {
+    return callWithFallback('updateAnnouncement', async () => {
+      await request(`/api/announcements/${id}`, {
+        method: 'PUT',
+        data,
+      })
+      return { success: true }
+    }, [id, data])
+  },
+
+  async deleteAnnouncement(id) {
+    return callWithFallback('deleteAnnouncement', async () => {
+      await request(`/api/announcements/${id}`, {
+        method: 'DELETE',
+      })
+      return { success: true }
+    }, [id])
+  },
+
+  // ---------- 工单管理 ----------
+  async completeOrder(orderId, note, completionPhotos) {
+    return callWithFallback('completeOrder', async () => {
+      await request(`/api/orders/${orderId}/complete`, {
+        method: 'POST',
+        data: { note, completionPhotos: completionPhotos || [] },
+      })
+      return { success: true }
+    }, [orderId, note, completionPhotos])
+  },
+
+  async processOrder(orderId) {
+    return callWithFallback('processOrder', async () => {
+      await request(`/api/orders/${orderId}/process`, {
+        method: 'POST',
+      })
+      return { success: true }
+    }, [orderId])
+  },
+
+  // ---------- 用户管理（管理端） ----------
+  async getUserList(params = {}) {
+    return callWithFallback('getUserList', () => {
+      const query = buildQuery({
+        role: params.role || undefined,
+        keyword: params.keyword || undefined,
+        page: params.page || 1,
+        pageSize: params.pageSize || 20,
+      })
+      return request(`/api/users/list${query}`)
+    }, [params])
+  },
+
+  async updateUserRole(userId, role, reason) {
+    return callWithFallback('updateUserRole', async () => {
+      await request(`/api/users/${userId}/role`, {
+        method: 'PUT',
+        data: { role, reason: reason || '' },
+      })
+      return { success: true }
+    }, [userId, role, reason])
+  },
+
+  async toggleUserActive(userId, isActive) {
+    return callWithFallback('toggleUserActive', async () => {
+      await request(`/api/users/${userId}/active`, {
+        method: 'PUT',
+        data: { isActive },
+      })
+      return { success: true }
+    }, [userId, isActive])
+  },
+
+  // ---------- 角色变更记录（公示） ----------
+  async getRoleLogs(params = {}) {
+    return callWithFallback('getRoleLogs', () => {
+      const query = buildQuery({
+        page: params.page || 1,
+        pageSize: params.pageSize || 20,
+      })
+      return request(`/api/users/role-logs${query}`)
+    }, [params])
+  },
+
+  async createFinanceReport(data) {
+    return callWithFallback('createFinanceReport', async () => {
+      const res = await request('/api/finance', {
+        method: 'POST',
+        data,
+      })
+      return { success: true, reportId: res.reportId }
+    }, [data])
+  },
+
+  // ---------- 社区管理（补充） ----------
+  async createCommunity(data) {
+    return callWithFallback('createCommunity', async () => {
+      const res = await request('/api/communities', {
+        method: 'POST',
+        data,
+      })
+      return { success: true, id: res.id }
+    }, [data])
+  },
+
+  async updateCommunity(communityId, data) {
+    return callWithFallback('updateCommunity', async () => {
+      await request(`/api/communities/${communityId}`, {
+        method: 'PUT',
+        data,
+      })
+      return { success: true }
+    }, [communityId, data])
   },
 }
 
-// 如果使用模拟数据，回退到 mockApi
-if (USE_MOCK) {
-  const { mockApi } = require('./mock-data.js')
-  module.exports = mockApi
-} else {
-  module.exports = api
-}
+module.exports = api

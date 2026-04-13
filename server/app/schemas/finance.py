@@ -2,7 +2,14 @@
 
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+class FinanceAttachmentOut(BaseModel):
+    """附件输出"""
+    name: str
+    url: str
+    size: int = 0  # bytes
 
 
 class FinanceItemOut(BaseModel):
@@ -36,17 +43,24 @@ class FinanceListOut(BaseModel):
 class FinanceDetailOut(FinanceListOut):
     """财务详情"""
     items: List[FinanceItemOut] = []
+    attachments: List[FinanceAttachmentOut] = []
 
 
 class FinanceItemCreate(BaseModel):
-    itemType: str  # income / expense
-    category: str
-    amount: float
-    description: str = ""
+    itemType: str = Field(..., pattern="^(income|expense)$")
+    category: str = Field(..., min_length=1, max_length=50)
+    amount: float = Field(..., gt=0)
+    description: str = Field("", max_length=200)
 
 
 class FinanceCreate(BaseModel):
     """创建财务报表"""
-    month: str
-    title: str
-    items: List[FinanceItemCreate] = []
+    month: str = Field(..., pattern=r"^\d{4}-\d{2}$", description="月份，格式 2026-03")
+    title: str = Field(..., min_length=1, max_length=200)
+    items: List[FinanceItemCreate] = Field(..., min_length=1)
+    attachments: List[FinanceAttachmentOut] = Field([], description="附件列表")
+
+
+class FinanceRejectRequest(BaseModel):
+    """拒绝财务报表"""
+    reason: str = Field("", max_length=500)

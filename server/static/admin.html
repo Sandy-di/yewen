@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>业问 · 管理后台</title>
+  <style>
+    :root {
+      --primary: #4A6FA5;
+      --primary-light: #6B8FC5;
+      --primary-dark: #3A5A8A;
+      --success: #52C41A;
+      --warning: #FAAD14;
+      --danger: #F5222D;
+      --bg: #F0F2F5;
+      --card: #FFFFFF;
+      --text: #1F2937;
+      --text-secondary: #6B7280;
+      --border: #E5E7EB;
+      --sidebar-bg: #1E293B;
+      --sidebar-text: #CBD5E1;
+      --sidebar-active: #4A6FA5;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+    /* ===== Login ===== */
+    #loginPage { display: flex; align-items: center; justify-content: center; width: 100%; background: linear-gradient(135deg, #1E293B 0%, #334155 100%); }
+    .login-box { background: var(--card); border-radius: 16px; padding: 48px 40px; width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .login-box h1 { font-size: 24px; margin-bottom: 8px; text-align: center; }
+    .login-box p { font-size: 14px; color: var(--text-secondary); text-align: center; margin-bottom: 32px; }
+    .login-box select, .login-box input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; margin-bottom: 16px; outline: none; transition: border 0.2s; }
+    .login-box select:focus, .login-box input:focus { border-color: var(--primary); }
+    .login-box button { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+    .login-box button:hover { background: var(--primary-dark); }
+
+    /* ===== Layout ===== */
+    #app { display: none; width: 100%; }
+    .sidebar { width: 220px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar-header { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-header h2 { font-size: 18px; color: #fff; }
+    .sidebar-header span { font-size: 12px; color: var(--sidebar-text); opacity: 0.7; }
+    .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+    .nav-item { display: flex; align-items: center; padding: 12px 20px; cursor: pointer; transition: all 0.2s; font-size: 14px; color: var(--sidebar-text); text-decoration: none; }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .nav-item.active { background: var(--sidebar-active); color: #fff; }
+    .nav-item .icon { width: 20px; margin-right: 12px; text-align: center; font-size: 16px; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-footer .user-info { font-size: 13px; color: var(--sidebar-text); }
+    .sidebar-footer .user-info strong { color: #fff; display: block; margin-bottom: 4px; }
+    .sidebar-footer button { margin-top: 8px; padding: 6px 12px; background: rgba(255,255,255,0.1); color: var(--sidebar-text); border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .sidebar-footer button:hover { background: rgba(255,255,255,0.2); }
+
+    .main { margin-left: 220px; flex: 1; min-height: 100vh; }
+    .topbar { background: var(--card); padding: 16px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .topbar h1 { font-size: 20px; }
+    .content { padding: 24px 32px; }
+
+    /* ===== Components ===== */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .stat-card .label { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+    .stat-card .value { font-size: 28px; font-weight: 700; }
+    .stat-card .sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+    .card { background: var(--card); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 20px; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .card-header h3 { font-size: 16px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; padding: 12px 16px; background: #F8FAFC; color: var(--text-secondary); font-weight: 500; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    tr:hover td { background: #F8FAFC; }
+
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .badge-success { background: #F0FFF4; color: var(--success); }
+    .badge-warning { background: #FFFBE6; color: #D48806; }
+    .badge-danger { background: #FFF1F0; color: var(--danger); }
+    .badge-info { background: #E6F7FF; color: #1890FF; }
+    .badge-default { background: #F5F5F5; color: var(--text-secondary); }
+
+    .btn { display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 8px; border: none; font-size: 14px; cursor: pointer; transition: all 0.2s; gap: 6px; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-warning { background: var(--warning); color: #fff; }
+    .btn-outline { background: #fff; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; }
+    .pagination button { padding: 6px 14px; border: 1px solid var(--border); background: #fff; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .pagination button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal { background: var(--card); border-radius: 12px; padding: 24px; width: 480px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    .modal h3 { margin-bottom: 20px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+    .empty { text-align: center; padding: 48px; color: var(--text-secondary); }
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .loading { text-align: center; padding: 48px; color: var(--text-secondary); }
+
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .status-dot.active { background: var(--success); }
+    .status-dot.pending { background: var(--warning); }
+    .status-dot.ended { background: var(--text-secondary); }
+
+    .filter-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .filter-bar select, .filter-bar input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; }
+    .filter-bar input { min-width: 180px; }
+  </style>
+</head>
+<body>
+
+<!-- ===== Login Page ===== -->
+<div id="loginPage">
+  <div class="login-box">
+    <h1>🏘️ 业问管理后台</h1>
+    <p>智慧社区管理平台 · 本地开发版</p>
+    <select id="loginRole">
+      <option value="oDev_Owner_001">👤 业主 — 张先生</option>
+      <option value="oDev_Property_001" selected>🏢 物业 — 物业服务中心</option>
+      <option value="oDev_Committee_001">📋 业委会 — 张主任</option>
+    </select>
+    <button onclick="doLogin()">登 录</button>
+  </div>
+</div>
+
+<!-- ===== Main App ===== -->
+<div id="app">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>业问</h2>
+      <span>管理后台 v1.0</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <span class="icon">📊</span> 仪表盘
+      </a>
+      <a class="nav-item" data-page="orders" onclick="navigate('orders')">
+        <span class="icon">🔧</span> 工单管理
+      </a>
+      <a class="nav-item" data-page="finance" onclick="navigate('finance')">
+        <span class="icon">💰</span> 财务管理
+      </a>
+      <a class="nav-item" data-page="votes" onclick="navigate('votes')">
+        <span class="icon">🗳️</span> 投票管理
+      </a>
+      <a class="nav-item" data-page="announcements" onclick="navigate('announcements')">
+        <span class="icon">📢</span> 公告管理
+      </a>
+      <a class="nav-item" data-page="users" onclick="navigate('users')">
+        <span class="icon">👥</span> 用户管理
+      </a>
+      <a class="nav-item" data-page="communities" onclick="navigate('communities')">
+        <span class="icon">🏘️</span> 社区管理
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <strong id="userNickname">-</strong>
+        <span id="userRole">-</span>
+      </div>
+      <button onclick="doLogout()">退出登录</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h1 id="pageTitle">仪表盘</h1>
+      <span style="font-size:13px;color:var(--text-secondary);" id="currentTime"></span>
+    </div>
+    <div class="content" id="pageContent">
+      <!-- dynamic content -->
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== State =====
+let TOKEN = '';
+let currentUser = null;
+const API = '/api';
+const headers = () => ({ 'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json' });
+
+// ===== API Helper =====
+async function api(method, path, body) {
+  const opts = { method, headers: headers() };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${API}${path}`, opts);
+  if (res.status === 401) { doLogout(); throw new Error('登录已过期'); }
+  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.detail || `HTTP ${res.status}`); }
+  return res.json();
+}
+
+// ===== Auth =====
+async function doLogin() {
+  const openid = document.getElementById('loginRole').value;
+  try {
+    const data = await fetch(`${API}/auth/dev-token?openid=${openid}`, { method: 'POST' }).then(r => r.json());
+    TOKEN = data.token;
+    currentUser = data;
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('userNickname').textContent = data.nickname;
+    document.getElementById('userRole').textContent = { owner: '业主', property: '物业', committee: '业委会' }[data.role] || data.role;
+    navigate('dashboard');
+  } catch (e) { alert('登录失败: ' + e.message); }
+}
+
+function doLogout() {
+  TOKEN = ''; currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+}
+
+// ===== Router =====
+const pageTitles = { dashboard: '仪表盘', orders: '工单管理', finance: '财务管理', votes: '投票管理', announcements: '公告管理', users: '用户管理', communities: '社区管理' };
+
+function navigate(page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
+  document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+  const renderers = { dashboard: renderDashboard, orders: renderOrders, finance: renderFinance, votes: renderVotes, announcements: renderAnnouncements, users: renderUsers, communities: renderCommunities };
+  if (renderers[page]) renderers[page]();
+}
+
+// ===== Utils =====
+function fmtDate(d) { if (!d) return '-'; return new Date(d).toLocaleDateString('zh-CN'); }
+function fmtDateTime(d) { if (!d) return '-'; return new Date(d).toLocaleString('zh-CN'); }
+function fmtMoney(n) { return '¥' + (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
+function statusBadge(label, type) { return `<span class="badge badge-${type}">${label}</span>`; }
+function orderStatusBadge(s) { const m = { submitted: ['已提交','info'], accepted: ['已接单','warning'], processing: ['处理中','warning'], pending_check: ['待验收','info'], completed: ['已完成','success'], rework: ['复修','danger'] }; const [l,t] = m[s] || [s,'default']; return statusBadge(l,t); }
+function voteStatusBadge(s) { const m = { draft: ['草稿','default'], active: ['进行中','success'], ended: ['已结束','info'], archived: ['已归档','default'] }; const [l,t] = m[s] || [s,'default']; return statusBadge(l,t); }
+function financeStatusBadge(s) { const m = { pending: ['待审批','warning'], published: ['已审批','success'], rejected: ['已拒绝','danger'] }; const [l,t] = m[s] || [s,'default']; return statusBadge(l,t); }
+function roleBadge(r) { const m = { owner: ['业主','info'], property: ['物业','warning'], committee: ['业委会','danger'] }; const [l,t] = m[r] || [r,'default']; return statusBadge(l,t); }
+function paginationHtml(page, total, pageSize, onPageClick) {
+  const pages = Math.ceil(total / pageSize) || 1;
+  let h = '<div class="pagination">';
+  h += `<button ${page<=1?'disabled':''} onclick="${onPageClick}(${page-1})">上一页</button>`;
+  for (let i = 1; i <= Math.min(pages, 7); i++) h += `<button class="${i===page?'active':''}" onclick="${onPageClick}(${i})">${i}</button>`;
+  if (pages > 7) h += `<button disabled>...</button><button class="${pages===page?'active':''}" onclick="${onPageClick}(${pages})">${pages}</button>`;
+  h += `<button ${page>=pages?'disabled':''} onclick="${onPageClick}(${page+1})">下一页</button>`;
+  h += `<span style="font-size:13px;color:var(--text-secondary);margin-left:12px;">共 ${total} 条</span></div>`;
+  return h;
+}
+
+// ===== Dashboard =====
+async function renderDashboard() {
+  const el = document.getElementById('pageContent');
+  el.innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const [dashboard, overview] = await Promise.all([api('GET', '/stats/dashboard'), api('GET', '/stats/overview')]);
+    el.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card" onclick="navigate('orders')" style="cursor:pointer">
+          <div class="label">🔧 待处理工单</div>
+          <div class="value" style="color:var(--warning)">${dashboard.pendingOrders || 0}</div>
+          <div class="sub">处理中 ${dashboard.processingOrders || 0} · 总计 ${dashboard.totalOrders || 0}</div>
+        </div>
+        <div class="stat-card" onclick="navigate('finance')" style="cursor:pointer">
+          <div class="label">💰 待审批财务</div>
+          <div class="value" style="color:var(--danger)">${dashboard.pendingFinance || 0}</div>
+          <div class="sub">总计 ${dashboard.totalFinance || 0} 份报表</div>
+        </div>
+        <div class="stat-card" onclick="navigate('votes')" style="cursor:pointer">
+          <div class="label">🗳️ 进行中投票</div>
+          <div class="value" style="color:var(--success)">${dashboard.activeVotes || 0}</div>
+          <div class="sub">总计 ${dashboard.totalVotes || 0} 个投票</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">👥 总用户数</div>
+          <div class="value">${dashboard.totalUsers || 0}</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">📢 公告数</div>
+          <div class="value">${dashboard.totalAnnouncements || 0}</div>
+        </div>
+      </div>
+      ${overview ? `
+      <div class="card">
+        <div class="card-header"><h3>社区概览</h3></div>
+        <div class="stat-grid" style="margin-bottom:0">
+          <div class="stat-card"><div class="label">社区名称</div><div class="value" style="font-size:18px">${overview.communityName || '-'}</div></div>
+          <div class="stat-card"><div class="label">总户数</div><div class="value" style="font-size:18px">${overview.totalUnits || 0}</div></div>
+          <div class="stat-card"><div class="label">总面积</div><div class="value" style="font-size:18px">${overview.totalArea || 0} m²</div></div>
+          <div class="stat-card"><div class="label">业主数</div><div class="value" style="font-size:18px">${overview.totalOwners || 0}</div></div>
+        </div>
+      </div>` : ''}
+    `;
+  } catch (e) { el.innerHTML = `<div class="empty">加载失败: ${e.message}</div>`; }
+}
+
+// ===== Orders =====
+let orderPage = 1;
+async function renderOrders() {
+  const el = document.getElementById('pageContent');
+  el.innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const data = await api('GET', `/orders?page=${orderPage}&pageSize=10`);
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-header"><h3>工单列表</h3></div>
+        <table>
+          <thead><tr><th>ID</th><th>分类</th><th>描述</th><th>状态</th><th>提交时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${data.data.length ? data.data.map(o => `
+              <tr>
+                <td style="font-family:monospace;font-size:12px">${o.orderId}</td>
+                <td>${o.category}${o.subCategory ? ' / ' + o.subCategory : ''}</td>
+                <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.description}</td>
+                <td>${orderStatusBadge(o.status)}</td>
+                <td>${fmtDateTime(o.createdAt)}</td>
+                <td><button class="btn btn-sm btn-outline" onclick="showOrderDetail('${o.orderId}')">详情</button></td>
+              </tr>
+            `).join('') : '<tr><td colspan="6" class="empty">暂无工单</td></tr>'}
+          </tbody>
+        </table>
+        ${paginationHtml(data.page, data.total, data.pageSize, 'orderGoPage')}
+      </div>`;
+  } catch (e) { el.innerHTML = `<div class="empty">加载失败: ${e.message}</div>`; }
+}
+function orderGoPage(p) { orderPage = p; renderOrders(); }
+
+async function showOrderDetail(id) {
+  try {
+    const o = await api('GET', `/orders/${id}`);
+    const actions = [];
+    if (currentUser.role === 'property' && o.status === 'submitted') actions.push(`<button class="btn btn-sm btn-primary" onclick="orderAction('${id}','accept')">接单</button>`);
+    if (currentUser.role === 'property' && o.status === 'accepted') actions.push(`<button class="btn btn-sm btn-warning" onclick="orderAction('${id}','process')">开始处理</button>`);
+    if (currentUser.role === 'property' && o.status === 'processing') actions.push(`<button class="btn btn-sm btn-success" onclick="orderComplete('${id}')">完成</button>`);
+    if (currentUser.role === 'owner' && o.status === 'completed') actions.push(`<button class="btn btn-sm btn-primary" onclick="orderRate('${id}')">评价</button>`);
+    if (currentUser.role === 'owner' && o.status === 'completed') actions.push(`<button class="btn btn-sm btn-danger" onclick="orderRework('${id}')">申请复修</button>`);
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = `<div class="modal">
+      <h3>工单详情 ${orderStatusBadge(o.status)}</h3>
+      <div class="form-group"><label>工单号</label><input value="${o.orderId}" readonly></div>
+      <div class="form-group"><label>分类</label><input value="${o.category} / ${o.subCategory || '-'}" readonly></div>
+      <div class="form-group"><label>描述</label><textarea readonly>${o.description}</textarea></div>
+      <div class="form-group"><label>联系人电话</label><input value="${o.contactPhone || '-'}" readonly></div>
+      <div class="form-group"><label>房产</label><input value="${o.propertyName || '-'}" readonly></div>
+      <div class="form-group"><label>接单人</label><input value="${o.acceptedBy ? o.acceptedBy + ' ' + (o.acceptorPhone||'') : '-'}" readonly></div>
+      ${o.completionNote ? `<div class="form-group"><label>完成备注</label><textarea readonly>${o.completionNote}</textarea></div>` : ''}
+      ${o.rating ? `<div class="form-group"><label>评价</label><input value="${'⭐'.repeat(o.rating)} ${o.ratingComment||''}" readonly></div>` : ''}
+      ${o.timeline && o.timeline.length ? `<div class="form-group"><label>时间线</label><div style="padding:8px 0">${o.timeline.map(t => `<div style="padding:4px 0;font-size:13px"><span style="color:var(--text-secondary)">${t.time}</span> ${t.content}</div>`).join('')}</div></div>` : ''}
+      ${actions.length ? `<div class="tag-row">${actions.join('')}</div>` : ''}
+      <div class="modal-actions"><button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">关闭</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+  } catch (e) { alert('加载失败: ' + e.message); }
+}
+
+async function orderAction(id, action) {
+  try { await api('POST', `/orders/${id}/${action}`); alert('操作成功'); location.reload(); } catch (e) { alert('操作失败: ' + e.message); }
+}
+async function orderComplete(id) {
+  const note = prompt('完成备注（可选）:');
+  if (note === null) return;
+  try { await api('POST', `/orders/${id}/complete`, { note, completionPhotos: [] }); alert('操作成功'); location.reload(); } catch (e) { alert('操作失败: ' + e.message); }
+}
+async function orderRate(id) {
+  const rating = prompt('评分 (1-5):', '5');
+  if (!rating) return;
+  const comment = prompt('评价内容:', '');
+  try { await api('POST', `/orders/${id}/rate`, { rating: parseInt(rating), comment: comment || '' }); alert('评价成功'); location.reload(); } catch (e) { alert('评价失败: ' + e.message); }
+}
+async function orderRework(id) {
+  const reason = prompt('复修原因:');
+  if (!reason) return;
+  try { await api('POST', `/orders/${id}/rework`, { reason }); alert('已申请复修'); location.reload(); } catch (e) { alert('操作失败: ' + e.message); }
+}
+
+// ===== Finance =====
+let financePage = 1;
+async function renderFinance() {
+  const el = document.getElementById('pageContent');
+  el.innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const data = await api('GET', `/finance?page=${financePage}&pageSize=10`);
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <h3>财务报表</h3>
+          ${currentUser.role === 'property' ? '<button class="btn btn-primary" onclick="showFinanceCreate()">+ 上报财务</button>' : ''}
+        </div>
+        <table>
+          <thead><tr><th>月份</th><th>标题</th><th>状态</th><th>收入</th><th>支出</th><th>结余</th><th>提交时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${data.data.length ? data.data.map(r => `
+              <tr>
+                <td>${r.month}</td>
+                <td>${r.title}</td>
+                <td>${financeStatusBadge(r.status)}</td>
+                <td style="color:var(--success)">${fmtMoney(r.totalIncome)}</td>
+                <td style="color:var(--danger)">${fmtMoney(r.totalExpense)}</td>
+                <td style="font-weight:600">${fmtMoney(r.balance)}</td>
+                <td>${fmtDateTime(r.submittedAt)}</td>
+                <td><button class="btn btn-sm btn-outline" onclick="showFinanceDetail('${r.reportId}')">详情</button></td>
+              </tr>
+            `).join('') : '<tr><td colspan="8" class="empty">暂无数据</td></tr>'}
+          </tbody>
+        </table>
+        ${paginationHtml(data.page, data.total, data.pageSize, 'financeGoPage')}
+      </div>`;
+  } catch (e) { el.innerHTML = `<div class="empty">加载失败: ${e.message}</div>`; }
+}
+function financeGoPage(p) { financePage = p; renderFinance(); }
+
+async function showFinanceDetail(id) {
+  try {
+    const r = await api('GET', `/finance/${id}`);
+    const actions = [];
+    if (currentUser.role === 'committee' && r.status === 'pending') {
+      actions.push(`<button class="btn btn-sm btn-success" onclick="financeAction('${id}','approve')">审批通过</button>`);
+      actions.push(`<button class="btn btn-sm btn-danger" onclick="financeReject('${id}')">拒绝</button>`);
+    }
+    const attachmentHtml = r.attachments && r.attachments.length ? `
+      <div class="form-group"><label>附件</label>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${r.attachments.map(a => `
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#F8FAFC;border-radius:8px;border:1px solid var(--border)">
+              <span style="font-size:18px">${a.name.endsWith('.pdf')?'📄':a.name.endsWith('.doc')||a.name.endsWith('.docx')?'📝':'🖼️'}</span>
+              <a href="${a.url}" target="_blank" style="flex:1;font-size:13px;color:var(--primary);text-decoration:none">${a.name}</a>
+              <span style="font-size:12px;color:var(--text-secondary)">${(a.size/1024).toFixed(1)}KB</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>` : '';
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = `<div class="modal" style="width:600px">
+      <h3>${r.title} ${financeStatusBadge(r.status)}</h3>
+      <div class="form-group"><label>月份</label><input value="${r.month}" readonly></div>
+      <div style="display:flex;gap:16px">
+        <div class="form-group" style="flex:1"><label>总收入</label><input value="${fmtMoney(r.totalIncome)}" readonly style="color:var(--success);font-weight:600"></div>
+        <div class="form-group" style="flex:1"><label>总支出</label><input value="${fmtMoney(r.totalExpense)}" readonly style="color:var(--danger);font-weight:600"></div>
+        <div class="form-group" style="flex:1"><label>结余</label><input value="${fmtMoney(r.balance)}" readonly style="font-weight:600"></div>
+      </div>
+      ${r.items && r.items.length ? `<table style="margin:12px 0"><thead><tr><th>类型</th><th>分类</th><th>金额</th><th>说明</th></tr></thead><tbody>${r.items.map(i => `<tr><td>${statusBadge(i.itemType==='income'?'收入':'支出', i.itemType==='income'?'success':'danger')}</td><td>${i.category}</td><td style="font-weight:500">${fmtMoney(i.amount)}</td><td>${i.description || '-'}</td></tr>`).join('')}</tbody></table>` : ''}
+      ${attachmentHtml}
+      ${actions.length ? `<div class="tag-row">${actions.join('')}</div>` : ''}
+      <div class="modal-actions"><button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">关闭</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+  } catch (e) { alert('加载失败: ' + e.message); }
+}
+
+async function financeAction(id, action) {
+  try { await api('POST', `/finance/${id}/${action}`); alert('操作成功'); location.reload(); } catch (e) { alert('操作失败: ' + e.message); }
+}
+async function financeReject(id) {
+  const reason = prompt('拒绝原因:');
+  if (!reason) return;
+  try { await api('POST', `/finance/${id}/reject`, { reason }); alert('已拒绝'); location.reload(); } catch (e) { alert('操作失败: ' + e.message); }
+}
+const FINANCE_CATEGORIES = {
+  income: ['物业费', '停车费', '广告位收入', '公共收益', '场地租赁', '其他收入'],
+  expense: ['人员工资', '维修费', '绿化费', '水电费', '保洁费', '办公费', '安保费', '保险费', '其他支出']
+};
+
+let financeItems = [{ itemType: 'income', category: '物业费', amount: '', description: '' }];
+let financeAttachments = [];
+
+function renderFinanceItemRow(item, index) {
+  const cats = FINANCE_CATEGORIES[item.itemType] || FINANCE_CATEGORIES.income;
+  return `<tr data-index="${index}">
+    <td><select class="fi-type" onchange="onFinanceItemTypeChange(${index}, this.value)" style="width:90px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px">
+      <option value="income" ${item.itemType==='income'?'selected':''}>收入</option>
+      <option value="expense" ${item.itemType==='expense'?'selected':''}>支出</option>
+    </select></td>
+    <td><select class="fi-category" onchange="onFinanceItemFieldChange(${index},'category',this.value)" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px">
+      ${cats.map(c => `<option value="${c}" ${item.category===c?'selected':''}>${c}</option>`).join('')}
+      <option value="__custom">自定义...</option>
+    </select></td>
+    <td><input type="number" class="fi-amount" value="${item.amount}" onchange="onFinanceItemFieldChange(${index},'amount',this.value)" placeholder="0.00" style="width:110px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:right"></td>
+    <td><input class="fi-desc" value="${item.description}" onchange="onFinanceItemFieldChange(${index},'description',this.value)" placeholder="说明" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px"></td>
+    <td><button class="btn btn-sm btn-danger" onclick="removeFinanceItem(${index})" ${financeItems.length<=1?'disabled':''}>删除</button></td>
+  </tr>`;
+}
+
+function refreshFinanceTable() {
+  const tbody = document.getElementById('fiTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = financeItems.map((item, i) => renderFinanceItemRow(item, i)).join('');
+  // 汇总
+  let totalIncome = 0, totalExpense = 0;
+  financeItems.forEach(item => {
+    const amt = parseFloat(item.amount) || 0;
+    if (item.itemType === 'income') totalIncome += amt;
+    else totalExpense += amt;
+  });
+  const summary = document.getElementById('fiSummary');
+  if (summary) {
+    summary.innerHTML = `<span style="color:var(--success);font-weight:600">收入: ${fmtMoney(totalIncome)}</span> &nbsp; <span style="color:var(--danger);font-weight:600">支出: ${fmtMoney(totalExpense)}</span> &nbsp; <span style="font-weight:700">结余: ${fmtMoney(totalIncome - totalExpense)}</span>`;
+  }
+}
+
+function onFinanceItemTypeChange(index, value) {
+  financeItems[index].itemType = value;
+  const cats = FINANCE_CATEGORIES[value];
+  financeItems[index].category = cats[0];
+  refreshFinanceTable();
+}
+
+function onFinanceItemFieldChange(index, field, value) {
+  if (field === 'category' && value === '__custom') {
+    const custom = prompt('请输入自定义分类名称:');
+    if (custom && custom.trim()) {
+      financeItems[index].category = custom.trim();
+    }
+    refreshFinanceTable();
+    return;
+  }
+  financeItems[index][field] = value;
+  if (field === 'amount') refreshFinanceTable();
+}
+
+function addFinanceItem() {
+  financeItems.push({ itemType: 'income', category: '物业费', amount: '', description: '' });
+  refreshFinanceTable();
+}
+
+function removeFinanceItem(index) {
+  if (financeItems.length <= 1) return;
+  financeItems.splice(index, 1);
+  refreshFinanceTable();
+}
+
+function showFinanceCreate() {
+  financeItems = [{ itemType: 'income', category: '物业费', amount: '', description: '' }];
+  financeAttachments = [];
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `<div class="modal" style="width:680px">
+    <h3>上报财务报表</h3>
+    <div style="display:flex;gap:16px">
+      <div class="form-group" style="flex:1"><label>月份 (YYYY-MM)</label><input id="fMonth" placeholder="2026-04" value="2026-04"></div>
+      <div class="form-group" style="flex:2"><label>标题</label><input id="fTitle" placeholder="4月物业收支报表"></div>
+    </div>
+    <div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+      <label style="font-size:14px;font-weight:600">收支明细</label>
+      <button class="btn btn-sm btn-primary" onclick="addFinanceItem()">+ 添加行</button>
+    </div>
+    <table style="margin-bottom:12px">
+      <thead><tr><th style="width:100px">类型</th><th>分类</th><th style="width:120px">金额</th><th>说明</th><th style="width:60px">操作</th></tr></thead>
+      <tbody id="fiTableBody"></tbody>
+    </table>
+    <div id="fiSummary" style="padding:12px;background:#F8FAFC;border-radius:8px;text-align:center;font-size:14px"></div>
+    <div style="margin-top:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <label style="font-size:14px;font-weight:600">📎 附件（表格/文档）</label>
+        <button class="btn btn-sm btn-outline" onclick="document.getElementById('financeFileInput').click()">+ 上传附件</button>
+      </div>
+      <input type="file" id="financeFileInput" style="display:none" accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx" onchange="onFinanceAttachmentUpload(this)">
+      <div id="fiAttachments" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">取消</button>
+      <button class="btn btn-primary" onclick="submitFinanceCreate()">提交</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  refreshFinanceTable();
+}
+
+async function onFinanceAttachmentUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { alert('文件不能超过10MB'); return; }
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/upload', { method: 'POST', headers: { 'Authorization': `Bearer ${TOKEN}` }, body: formData });
+    if (!res.ok) throw new Error('上传失败');
+    const data = await res.json();
+    financeAttachments.push({ name: file.name, url: data.url, size: file.size });
+    refreshFinanceAttachments();
+  } catch (e) { alert('上传失败: ' + e.message); }
+  input.value = '';
+}
+
+function refreshFinanceAttachments() {
+  const el = document.getElementById('fiAttachments');
+  if (!el) return;
+  el.innerHTML = financeAttachments.map((a, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#F8FAFC;border-radius:8px;border:1px solid var(--border)">
+      <span style="font-size:16px">${a.name.endsWith('.pdf')?'📄':a.name.endsWith('.doc')||a.name.endsWith('.docx')?'📝':'🖼️'}</span>
+      <span style="flex:1;font-size:13px">${a.name}</span>
+      <span style="font-size:12px;color:var(--text-secondary)">${(a.size/1024).toFixed(1)}KB</span>
+      <button class="btn btn-sm btn-danger" onclick="financeAttachments.splice(${i},1);refreshFinanceAttachments()">删除</button>
+    </div>
+  `).join('');
+}
+async function submitFinanceCreate() {
+  try {
+    const items = financeItems.map(item => ({
+      itemType: item.itemType,
+      category: item.category,
+      amount: parseFloat(item.amount) || 0,
+      description: item.description
+    })).filter(item => item.amount > 0);
+    if (items.length === 0) { alert('请至少填写一条明细'); return; }
+    await api('POST', '/finance', {
+      month: document.getElementById('fMonth').value,
+      title: document.getElementById('fTitle').value,
+      items,
+      attachments: financeAttachments
+    });
+    alert('上报成功'); location.reload();
+  } catch (e) { alert('提交失败: ' + e.message); }
+}
+
+// ===== Votes =====
+let votePage = 1;
+async function renderVotes() {
+  const el = document.getElementById('pageContent');
+  el.innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const data = await api('GET', `/votes?page=${votePage}&pageSize=10`);
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <h3>投票管理</h3>
+          ${currentUser.role === 'committee' ? '<button class="btn btn-primary" onclick="showVoteCreate()">+ 创建投票</button>' : ''}
+        </div>
+        <table>
+          <thead><tr><th>标题</th><th>类型</th><th>状态</th><th>参与率</th><th>创建时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${data.data.length ? data.data.map(v => {
+              const rate = v.totalProperties ? (v.participatedCount / v.totalProperties * 100).toFixed(1) : 0;
+              return `<tr>
+                <td>${v.title}</td>
+                <td>${{double_majority:'双过半',double_three_quarters:'双3/4',simple:'简单多数'}[v.voteType] || v.voteType}</td>
+                <td>${voteStatusBadge(v.status)}</td>
+                <td>${rate}% (${v.participatedCount}/${v.totalProperties})</td>
+                <td>${fmtDateTime(v.createdAt)}</td>
+                <td><button class="btn btn-sm btn-outline" onclick="showVoteDetail('${v.voteId}')">详情</button></td>
+              </tr>`;
+            }).join('') : '<tr><td colspan="6" class="empty">暂无投票</td></tr>'}
+          </tbody>
+        </table>
+        ${paginationHtml(data.page, data.total, data.pageSize, 'voteGoPage')}
+      </div>`;
+  } catch (e) { el.innerHTML = `<div class="empty">加载失败: ${e.message}</div>`; }
+}
+function voteGoPage(p) { votePage = p; renderVotes(); }
+
+async function showVoteDetail(id) {
+  try {
+    const v = await api('GET', `/votes/${id}`);
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = `<div class="modal">
+      <h3>${v.title} ${voteStatusBadge(v.status)}</h3>
+      <div class="form-group"><label>描述</label><textarea readonly>${v.description || '-'}</textarea></div>
+      <div style="display:flex;gap:16px">
+        <div class="form-group" style="flex:1"><label>核验等级</label><input value="L${v.verificationLevel}" readonly></div>
+        <div class="form-group" style="flex:1"><label>投票类型</label><input value="${{double_majority:'双过半',double_three_quarters:'双3/4',simple:'简单多数'}[v.voteType]}" readonly></div>
+      </div>
+      <div style="display:flex;gap:16px">
+        <div class="form-group" style="flex:1"><label>开始时间</label><input value="${fmtDateTime(v.startTime)}" readonly></div>
+        <div class="form-group" style="flex:1"><label>结束时间</label><input value="${fmtDateTime(v.endTime)}" readonly></div>
+      </div>
+      <h4 style="margin:16px 0 8px">选项</h4>
+      <table><thead><tr><th>选项</th><th>票数</th><th>面积</th></tr></thead><tbody>
+        ${v.options.map(o => `<tr><td>${o.label}</td><td>${o.count}</td><td>${o.area} m²</td></tr>`).join('')}
+      </tbody></table>
+      ${v.result ? `<div class="form-group" style="margin-top:12px"><label>结果</label><input value="${v.result === 'passed' ? '通过' : '未通过'}" readonly></div>` : ''}
+      ${v.resultSummary ? `<div class="form-group"><label>结果摘要</label><textarea readonly>${v.resultSummary}</textarea></div>` : ''}
+      <div class="modal-actions"><button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">关闭</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+  } catch (e) { alert('加载失败: ' + e.message); }
+}
+
+function showVoteCreate() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `<div class="modal">
+    <h3>创建投票</h3>
+    <div class="form-group"><label>标题</label><input id="vTitle" placeholder="关于XX的投票"></div>
+    <div class="form-group"><label>描述</label><textarea id="vDesc" placeholder="投票说明"></textarea></div>
+    <div style="display:flex;gap:16px">
+      <div class="form-group" style="flex:1"><label>投票类型</label><select id="vType"><option value="simple">简单多数</option><option value="double_majority">双过半</option><option value="double_three_quarters">双3/4</option></select></div>
+      <div class="form-group" style="flex:1"><label>核验等级</label><select id="vLevel"><option value="1">L1</option><option value="2">L2</option><option value="3">L3</option><option value="4">L4</option></select></div>
+    </div>
+    <div class="form-group"><label>选项（每行一个，至少2个）</label><textarea id="vOptions" rows="4">同意\n反对</textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">取消</button>
+      <button class="btn btn-primary" onclick="submitVoteCreate()">创建</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+async function submitVoteCreate() {
+  try {
+    const options = document.getElementById('vOptions').value.split('\n').filter(s => s.trim()).map(l => ({ label: l.trim() }));
+    if (options.length < 2) { alert('至少2个选项'); return; }
+    await api('POST', '/votes', {
+      title: document.getElementById('vTitle').value,
+      description: document.getElementById('vDesc').value,
+      voteType: document.getElementById('vType').value,
+      verificationLevel: parseInt(document.getElementById('vLevel').value),
+      options
+    });
+    alert('创建成功'); location.reload();
+  } catch (e) { alert('创建失败: ' + e.message); }
+}
+
+// ===== Announcements =====
+let annPage = 1;
+async function renderAnnouncements() {
+  const el = document.getElementById('pageContent');
+  el.innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const data = await api('GET', `/announcements?page=${annPage}&pageSize=10`);
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <h3>公告管理</h3>
+          ${['property','committee'].includes(currentUser.role) ? '<button class="btn btn-primary" onclick="showAnnCreate()">+ 发布公告</button>' : ''}
+        </div>
+        <table>
+          <thead><tr><th>标题</th><th>类型</th><th>发布者</th><th>置顶</th><th>阅读</th><th>时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${data.data.length ? data.data.map(a => `
+              <tr>
+                <td>${a.isTop ? '📌 ' : ''}${a.title}</td>
+                <td>${statusBadge({vote:'投票',notice:'通知',finance:'财务'}[a.type]||a.type, 'info')}</td>
+                <td>${a.publisherName || a.publisher}</td>
+                <td>${a.isTop ? '✅' : ''}</td>
+                <td>${a.readCount}/${a.totalUsers}</td>
+                <td>${fmtDateTime(a.createdAt)}</td>
+                <td>
+                  <button class="btn btn-sm btn-outline" onclick="showAnnDetail('${a.id}')">查看</button>
+                  ${['property','committee'].includes(currentUser.role) ? `<button class="btn btn-sm btn-danger" onclick="deleteAnn('${a.id}')">删除</button>` : ''}
+                </td>
+              </tr>
+            `).join('') : '<tr><td colspan="7" class="empty">暂无公告</td></tr>'}
+          </tbody>
+        </table>
+        ${paginationHtml(data.page, data.total, data.pageSize, 'annGoPage')}
+      </div>`;
+  } catch (e) { el.innerHTML = `<div class="empty">加载失败: ${e.message}</div>`; }
+}
+function annGoPage(p) { annPage = p; renderAnnouncements(); }
+
+async function showAnnDetail(id) {
+  try {
+    const a = await api('GET', `/announcements/${id}`);
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = `<div class="modal">
+      <h3>${a.title}</h3>
+      <div style="display:flex;gap:12px;margin-bottom:16px">
+        ${statusBadge({vote:'投票',notice:'通知',finance:'财务'}[a.type]||a.type, 'info')}
+        <span style="font-size:13px;color:var(--text-secondary)">${a.publisherName} · ${fmtDateTime(a.createdAt)}</span>
+        <span style="font-size:13px;color:var(--text-secondary)">阅读 ${a.readCount}/${a.totalUsers}</span>
+      </div>
+      <div style="line-height:1.8;white-space:pre-wrap">${a.content}</div>
+      <div class="modal-actions"><button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">关闭</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+  } catch (e) { alert('加载失败: ' + e.message); }
+}
+
+async function deleteAnn(id) {
+  if (!confirm('确定删除此公告？')) return;
+  try { await api('DELETE', `/announcements/${id}`); alert('已删除'); renderAnnouncements(); } catch (e) { alert('删除失败: ' + e.message); }
+}
+
+function showAnnCreate() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `<div class="modal">
+    <h3>发布公告</h3>
+    <div class="form-group"><label>标题</label><input id="aTitle" placeholder="通知标题"></div>
+    <div class="form-group"><label>类型</label><select id="aType"><option value="notice">通知</option><option value="vote">投票</option><option value="finance">财务</option></select></div>
+    <div class="form-group"><label>内容</label><textarea id="aContent" rows="6" placeholder="公告内容"></textarea></div>
+    <div class="form-group"><label><input type="checkbox" id="aIsTop"> 置顶</label></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">取消</button>
+      <button class="btn btn-primary" onclick="submitAnnCreate()">发布</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+async function submitAnnCreate() {
+  try {
+    await api('POST', '/announcements', {
+      title: document.getElementById('aTitle').value,
+      type: document.getElementById('aType').value,
+      content: document.getElementById('aContent').value,
+      publisher: currentUser.role === 'property' ? '物业' : '业委会',
+      publisherName: currentUser.nickname,
+      isTop: document.getElementById('aIsTop').checked
+    });
+    alert('发布成功'); location.reload();
+  } catch (e) { alert('发布失败: ' + e.message); }
+}
+
+// ===== Users =====
+let userPage = 1;
+async function renderUsers() {
+  const el = document.getElementById('pageContent');
+  if (currentUser.role === 'owner') { el.innerHTML = '<div class="empty">⚠️ 仅物业/业委会可查看用户管理</div>'; return; }
+  el.innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const data = await api('GET', `/users/list?page=${userPage}&pageSize=10`);
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <h3>用户管理</h3>
+          ${currentUser.role === 'committee' ? '<button class="btn btn-outline" onclick="showRoleLogs()">📋 角色变更记录</button>' : ''}
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>昵称</th><th>手机</th><th>角色</th><th>核验等级</th><th>状态</th><th>注册时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${data.data.length ? data.data.map(u => `
+              <tr>
+                <td style="font-family:monospace;font-size:12px">${u.id}</td>
+                <td>${u.nickname || '-'}</td>
+                <td>${u.phone || '-'}</td>
+                <td>${roleBadge(u.role)}</td>
+                <td>L${u.verifiedLevel}</td>
+                <td>${u.isActive ? statusBadge('正常','success') : statusBadge('禁用','danger')}</td>
+                <td>${fmtDateTime(u.createdAt)}</td>
+                <td>
+                  ${currentUser.role === 'committee' ? `
+                    <button class="btn btn-sm btn-outline" onclick="changeUserRole('${u.id}','${u.role}')">改角色</button>
+                    <button class="btn btn-sm ${u.isActive?'btn-warning':'btn-success'}" onclick="toggleUserActive('${u.id}',${!u.isActive})">${u.isActive?'禁用':'启用'}</button>
+                  ` : ''}
+                </td>
+              </tr>
+            `).join('') : '<tr><td colspan="8" class="empty">暂无用户</td></tr>'}
+          </tbody>
+        </table>
+        ${paginationHtml(data.page, data.total, data.pageSize, 'userGoPage')}
+      </div>`;
+  } catch (e) { el.innerHTML = `<div class="empty">加载失败: ${e.message}</div>`; }
+}
+function userGoPage(p) { userPage = p; renderUsers(); }
+
+async function changeUserRole(id, currentRole) {
+  const roleLabels = { owner: '业主', property: '物业', committee: '业委会' };
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `<div class="modal">
+    <h3>修改用户角色</h3>
+    <div class="form-group"><label>当前角色</label><input value="${roleLabels[currentRole] || currentRole}" readonly></div>
+    <div class="form-group"><label>新角色</label><select id="newRole">
+      <option value="业主" ${currentRole==='owner'?'selected':''}>业主</option>
+      <option value="物业" ${currentRole==='property'?'selected':''}>物业</option>
+      <option value="业委会" ${currentRole==='committee'?'selected':''}>业委会</option>
+    </select></div>
+    <div class="form-group"><label>变更原因</label><textarea id="roleReason" placeholder="请输入角色变更原因（选填）" rows="3"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">取消</button>
+      <button class="btn btn-primary" onclick="submitRoleChange('${id}')">确认修改</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+async function submitRoleChange(id) {
+  const role = document.getElementById('newRole').value;
+  const reason = document.getElementById('roleReason').value;
+  try {
+    await api('PUT', `/users/${id}/role`, { role, reason });
+    alert('角色已更新');
+    document.querySelector('.modal-overlay')?.remove();
+    renderUsers();
+  } catch (e) { alert('操作失败: ' + e.message); }
+}
+async function toggleUserActive(id, isActive) {
+  try { await api('PUT', `/users/${id}/active`, { isActive }); alert(isActive ? '已启用' : '已禁用'); renderUsers(); } catch (e) { alert('操作失败: ' + e.message); }
+}
+
+let roleLogPage = 1;
+async function showRoleLogs() {
+  try {
+    const data = await api('GET', `/users/role-logs?page=${roleLogPage}&pageSize=10`);
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = `<div class="modal" style="width:680px">
+      <h3>📋 角色变更记录（公示，不可删除）</h3>
+      <table>
+        <thead><tr><th>时间</th><th>原角色</th><th>新角色</th><th>原因</th><th>操作者</th></tr></thead>
+        <tbody>
+          ${data.data.length ? data.data.map(l => `
+            <tr>
+              <td style="font-size:12px">${fmtDateTime(l.createdAt)}</td>
+              <td>${statusBadge(l.oldRoleLabel, l.oldRole==='owner'?'info':l.oldRole==='property'?'warning':'danger')}</td>
+              <td>${statusBadge(l.newRoleLabel, l.newRole==='owner'?'info':l.newRole==='property'?'warning':'danger')}</td>
+              <td style="font-size:13px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.reason || '-'}</td>
+              <td style="font-size:13px">${l.operatorNickname || l.operatedBy || '-'}</td>
+            </tr>
+          `).join('') : '<tr><td colspan="5" class="empty">暂无变更记录</td></tr>'}
+        </tbody>
+      </table>
+      ${paginationHtml(data.page, data.total, data.pageSize, 'roleLogGoPage')}
+      <div class="modal-actions"><button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">关闭</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+  } catch (e) { alert('加载失败: ' + e.message); }
+}
+function roleLogGoPage(p) { roleLogPage = p; document.querySelector('.modal-overlay')?.remove(); showRoleLogs(); }
+
+// ===== Communities =====
+let commPage = 1;
+let commKeyword = '';
+async function renderCommunities() {
+  const el = document.getElementById('pageContent');
+  el.innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    let url = `/communities?page=${commPage}&pageSize=10`;
+    if (commKeyword) url += `&keyword=${encodeURIComponent(commKeyword)}`;
+    const data = await api('GET', url);
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <h3>社区管理</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="commSearch" placeholder="搜索社区名称/地址" value="${commKeyword}" style="padding:6px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;width:200px" onkeydown="if(event.key==='Enter'){commKeyword=this.value;commPage=1;renderCommunities()}">
+            <button class="btn btn-sm btn-outline" onclick="commKeyword=document.getElementById('commSearch').value;commPage=1;renderCommunities()">搜索</button>
+            ${currentUser.role === 'committee' ? '<button class="btn btn-primary" onclick="showCommCreate()">+ 创建社区</button>' : ''}
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>名称</th><th>总户数</th><th>总面积</th><th>地址</th><th>创建时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${data.data.length ? data.data.map(c => `
+              <tr>
+                <td style="font-family:monospace;font-size:12px">${c.id}</td>
+                <td style="font-weight:500">${c.name}</td>
+                <td>${c.totalUnits}</td>
+                <td>${c.totalArea} m²</td>
+                <td>${c.address || '-'}</td>
+                <td>${fmtDateTime(c.createdAt)}</td>
+                <td>
+                  ${currentUser.role === 'committee' ? `<button class="btn btn-sm btn-outline" onclick="showCommEdit('${c.id}','${c.name}',${c.totalUnits},${c.totalArea},'${(c.address||'').replace(/'/g,"\\'")}')">编辑</button>` : ''}
+                </td>
+              </tr>
+            `).join('') : '<tr><td colspan="7" class="empty">暂无社区</td></tr>'}
+          </tbody>
+        </table>
+        ${paginationHtml(data.page, data.total, data.pageSize, 'commGoPage')}
+      </div>`;
+  } catch (e) { el.innerHTML = `<div class="empty">加载失败: ${e.message}</div>`; }
+}
+function commGoPage(p) { commPage = p; renderCommunities(); }
+
+function showCommCreate() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `<div class="modal">
+    <h3>创建社区</h3>
+    <div class="form-group"><label>名称</label><input id="cName" placeholder="XX花园"></div>
+    <div style="display:flex;gap:16px">
+      <div class="form-group" style="flex:1"><label>总户数</label><input id="cUnits" type="number" value="500"></div>
+      <div class="form-group" style="flex:1"><label>总面积(m²)</label><input id="cArea" type="number" value="30000"></div>
+    </div>
+    <div class="form-group"><label>地址</label><input id="cAddr" placeholder="地址"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">取消</button>
+      <button class="btn btn-primary" onclick="submitCommCreate()">创建</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function showCommEdit(id, name, units, area, addr) {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `<div class="modal">
+    <h3>编辑社区</h3>
+    <div class="form-group"><label>名称</label><input id="eName" value="${name}"></div>
+    <div style="display:flex;gap:16px">
+      <div class="form-group" style="flex:1"><label>总户数</label><input id="eUnits" type="number" value="${units}"></div>
+      <div class="form-group" style="flex:1"><label>总面积(m²)</label><input id="eArea" type="number" value="${area}"></div>
+    </div>
+    <div class="form-group"><label>地址</label><input id="eAddr" value="${addr}"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">取消</button>
+      <button class="btn btn-primary" onclick="submitCommEdit('${id}')">保存</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+async function submitCommEdit(id) {
+  try {
+    await api('PUT', `/communities/${id}`, {
+      name: document.getElementById('eName').value,
+      totalUnits: parseInt(document.getElementById('eUnits').value),
+      totalArea: parseFloat(document.getElementById('eArea').value),
+      address: document.getElementById('eAddr').value
+    });
+    alert('更新成功'); location.reload();
+  } catch (e) { alert('更新失败: ' + e.message); }
+}
+async function submitCommCreate() {
+  try {
+    await api('POST', '/communities', {
+      name: document.getElementById('cName').value,
+      totalUnits: parseInt(document.getElementById('cUnits').value),
+      totalArea: parseFloat(document.getElementById('cArea').value),
+      address: document.getElementById('cAddr').value
+    });
+    alert('创建成功'); location.reload();
+  } catch (e) { alert('创建失败: ' + e.message); }
+}
+
+// ===== Clock =====
+setInterval(() => {
+  const el = document.getElementById('currentTime');
+  if (el) el.textContent = new Date().toLocaleString('zh-CN');
+}, 1000);
+
+// ===== Auto-login check =====
+if (TOKEN) { document.getElementById('loginPage').style.display = 'none'; document.getElementById('app').style.display = 'flex'; }
+</script>
+</body>
+</html>

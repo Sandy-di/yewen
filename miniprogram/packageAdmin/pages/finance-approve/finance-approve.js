@@ -24,12 +24,16 @@ Page({
 
   async onApprove(e) {
     const id = e.currentTarget.dataset.id
-    showLoading('审批中...')
-    setTimeout(() => {
+    try {
+      showLoading('审批中...')
+      await api.approveFinance(id)
       hideLoading()
       showToast('已审批通过', 'success')
       this.loadPending()
-    }, 800)
+    } catch (err) {
+      hideLoading()
+      showToast(err.message || '审批失败')
+    }
   },
 
   onReject(e) {
@@ -38,10 +42,19 @@ Page({
       title: '拒绝原因',
       editable: true,
       placeholderText: '请输入拒绝原因',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          showToast('已退回修改')
-          this.loadPending()
+          try {
+            const reason = res.content || ''
+            showLoading('处理中...')
+            await api.rejectFinance(id, reason)
+            hideLoading()
+            showToast('已退回修改', 'success')
+            this.loadPending()
+          } catch (err) {
+            hideLoading()
+            showToast(err.message || '操作失败')
+          }
         }
       }
     })

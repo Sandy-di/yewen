@@ -40,19 +40,18 @@ async def seed():
 
         # ===== 1. 社区 =====
         community = Community(
-            id="C20260410001",
-            name="翠湖花园",
+            id=gen_id("C"),
+            name="黑金时代广场",
             total_units=512,
             total_area=45600.0,
-            address="杭州市西湖区翠湖路88号",
+            address="杭州市西湖区黑金路88号",
         )
         session.add(community)
         await session.flush()
-        print(f"  ✅ 社区: {community.name}")
+        print(f"  ✅ 社区: {community.name} ({community.id})")
 
         # ===== 2. 用户（3个角色） =====
         owner = User(
-            id="U20260410001",
             openid="oDev_Owner_001",
             nickname="张先生",
             phone="138****5678",
@@ -61,7 +60,6 @@ async def seed():
             community_id=community.id,
         )
         property_staff = User(
-            id="U20260410002",
             openid="oDev_Property_001",
             nickname="物业服务中心",
             phone="139****1234",
@@ -70,7 +68,6 @@ async def seed():
             community_id=community.id,
         )
         committee = User(
-            id="U20260410003",
             openid="oDev_Committee_001",
             nickname="张主任",
             phone="137****5678",
@@ -80,11 +77,10 @@ async def seed():
         )
         session.add_all([owner, property_staff, committee])
         await session.flush()
-        print(f"  ✅ 用户: {owner.nickname}(业主), {property_staff.nickname}(物业), {committee.nickname}(业委会)")
+        print(f"  ✅ 用户: {owner.nickname}({owner.id}), {property_staff.nickname}({property_staff.id}), {committee.nickname}({committee.id})")
 
         # ===== 3. 房产 =====
         prop1 = UserProperty(
-            id="P20260410001",
             user_id=owner.id,
             community_id=community.id,
             building="3栋",
@@ -95,11 +91,10 @@ async def seed():
         )
         session.add(prop1)
         await session.flush()
-        print(f"  ✅ 房产: {prop1.building}{prop1.unit}{prop1.room_no}")
+        print(f"  ✅ 房产: {prop1.building}{prop1.unit}{prop1.room_no} ({prop1.id})")
 
         # ===== 4. 投票 =====
         vote1 = Vote(
-            id="V20260410001",
             community_id=community.id,
             title="关于小区大门更换的投票",
             description="现有小区东门及南门大门使用已超过10年，锈蚀严重且存在安全隐患。业委会提议使用公共维修基金更换为智能门禁系统，预算约28万元。请各位业主投票表决。",
@@ -115,7 +110,6 @@ async def seed():
             created_by=committee.id,
         )
         vote2 = Vote(
-            id="V20260410002",
             community_id=community.id,
             title="关于绿化改造方案的投票",
             description="为提升小区环境品质，拟对中心花园区域进行绿化升级改造，增加休闲座椅和儿童游乐设施。预算15万元。",
@@ -134,7 +128,6 @@ async def seed():
             result_summary="参与户数76%（389/512），参与面积75%（34,200/45,600㎡）。同意户数92%（356/389），同意面积91%（31,200/34,200㎡）。达到双过半标准，投票通过。",
         )
         vote3 = Vote(
-            id="V20260410003",
             community_id=community.id,
             title="关于物业费调整的投票",
             description="鉴于人力成本上涨及服务升级需求，拟将物业费从2.5元/㎡调整为3.0元/㎡，同时增加以下服务：24小时安保巡逻、公共区域WiFi覆盖、垃圾分类指导。",
@@ -154,19 +147,18 @@ async def seed():
 
         # 投票选项
         opts_data = [
-            (vote1.id, [("opt1_v1", "同意更换", 189, 15230), ("opt2_v1", "不同意", 35, 2890), ("opt3_v1", "弃权", 10, 800)]),
-            (vote2.id, [("opt1_v2", "同意改造", 356, 31200), ("opt2_v2", "不同意", 25, 2200), ("opt3_v2", "弃权", 8, 800)]),
-            (vote3.id, [("opt1_v3", "同意调整", 98, 8100), ("opt2_v3", "不同意", 48, 3900), ("opt3_v3", "弃权", 10, 800)]),
+            (vote1.id, [("同意更换", 189, 15230), ("不同意", 35, 2890), ("弃权", 10, 800)]),
+            (vote2.id, [("同意改造", 356, 31200), ("不同意", 25, 2200), ("弃权", 8, 800)]),
+            (vote3.id, [("同意调整", 98, 8100), ("不同意", 48, 3900), ("弃权", 10, 800)]),
         ]
         for vote_id, options in opts_data:
-            for oid, label, count, area in options:
-                session.add(VoteOption(id=oid, vote_id=vote_id, label=label, count=count, area=area))
+            for label, count, area in options:
+                session.add(VoteOption(vote_id=vote_id, label=label, count=count, area=area))
         await session.flush()
         print(f"  ✅ 投票: 3个投票 + 9个选项")
 
         # ===== 5. 报修工单 =====
         order1 = RepairOrder(
-            id="WR20260410001",
             community_id=community.id,
             user_id=owner.id,
             category="access",
@@ -183,7 +175,6 @@ async def seed():
             sla_deadline=datetime(2026, 4, 11, 14, 23),
         )
         order2 = RepairOrder(
-            id="WR20260408003",
             community_id=community.id,
             user_id=owner.id,
             category="water_elec",
@@ -202,7 +193,6 @@ async def seed():
             sla_deadline=datetime(2026, 4, 9, 9, 15),
         )
         order3 = RepairOrder(
-            id="WR20260407005",
             community_id=community.id,
             user_id=owner.id,
             category="facility",
@@ -224,33 +214,32 @@ async def seed():
         # 时间线
         timelines_data = [
             (order1.id, [
-                ("14:23", "业主提交报修", "submitted"),
-                ("14:30", "物业已接单，张师傅预计15:00上门", "accepted"),
-                ("14:55", "开始维修，正在更换门禁控制模块", "processing"),
+                ("业主提交报修", "submitted"),
+                ("物业已接单，张师傅预计15:00上门", "accepted"),
+                ("开始维修，正在更换门禁控制模块", "processing"),
             ]),
             (order2.id, [
-                ("09:15", "业主提交报修", "submitted"),
-                ("09:45", "李师傅已接单", "accepted"),
-                ("10:30", "开始维修", "processing"),
-                ("16:30", "维修完成，已重新做防水处理", "completed"),
-                ("17:00", "业主验收通过，评价5星", "verified"),
+                ("业主提交报修", "submitted"),
+                ("李师傅已接单", "accepted"),
+                ("开始维修", "processing"),
+                ("维修完成，已重新做防水处理", "completed"),
+                ("业主验收通过，评价5星", "verified"),
             ]),
             (order3.id, [
-                ("20:10", "业主提交报修", "submitted"),
-                ("20:30", "王师傅已接单，明早处理", "accepted"),
-                ("08:00", "开始维修，联系电梯维保公司", "processing"),
-                ("11:00", "维修完成，更换钢丝绳和导轨", "completed"),
+                ("业主提交报修", "submitted"),
+                ("王师傅已接单，明早处理", "accepted"),
+                ("开始维修，联系电梯维保公司", "processing"),
+                ("维修完成，更换钢丝绳和导轨", "completed"),
             ]),
         ]
         for order_id, timelines in timelines_data:
-            for time_str, content, type_str in timelines:
+            for content, type_str in timelines:
                 session.add(OrderTimeline(order_id=order_id, content=content, type=type_str))
         await session.flush()
         print(f"  ✅ 工单: 3个工单 + 时间线")
 
         # ===== 6. 财务报表 =====
         report1 = FinanceReport(
-            id="F2026030001",
             community_id=community.id,
             month="2026-03",
             title="2026年3月物业收支报表",
@@ -264,7 +253,6 @@ async def seed():
             balance=33329.50,
         )
         report2 = FinanceReport(
-            id="F2026020001",
             community_id=community.id,
             month="2026-02",
             title="2026年2月物业收支报表",
@@ -278,7 +266,6 @@ async def seed():
             balance=26550.00,
         )
         report3 = FinanceReport(
-            id="F2026040001",
             community_id=community.id,
             month="2026-04",
             title="2026年4月物业收支报表",
@@ -294,7 +281,6 @@ async def seed():
 
         # 财务明细
         finance_items = [
-            # 3月
             (report1.id, "income", "物业费", 102400.00, "3月物业费收缴"),
             (report1.id, "income", "停车费", 18600.00, "地下车库停车费"),
             (report1.id, "income", "广告位收入", 5600.00, "电梯广告位出租"),
@@ -305,7 +291,6 @@ async def seed():
             (report1.id, "expense", "水电费", 12600.00, "公共区域水电费"),
             (report1.id, "expense", "保洁费", 5230.00, "保洁服务费"),
             (report1.id, "expense", "办公费", 4000.00, "办公用品+打印"),
-            # 2月
             (report2.id, "income", "物业费", 96000.00, "2月物业费收缴"),
             (report2.id, "income", "停车费", 15200.00, "地下车库停车费"),
             (report2.id, "income", "广告位收入", 4000.00, "电梯广告位出租"),
@@ -330,7 +315,6 @@ async def seed():
         # ===== 7. 公告 =====
         announcements = [
             Announcement(
-                id="A20260410001",
                 community_id=community.id,
                 title="关于小区大门更换投票的通知",
                 content="各位业主：\n\n根据《民法典》相关规定，现就小区大门更换事宜发起业主投票。投票时间为4月5日至4月15日，请各位业主积极参与。\n\n本次投票需完成L3身份核验后方可参与，请提前完成核验。",
@@ -342,7 +326,6 @@ async def seed():
                 created_at=datetime(2026, 4, 4, 9, 0),
             ),
             Announcement(
-                id="A20260408002",
                 community_id=community.id,
                 title="4月小区绿化养护安排通知",
                 content="各位业主：\n\n4月绿化养护工作安排如下：\n1. 4月12日-13日：中心花园春季补种\n2. 4月15日-16日：行道树修剪\n3. 4月20日：病虫害防治喷药\n\n喷药期间请注意关窗，照看好宠物和儿童。",
@@ -354,7 +337,6 @@ async def seed():
                 created_at=datetime(2026, 4, 8, 10, 0),
             ),
             Announcement(
-                id="A20260405003",
                 community_id=community.id,
                 title="清明假期物业服务时间调整",
                 content="各位业主：\n\n清明假期（4月4日-6日）期间，物业服务中心营业时间调整为：9:00-17:00。\n\n24小时报修热线正常服务。",
@@ -366,7 +348,6 @@ async def seed():
                 created_at=datetime(2026, 4, 3, 15, 0),
             ),
             Announcement(
-                id="A20260401004",
                 community_id=community.id,
                 title="2026年第一季度财务公示",
                 content='各位业主：\n\n2026年第一季度（1-3月）物业财务报表已完成审批并公示。详细收支明细请查看"公示"页面。\n\n如有疑问，可联系业委会或物业前台。',
@@ -385,9 +366,9 @@ async def seed():
         await session.commit()
         print("\n🎉 种子数据填充完成！")
         print("\n📋 测试账号:")
-        print(f"  业主: openid=oDev_Owner_001 → {owner.nickname}")
-        print(f"  物业: openid=oDev_Property_001 → {property_staff.nickname}")
-        print(f"  业委会: openid=oDev_Committee_001 → {committee.nickname}")
+        print(f"  业主: openid=oDev_Owner_001 → {owner.nickname} (id={owner.id})")
+        print(f"  物业: openid=oDev_Property_001 → {property_staff.nickname} (id={property_staff.id})")
+        print(f"  业委会: openid=oDev_Committee_001 → {committee.nickname} (id={committee.id})")
 
 
 if __name__ == "__main__":

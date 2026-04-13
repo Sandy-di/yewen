@@ -1,0 +1,112 @@
+/* packageAdmin/pages/community-manage/community-manage.wxss */
+
+.page-community-manage {
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.community-card {
+  margin-bottom: var(--space-md);
+}
+
+.community-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-bottom: 14rpx;
+}
+
+.community-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.community-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.community-info-item {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* 弹窗样式 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-dialog {
+  width: 620rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  text-align: center;
+  padding: 36rpx 32rpx 20rpx;
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 0 32rpx;
+}
+
+.modal-body .form-group {
+  margin-bottom: 24rpx;
+}
+
+.modal-body .form-label {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  margin-bottom: 8rpx;
+}
+
+.modal-body .form-input {
+  width: 100%;
+  height: 72rpx;
+  padding: 0 20rpx;
+  border: 1rpx solid var(--border);
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  background: #F8FAFC;
+}
+
+.modal-footer {
+  display: flex;
+  border-top: 1rpx solid var(--border);
+  margin-top: 24rpx;
+}
+
+.modal-btn {
+  flex: 1;
+  text-align: center;
+  padding: 28rpx 0;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.modal-btn-cancel {
+  color: var(--text-secondary);
+  border-right: 1rpx solid var(--border);
+}
+
+.modal-btn-confirm {
+  color: var(--primary);
+}

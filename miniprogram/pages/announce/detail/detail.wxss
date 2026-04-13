@@ -1,78 +1,95 @@
-/* pages/announce/detail/detail.wxss — 深空科技风格 */
+/* pages/announce/detail/detail.wxss */
 
 .page-announce-detail {
   min-height: 100vh;
   background: var(--bg-page);
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 
 .announce-header {
-  padding: var(--space-lg);
-  background: var(--bg-card-solid);
-  margin-bottom: var(--space-md);
-  border-bottom: 1rpx solid var(--border);
+  position: relative;
+  overflow: hidden;
+  margin: var(--space-md) var(--space-lg) 0;
+  padding: 40rpx var(--space-lg);
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 100%);
+  box-shadow: var(--shadow-lg), var(--shadow-inset);
+}
+
+.announce-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at right top, rgba(102, 125, 150, 0.14) 0%, rgba(102, 125, 150, 0) 48%);
+}
+
+.announce-title,
+.announce-meta {
+  position: relative;
+  z-index: 1;
 }
 
 .announce-title {
-  font-size: 40rpx;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1.4;
   margin-bottom: 20rpx;
-  letter-spacing: -0.3px;
+  font-size: 40rpx;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--text-primary);
 }
 
 .announce-meta {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: 10rpx;
 }
 
 .meta-row {
   display: flex;
   justify-content: space-between;
+  gap: 20rpx;
   font-size: 24rpx;
   color: var(--text-secondary);
 }
 
 .meta-publisher {
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .announce-body {
-  margin: 0 var(--space-lg);
+  margin: var(--space-md) var(--space-lg) 0;
 }
 
 .announce-content {
   font-size: 30rpx;
-  line-height: 2;
+  line-height: 1.9;
   color: var(--text-primary);
   white-space: pre-wrap;
 }
 
 .share-bar {
   position: fixed;
-  bottom: 0;
   left: 0;
   right: 0;
+  bottom: 0;
   padding: 20rpx var(--space-lg);
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: var(--bg-card-solid);
-  border-top: 1rpx solid var(--border);
+  background: rgba(251, 251, 252, 0.92);
+  backdrop-filter: blur(16rpx);
+  border-top: 1rpx solid rgba(152, 162, 179, 0.16);
 }
 
 .share-btn {
   width: 100%;
   height: 88rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--gradient-btn);
-  color: #FFFFFF;
-  font-size: 32rpx;
-  font-weight: 600;
-  border-radius: var(--radius-md);
   border: none;
-  box-shadow: var(--glow-primary);
+  border-radius: var(--radius-sm);
+  background: var(--gradient-primary);
+  color: var(--text-inverse);
+  font-size: 30rpx;
+  font-weight: 600;
+  box-shadow: 0 14rpx 28rpx rgba(102, 125, 150, 0.22);
 }
 
 .share-btn::after {
