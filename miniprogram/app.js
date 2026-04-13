@@ -84,6 +84,7 @@ App({
       url: `${baseUrl}/api/auth/login`,
       method: 'POST',
       data: { code },
+      timeout: 15000,
       success: (res) => {
         if (res.statusCode === 200 && res.data.token) {
           const { token, user_id, role, nickname } = res.data
@@ -91,6 +92,9 @@ App({
           
           // 登录后拉取完整用户信息
           this.refreshProfile()
+        } else {
+          console.warn('后端登录返回异常，使用模拟登录')
+          this.mockLogin()
         }
       },
       fail: () => {
@@ -114,6 +118,7 @@ App({
       url: `${baseUrl}/api/auth/profile`,
       method: 'GET',
       header: { 'Authorization': `Bearer ${token}` },
+      timeout: 10000,
       success: (res) => {
         if (res.statusCode === 200 && res.data) {
           const profile = res.data

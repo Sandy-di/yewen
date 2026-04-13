@@ -27,6 +27,8 @@ class RepairOrder(Base):
     completed_at: Mapped[datetime] = mapped_column(DateTime, nullable=True, default=None)
     completion_photos: Mapped[str] = mapped_column(Text, default="[]")
     completion_note: Mapped[str] = mapped_column(Text, default="")
+    video: Mapped[str] = mapped_column(String(500), default="")  # 视频URL
+    appointment_time: Mapped[str] = mapped_column(String(30), default="")  # 预约上门时间
     rating: Mapped[int] = mapped_column(Integer, nullable=True, default=None)
     rating_comment: Mapped[str] = mapped_column(Text, default="")
     sla_level: Mapped[int] = mapped_column(Integer, default=24)  # 小时

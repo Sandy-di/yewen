@@ -1,6 +1,7 @@
 """财务路由 — CRUD + 审批/拒绝"""
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 
@@ -9,7 +10,8 @@ from app.models import User
 from app.middleware.auth import get_current_user, require_role
 from app.schemas.finance import (
     FinanceListOut, FinanceDetailOut, FinanceItemOut, FinanceAttachmentOut,
-    FinanceCreate, FinanceRejectRequest,
+    FinanceQuestionOut, FinanceCreate, FinanceRejectRequest,
+    FinanceQuestionCreate, FinanceQuestionAnswer,
 )
 from app.services.finance_service import FinanceService
 
@@ -72,6 +74,7 @@ async def get_finance_detail(
             category=item.category,
             amount=float(item.amount or 0),
             description=item.description,
+            receiptUrl=item.receipt_url or "",
         )
         for item in report.items
     ]
@@ -85,7 +88,26 @@ async def get_finance_detail(
         for a in report.get_attachments()
     ]
 
-    return FinanceDetailOut(**base.model_dump(), items=items, attachments=attachments)
+    # 业主提问
+    from app.models import FinanceQuestion
+    questions_result = await db.execute(
+        select(FinanceQuestion).where(FinanceQuestion.report_id == report_id).order_by(FinanceQuestion.created_at.desc())
+    )
+    questions = [
+        FinanceQuestionOut(
+            id=q.id,
+            itemId=q.item_id,
+            userId=q.user_id,
+            question=q.question,
+            answer=q.answer,
+            answeredBy=q.answered_by,
+            answeredAt=q.answered_at,
+            createdAt=q.created_at,
+        )
+        for q in questions_result.scalars().all()
+    ]
+
+    return FinanceDetailOut(**base.model_dump(), items=items, attachments=attachments, questions=questions)
 
 
 @router.post("")
@@ -128,4 +150,50 @@ async def reject_finance_report(
         await service.reject(report_id, current_user, req.reason)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    return {"success": True}
+
+
+@router.post("/{report_id}/questions")
+async def create_finance_question(
+    report_id: str,
+    req: FinanceQuestionCreate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """业主对财务报表提问"""
+    from app.models import FinanceQuestion
+    question = FinanceQuestion(
+        report_id=report_id,
+        item_id=req.itemId,
+        user_id=current_user.id,
+        question=req.question,
+    )
+    db.add(question)
+    await db.flush()
+    return {"success": True, "id": question.id}
+
+
+@router.post("/{report_id}/questions/{question_id}/answer")
+async def answer_finance_question(
+    report_id: str,
+    question_id: str,
+    req: FinanceQuestionAnswer,
+    current_user: User = Depends(require_role("property", "committee")),
+    db: AsyncSession = Depends(get_db),
+):
+    """物业/业委会回答业主提问"""
+    from app.models import FinanceQuestion
+    from datetime import datetime, timezone
+
+    result = await db.execute(
+        select(FinanceQuestion).where(FinanceQuestion.id == question_id)
+    )
+    question = result.scalar_one_or_none()
+    if not question:
+        raise HTTPException(status_code=404, detail="提问不存在")
+    question.answer = req.answer
+    question.answered_by = current_user.id
+    question.answered_at = datetime.now(timezone.utc)
+    db.add(question)
+    await db.flush()
     return {"success": True}

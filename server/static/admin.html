@@ -164,6 +164,9 @@
       <a class="nav-item" data-page="communities" onclick="navigate('communities')">
         <span class="icon">🏘️</span> 社区管理
       </a>
+      <a class="nav-item" data-page="complaints" onclick="navigate('complaints')">
+        <span class="icon">📩</span> 投诉管理
+      </a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -224,12 +227,12 @@ function doLogout() {
 }
 
 // ===== Router =====
-const pageTitles = { dashboard: '仪表盘', orders: '工单管理', finance: '财务管理', votes: '投票管理', announcements: '公告管理', users: '用户管理', communities: '社区管理' };
+const pageTitles = { dashboard: '仪表盘', orders: '工单管理', finance: '财务管理', votes: '投票管理', announcements: '公告管理', users: '用户管理', communities: '社区管理', complaints: '投诉管理' };
 
 function navigate(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
   document.getElementById('pageTitle').textContent = pageTitles[page] || page;
-  const renderers = { dashboard: renderDashboard, orders: renderOrders, finance: renderFinance, votes: renderVotes, announcements: renderAnnouncements, users: renderUsers, communities: renderCommunities };
+  const renderers = { dashboard: renderDashboard, orders: renderOrders, finance: renderFinance, votes: renderVotes, announcements: renderAnnouncements, users: renderUsers, communities: renderCommunities, complaints: renderComplaints };
   if (renderers[page]) renderers[page]();
 }
 
@@ -258,7 +261,11 @@ async function renderDashboard() {
   const el = document.getElementById('pageContent');
   el.innerHTML = '<div class="loading">加载中...</div>';
   try {
-    const [dashboard, overview] = await Promise.all([api('GET', '/stats/dashboard'), api('GET', '/stats/overview')]);
+    const [dashboard, overview, sla] = await Promise.all([
+      api('GET', '/stats/dashboard'),
+      api('GET', '/stats/overview'),
+      api('GET', '/stats/sla').catch(() => null)
+    ]);
     el.innerHTML = `
       <div class="stat-grid">
         <div class="stat-card" onclick="navigate('orders')" style="cursor:pointer">
@@ -285,6 +292,37 @@ async function renderDashboard() {
           <div class="value">${dashboard.totalAnnouncements || 0}</div>
         </div>
       </div>
+      ${sla ? `
+      <div class="card">
+        <div class="card-header"><h3>📊 SLA监控看板</h3></div>
+        <div class="stat-grid" style="margin-bottom:0">
+          <div class="stat-card">
+            <div class="label">按时完成率</div>
+            <div class="value" style="color:${sla.onTimeRate >= 90 ? 'var(--success)' : sla.onTimeRate >= 70 ? 'var(--warning)' : 'var(--danger)'}">${sla.onTimeRate || 0}%</div>
+            <div class="sub">超时 ${sla.slaBreached || 0} 单</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">平均响应时长</div>
+            <div class="value" style="font-size:22px">${sla.avgResponseMinutes || 0} 分钟</div>
+            <div class="sub">从提交到接单</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">平均完成时长</div>
+            <div class="value" style="font-size:22px">${sla.avgCompleteHours || 0} 小时</div>
+            <div class="sub">从提交到完成</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">好评率</div>
+            <div class="value" style="color:${sla.goodRate >= 90 ? 'var(--success)' : 'var(--warning)'}">${sla.goodRate || 0}%</div>
+            <div class="sub">4-5星占比</div>
+          </div>
+        </div>
+        ${sla.byCategory && sla.byCategory.length ? `
+        <h4 style="margin:20px 0 8px;font-size:14px">按故障类型统计</h4>
+        <table style="font-size:13px"><thead><tr><th>类型</th><th>工单数</th><th>按时率</th><th>好评率</th></tr></thead><tbody>
+          ${sla.byCategory.map(c => `<tr><td>${c.category}</td><td>${c.total}</td><td style="color:${c.onTimeRate>=90?'var(--success)':'var(--warning)'}">${c.onTimeRate}%</td><td>${c.goodRate}%</td></tr>`).join('')}
+        </tbody></table>` : ''}
+      </div>` : ''}
       ${overview ? `
       <div class="card">
         <div class="card-header"><h3>社区概览</h3></div>
@@ -691,10 +729,13 @@ function showVoteCreate() {
   const modal = document.createElement('div');
   modal.className = 'modal-overlay';
   modal.onclick = e => { if (e.target === modal) modal.remove(); };
-  modal.innerHTML = `<div class="modal">
+  modal.innerHTML = `<div class="modal" style="width:560px">
     <h3>创建投票</h3>
+    <div class="form-group"><label>选择场景模板（可选）</label><select id="vTemplate" onchange="onVoteTemplateChange()">
+      <option value="">-- 自定义 --</option>
+    </select></div>
     <div class="form-group"><label>标题</label><input id="vTitle" placeholder="关于XX的投票"></div>
-    <div class="form-group"><label>描述</label><textarea id="vDesc" placeholder="投票说明"></textarea></div>
+    <div class="form-group"><label>描述</label><textarea id="vDesc" placeholder="投票说明" rows="4"></textarea></div>
     <div style="display:flex;gap:16px">
       <div class="form-group" style="flex:1"><label>投票类型</label><select id="vType"><option value="simple">简单多数</option><option value="double_majority">双过半</option><option value="double_three_quarters">双3/4</option></select></div>
       <div class="form-group" style="flex:1"><label>核验等级</label><select id="vLevel"><option value="1">L1</option><option value="2">L2</option><option value="3">L3</option><option value="4">L4</option></select></div>
@@ -706,7 +747,38 @@ function showVoteCreate() {
     </div>
   </div>`;
   document.body.appendChild(modal);
+  loadVoteTemplates();
 }
+
+let voteTemplates = [];
+async function loadVoteTemplates() {
+  try {
+    const res = await api('GET', '/vote-templates');
+    voteTemplates = res.data || [];
+    const sel = document.getElementById('vTemplate');
+    if (sel) {
+      voteTemplates.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = t.name;
+        sel.appendChild(opt);
+      });
+    }
+  } catch (e) { console.error('加载模板失败:', e); }
+}
+
+function onVoteTemplateChange() {
+  const id = document.getElementById('vTemplate').value;
+  if (!id) return;
+  const tpl = voteTemplates.find(t => t.id === id);
+  if (!tpl) return;
+  document.getElementById('vTitle').value = tpl.name;
+  document.getElementById('vDesc').value = tpl.descriptionTemplate || tpl.description;
+  document.getElementById('vType').value = tpl.voteType;
+  document.getElementById('vLevel').value = tpl.verificationLevel;
+  document.getElementById('vOptions').value = (tpl.optionsTemplate || []).join('\\n');
+}
+
 async function submitVoteCreate() {
   try {
     const options = document.getElementById('vOptions').value.split('\n').filter(s => s.trim()).map(l => ({ label: l.trim() }));
@@ -1030,6 +1102,178 @@ async function submitCommCreate() {
     });
     alert('创建成功'); location.reload();
   } catch (e) { alert('创建失败: ' + e.message); }
+}
+
+// ===== Complaints =====
+let compPage = 1;
+function complaintStatusBadge(s) { const m = { submitted: ['待回复','danger'], replied: ['已回复','warning'], resolved: ['已解决','success'], closed: ['已关闭','default'] }; const [l,t] = m[s] || [s,'default']; return statusBadge(l,t); }
+
+async function renderComplaints() {
+  const el = document.getElementById('pageContent');
+  el.innerHTML = '<div class="loading">加载中...</div>';
+  try {
+    const data = await api('GET', `/complaints?page=${compPage}&pageSize=10`);
+    el.innerHTML = `
+      <div class="card">
+        <div class="card-header">
+          <h3>投诉建议</h3>
+          ${currentUser.role === 'owner' ? '<button class="btn btn-primary" onclick="showComplaintCreate()">+ 提交投诉</button>' : ''}
+        </div>
+        <div class="filter-bar">
+          <select id="compStatusFilter" onchange="compPage=1;renderComplaintsFiltered()" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px">
+            <option value="">全部状态</option>
+            <option value="submitted">待回复</option>
+            <option value="replied">已回复</option>
+            <option value="resolved">已解决</option>
+            <option value="closed">已关闭</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>标题</th><th>分类</th><th>状态</th><th>重要</th><th>回复数</th><th>时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${data.data.length ? data.data.map(c => `
+              <tr>
+                <td>${c.title}</td>
+                <td>${{service:'服务',fee:'收费',safety:'安全',environment:'环境',other:'其他'}[c.category]||c.category}</td>
+                <td>${complaintStatusBadge(c.status)}</td>
+                <td>${c.isImportant ? '⭐' : ''}</td>
+                <td>${c.replyCount}</td>
+                <td>${fmtDateTime(c.createdAt)}</td>
+                <td><button class="btn btn-sm btn-outline" onclick="showComplaintDetail('${c.complaintId}')">详情</button></td>
+              </tr>
+            `).join('') : '<tr><td colspan="7" class="empty">暂无投诉</td></tr>'}
+          </tbody>
+        </table>
+        ${paginationHtml(data.page, data.total, data.pageSize, 'compGoPage')}
+      </div>`;
+  } catch (e) { el.innerHTML = `<div class="empty">加载失败: ${e.message}</div>`; }
+}
+function compGoPage(p) { compPage = p; renderComplaints(); }
+async function renderComplaintsFiltered() {
+  const status = document.getElementById('compStatusFilter')?.value || '';
+  compPage = 1;
+  // Re-fetch with status filter
+  let url = `/complaints?page=${compPage}&pageSize=10`;
+  if (status) url += `&status=${status}`;
+  const el = document.getElementById('pageContent');
+  try {
+    const data = await api('GET', url);
+    const tbody = el.querySelector('tbody');
+    if (tbody) {
+      tbody.innerHTML = data.data.length ? data.data.map(c => `
+        <tr>
+          <td>${c.title}</td>
+          <td>${{service:'服务',fee:'收费',safety:'安全',environment:'环境',other:'其他'}[c.category]||c.category}</td>
+          <td>${complaintStatusBadge(c.status)}</td>
+          <td>${c.isImportant ? '⭐' : ''}</td>
+          <td>${c.replyCount}</td>
+          <td>${fmtDateTime(c.createdAt)}</td>
+          <td><button class="btn btn-sm btn-outline" onclick="showComplaintDetail('${c.complaintId}')">详情</button></td>
+        </tr>
+      `).join('') : '<tr><td colspan="7" class="empty">暂无投诉</td></tr>';
+    }
+  } catch (e) { console.error(e); }
+}
+
+function showComplaintCreate() {
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `<div class="modal">
+    <h3>提交投诉</h3>
+    <div class="form-group"><label>标题</label><input id="cpTitle" placeholder="投诉标题"></div>
+    <div class="form-group"><label>分类</label><select id="cpCategory">
+      <option value="service">服务问题</option><option value="fee">收费问题</option>
+      <option value="safety">安全隐患</option><option value="environment">环境卫生</option>
+      <option value="other">其他</option>
+    </select></div>
+    <div class="form-group"><label>内容</label><textarea id="cpContent" rows="5" placeholder="详细描述投诉内容"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">取消</button>
+      <button class="btn btn-primary" onclick="submitComplaintCreate()">提交</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+async function submitComplaintCreate() {
+  try {
+    await api('POST', '/complaints', {
+      title: document.getElementById('cpTitle').value,
+      category: document.getElementById('cpCategory').value,
+      content: document.getElementById('cpContent').value,
+      photos: []
+    });
+    alert('投诉已提交'); location.reload();
+  } catch (e) { alert('提交失败: ' + e.message); }
+}
+
+async function showComplaintDetail(id) {
+  try {
+    const c = await api('GET', `/complaints/${id}`);
+    const actions = [];
+    if (currentUser.role === 'property' && (c.status === 'submitted' || c.status === 'replied'))
+      actions.push(`<button class="btn btn-sm btn-primary" onclick="complaintReply('${id}','reply')">回复</button>`);
+    if (currentUser.role === 'committee') {
+      if (c.status !== 'resolved' && c.status !== 'closed')
+        actions.push(`<button class="btn btn-sm btn-warning" onclick="complaintReply('${id}','supervise')">督导</button>`);
+      if (c.status !== 'resolved' && c.status !== 'closed')
+        actions.push(`<button class="btn btn-sm btn-success" onclick="complaintReply('${id}','resolve')">结案</button>`);
+      actions.push(`<button class="btn btn-sm ${c.isImportant?'btn-outline':'btn-warning'}" onclick="complaintToggleImportant('${id}',${!c.isImportant})">${c.isImportant?'取消重要':'标记重要'}</button>`);
+      if (c.status !== 'closed')
+        actions.push(`<button class="btn btn-sm btn-danger" onclick="complaintClose('${id}')">关闭</button>`);
+    }
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = `<div class="modal" style="width:600px">
+      <h3>${c.title} ${complaintStatusBadge(c.status)} ${c.isImportant?'⭐':''}</h3>
+      <div style="display:flex;gap:12px;margin-bottom:16px">
+        <span style="font-size:13px;color:var(--text-secondary)">分类: ${{service:'服务',fee:'收费',safety:'安全',environment:'环境',other:'其他'}[c.category]||c.category}</span>
+        <span style="font-size:13px;color:var(--text-secondary)">SLA: ${c.slaDeadline ? fmtDateTime(c.slaDeadline) : '-'}</span>
+      </div>
+      <div class="form-group"><label>投诉内容</label><textarea readonly style="min-height:60px">${c.content}</textarea></div>
+      ${c.photos && c.photos.length ? `<div class="form-group"><label>图片</label><div style="display:flex;gap:8px;flex-wrap:wrap">${c.photos.map(p => `<img src="${p}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">`).join('')}</div></div>` : ''}
+      ${c.replies && c.replies.length ? `<h4 style="margin:16px 0 8px">回复记录 (${c.replies.length})</h4>
+        <div style="display:flex;flex-direction:column;gap:8px">${c.replies.map(r => `
+          <div style="padding:10px 14px;background:${r.replyType==='supervise'?'#FFF7E6':'${r.replyType==='resolve'?'#F0FFF4':'#F8FAFC'}';border-radius:8px;border-left:3px solid ${r.replyType==='supervise'?'var(--warning)':r.replyType==='resolve'?'var(--success)':'var(--primary)'}">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:12px;font-weight:500">${{reply:'回复',supervise:'督导',resolve:'结案'}[r.replyType]||r.replyType}</span>
+              <span style="font-size:12px;color:var(--text-secondary)">${fmtDateTime(r.createdAt)}</span>
+            </div>
+            <div style="font-size:14px;line-height:1.6">${r.content}</div>
+          </div>
+        `).join('')}</div>` : ''}
+      ${actions.length ? `<div class="tag-row" style="margin-top:16px">${actions.join('')}</div>` : ''}
+      <div class="modal-actions"><button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">关闭</button></div>
+    </div>`;
+    document.body.appendChild(modal);
+  } catch (e) { alert('加载失败: ' + e.message); }
+}
+
+async function complaintReply(id, replyType) {
+  const label = replyType === 'supervise' ? '督导意见' : replyType === 'resolve' ? '结案说明' : '回复内容';
+  const content = prompt(label + ':');
+  if (!content) return;
+  try {
+    await api('POST', `/complaints/${id}/reply`, { content, replyType });
+    alert('操作成功'); location.reload();
+  } catch (e) { alert('操作失败: ' + e.message); }
+}
+
+async function complaintToggleImportant(id, isImportant) {
+  try {
+    await api('PUT', `/complaints/${id}/important`, { isImportant });
+    alert(isImportant ? '已标记重要' : '已取消重要'); location.reload();
+  } catch (e) { alert('操作失败: ' + e.message); }
+}
+
+async function complaintClose(id) {
+  if (!confirm('确定关闭此投诉？')) return;
+  try {
+    await api('POST', `/complaints/${id}/close`);
+    alert('已关闭'); location.reload();
+  } catch (e) { alert('操作失败: ' + e.message); }
 }
 
 // ===== Clock =====

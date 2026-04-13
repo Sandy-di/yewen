@@ -58,6 +58,7 @@ function request(url, options = {}) {
       method: options.method || 'GET',
       data: options.data || {},
       header: { ...getHeaders(), ...options.header },
+      timeout: options.timeout || 15000,
       success(res) {
         if (res.statusCode === 401) {
           wx.removeStorageSync('token')
@@ -450,6 +451,72 @@ const api = {
       })
       return { success: true }
     }, [communityId, data])
+  },
+
+  // ---------- 投诉建议 ----------
+  async getComplaintList(params = {}) {
+    return callWithFallback('getComplaintList', () => {
+      const query = buildQuery({
+        status: params.status && params.status !== 'all' ? params.status : undefined,
+        category: params.category || undefined,
+        keyword: params.keyword || undefined,
+        page: params.page || 1,
+        pageSize: params.pageSize || 20,
+      })
+      return request(`/api/complaints${query}`)
+    }, [params])
+  },
+
+  async getComplaintDetail(complaintId) {
+    try {
+      return await callWithFallback('getComplaintDetail', () => request(`/api/complaints/${complaintId}`), [complaintId])
+    } catch {
+      return null
+    }
+  },
+
+  async createComplaint(data) {
+    return callWithFallback('createComplaint', async () => {
+      const res = await request('/api/complaints', {
+        method: 'POST',
+        data,
+      })
+      return { success: true, complaintId: res.complaintId }
+    }, [data])
+  },
+
+  async replyComplaint(complaintId, content, replyType) {
+    return callWithFallback('replyComplaint', async () => {
+      await request(`/api/complaints/${complaintId}/reply`, {
+        method: 'POST',
+        data: { content, replyType: replyType || 'reply' },
+      })
+      return { success: true }
+    }, [complaintId, content, replyType])
+  },
+
+  async markComplaintImportant(complaintId, isImportant) {
+    return callWithFallback('markComplaintImportant', async () => {
+      await request(`/api/complaints/${complaintId}/important`, {
+        method: 'PUT',
+        data: { isImportant },
+      })
+      return { success: true }
+    }, [complaintId, isImportant])
+  },
+
+  async closeComplaint(complaintId) {
+    return callWithFallback('closeComplaint', async () => {
+      await request(`/api/complaints/${complaintId}/close`, {
+        method: 'POST',
+      })
+      return { success: true }
+    }, [complaintId])
+  },
+
+  // ---------- 投票模板 ----------
+  async getVoteTemplates() {
+    return callWithFallback('getVoteTemplates', () => request('/api/vote-templates'), [])
   },
 }
 

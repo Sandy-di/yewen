@@ -69,7 +69,7 @@ app.mount("/admin", StaticFiles(directory=str(static_dir), html=True), name="adm
 
 # 注册路由
 from app.routers import auth, users, votes, orders, finance, announcements  # noqa: E402
-from app.routers import community, upload, stats  # noqa: E402
+from app.routers import community, upload, stats, complaints, vote_templates, notifications, meetings, archives  # noqa: E402
 
 app.include_router(auth.router, prefix="/api/auth", tags=["认证"])
 app.include_router(users.router, prefix="/api/users", tags=["用户"])
@@ -80,6 +80,11 @@ app.include_router(announcements.router, prefix="/api/announcements", tags=["公
 app.include_router(community.router, prefix="/api/communities", tags=["社区管理"])
 app.include_router(upload.router, prefix="/api/upload", tags=["文件上传"])
 app.include_router(stats.router, prefix="/api/stats", tags=["数据统计"])
+app.include_router(complaints.router, prefix="/api/complaints", tags=["投诉建议"])
+app.include_router(vote_templates.router, prefix="/api/vote-templates", tags=["投票模板"])
+app.include_router(notifications.router, prefix="/api/notifications", tags=["消息通知"])
+app.include_router(meetings.router, prefix="/api/meetings", tags=["会议管理"])
+app.include_router(archives.router, prefix="/api/archives", tags=["档案管理"])
 
 
 @app.get("/api/health", tags=["系统"])

@@ -1,0 +1,27 @@
+.page { padding: 0; background: #f5f5f5; min-height: 100vh; }
+
+.filter-bar { background: #fff; padding: 16rpx 24rpx; border-bottom: 1rpx solid #eee; }
+.filter-tabs { display: flex; gap: 16rpx; }
+.tab { padding: 10rpx 24rpx; border-radius: 32rpx; font-size: 26rpx; color: #666; background: #f5f5f5; }
+.tab.active { background: #4A6FA5; color: #fff; }
+
+.complaint-list { padding: 20rpx 24rpx; }
+.complaint-card { background: #fff; border-radius: 16rpx; padding: 28rpx; margin-bottom: 16rpx; box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04); }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12rpx; }
+.card-title { font-size: 30rpx; font-weight: 600; flex: 1; margin-right: 16rpx; }
+.status-badge { font-size: 22rpx; padding: 4rpx 16rpx; border-radius: 20rpx; white-space: nowrap; }
+.status-submitted { background: #FFF1F0; color: #F5222D; }
+.status-replied { background: #FFFBE6; color: #D48806; }
+.status-resolved { background: #F0FFF4; color: #52C41A; }
+.status-closed { background: #F5F5F5; color: #999; }
+
+.card-info { display: flex; align-items: center; gap: 12rpx; margin-bottom: 8rpx; }
+.info-tag { font-size: 22rpx; padding: 4rpx 12rpx; border-radius: 8rpx; background: #E6F7FF; color: #1890FF; }
+.important-tag { font-size: 22rpx; color: #FAAD14; }
+.info-text { font-size: 24rpx; color: #999; }
+.card-time { font-size: 22rpx; color: #bbb; }
+
+.empty { text-align: center; padding: 120rpx 0; color: #999; font-size: 28rpx; }
+.loading { text-align: center; padding: 40rpx 0; color: #999; font-size: 26rpx; }
+
+.fab { position: fixed; right: 40rpx; bottom: 120rpx; width: 100rpx; height: 100rpx; border-radius: 50%; background: #4A6FA5; color: #fff; font-size: 52rpx; display: flex; align-items: center; justify-content: center; box-shadow: 0 8rpx 24rpx rgba(74,111,165,0.4); }

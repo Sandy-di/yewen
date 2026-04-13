@@ -17,6 +17,22 @@ class FinanceItemOut(BaseModel):
     category: str
     amount: float
     description: str
+    receiptUrl: str = ""  # 凭证URL
+
+    class Config:
+        from_attributes = True
+
+
+class FinanceQuestionOut(BaseModel):
+    """业主提问输出"""
+    id: str
+    itemId: Optional[str] = None
+    userId: str
+    question: str
+    answer: str = ""
+    answeredBy: Optional[str] = None
+    answeredAt: Optional[datetime] = None
+    createdAt: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -44,6 +60,7 @@ class FinanceDetailOut(FinanceListOut):
     """财务详情"""
     items: List[FinanceItemOut] = []
     attachments: List[FinanceAttachmentOut] = []
+    questions: List[FinanceQuestionOut] = []
 
 
 class FinanceItemCreate(BaseModel):
@@ -51,6 +68,7 @@ class FinanceItemCreate(BaseModel):
     category: str = Field(..., min_length=1, max_length=50)
     amount: float = Field(..., gt=0)
     description: str = Field("", max_length=200)
+    receiptUrl: str = Field("", max_length=500, description="凭证URL")
 
 
 class FinanceCreate(BaseModel):
@@ -64,3 +82,14 @@ class FinanceCreate(BaseModel):
 class FinanceRejectRequest(BaseModel):
     """拒绝财务报表"""
     reason: str = Field("", max_length=500)
+
+
+class FinanceQuestionCreate(BaseModel):
+    """业主提问"""
+    question: str = Field(..., min_length=1, max_length=1000)
+    itemId: Optional[str] = None
+
+
+class FinanceQuestionAnswer(BaseModel):
+    """物业回答提问"""
+    answer: str = Field(..., min_length=1, max_length=2000)

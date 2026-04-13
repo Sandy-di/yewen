@@ -27,3 +27,6 @@ class Community(Base):
     orders = relationship("RepairOrder", back_populates="community", lazy="selectin")
     finance_reports = relationship("FinanceReport", back_populates="community", lazy="selectin")
     announcements = relationship("Announcement", back_populates="community", lazy="selectin")
+    complaints = relationship("Complaint", back_populates="community", lazy="selectin")
+    meetings = relationship("Meeting", back_populates="community", lazy="selectin")
+    archives = relationship("Archive", back_populates="community", lazy="selectin")

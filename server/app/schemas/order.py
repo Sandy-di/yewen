@@ -39,6 +39,8 @@ class OrderDetailOut(OrderListOut):
     propertyId: Optional[str] = None
     propertyName: str = ""
     photos: list = []
+    video: str = ""
+    appointmentTime: str = ""
     completedAt: Optional[datetime] = None
     completionPhotos: list = []
     completionNote: str = ""
@@ -53,6 +55,8 @@ class OrderCreate(BaseModel):
     subCategory: str = Field("", max_length=50)
     description: str = Field(..., min_length=1, max_length=2000)
     photos: list = []
+    video: str = Field("", max_length=500, description="视频URL")
+    appointmentTime: str = Field("", max_length=30, description="预约上门时间")
     contactPhone: str = Field("", max_length=20)
 
 

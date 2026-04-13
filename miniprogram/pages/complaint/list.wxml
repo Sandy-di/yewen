@@ -1,0 +1,35 @@
+<view class="page">
+  <view class="filter-bar">
+    <view class="filter-tabs">
+      <view class="tab {{currentStatus === '' ? 'active' : ''}}" bindtap="onFilterTap" data-status="">全部</view>
+      <view class="tab {{currentStatus === 'submitted' ? 'active' : ''}}" bindtap="onFilterTap" data-status="submitted">待回复</view>
+      <view class="tab {{currentStatus === 'replied' ? 'active' : ''}}" bindtap="onFilterTap" data-status="replied">已回复</view>
+      <view class="tab {{currentStatus === 'resolved' ? 'active' : ''}}" bindtap="onFilterTap" data-status="resolved">已解决</view>
+    </view>
+  </view>
+
+  <view class="complaint-list" wx:if="{{list.length}}">
+    <view class="complaint-card" wx:for="{{list}}" wx:key="complaintId" bindtap="goDetail" data-id="{{item.complaintId}}">
+      <view class="card-top">
+        <text class="card-title">{{item.title}}</text>
+        <view class="status-badge status-{{item.status}}">{{statusMap[item.status] || item.status}}</view>
+      </view>
+      <view class="card-info">
+        <text class="info-tag">{{categoryMap[item.category] || item.category}}</text>
+        <text wx:if="{{item.isImportant}}" class="important-tag">⭐ 重要</text>
+        <text class="info-text">{{item.replyCount}}条回复</text>
+      </view>
+      <view class="card-time">{{item.createdAt}}</view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && !list.length}}">
+    <text>暂无投诉记录</text>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="fab" bindtap="goCreate" wx:if="{{role === 'owner'}}">+</view>
+</view>

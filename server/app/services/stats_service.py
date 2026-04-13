@@ -147,3 +147,117 @@ class StatsService:
             "recentOrders": recent_orders,
             "activeVotes": active_votes,
         }
+
+    async def get_sla_dashboard(self, user: User) -> dict:
+        """SLA监控看板：按时完成率、平均响应时长、好评率、分类统计"""
+        community_id = user.community_id
+        if not community_id:
+            return {
+                "onTimeRate": 0, "avgResponseMinutes": 0, "avgCompleteHours": 0,
+                "goodRate": 0, "byCategory": [], "byAcceptor": [],
+                "slaBreached": 0, "totalCompleted": 0,
+            }
+
+        from datetime import datetime, timedelta, timezone
+
+        # 已完成的工单（用于计算各项指标）
+        base_query = select(RepairOrder).where(
+            RepairOrder.community_id == community_id,
+            RepairOrder.status == "completed",
+        )
+        result = await self.db.execute(base_query)
+        completed_orders = result.scalars().all()
+
+        total_completed = len(completed_orders)
+        if total_completed == 0:
+            return {
+                "onTimeRate": 0, "avgResponseMinutes": 0, "avgCompleteHours": 0,
+                "goodRate": 0, "byCategory": [], "byAcceptor": [],
+                "slaBreached": 0, "totalCompleted": 0,
+            }
+
+        # 按时完成率
+        on_time_count = 0
+        sla_breached = 0
+        total_response_minutes = 0
+        total_complete_hours = 0
+        good_count = 0
+        response_count = 0
+        category_stats: dict[str, dict] = {}
+        acceptor_stats: dict[str, dict] = {}
+
+        for o in completed_orders:
+            # SLA按时
+            if o.sla_deadline and o.completed_at:
+                if o.completed_at <= o.sla_deadline:
+                    on_time_count += 1
+                else:
+                    sla_breached += 1
+
+            # 响应时长（提交→接单）
+            if o.accepted_at and o.created_at:
+                delta = (o.accepted_at - o.created_at).total_seconds() / 60
+                total_response_minutes += delta
+                response_count += 1
+
+            # 完成时长（提交→完成）
+            if o.completed_at and o.created_at:
+                delta = (o.completed_at - o.created_at).total_seconds() / 3600
+                total_complete_hours += delta
+
+            # 好评（4-5星）
+            if o.rating and o.rating >= 4:
+                good_count += 1
+
+            # 分类统计
+            cat = o.category or "other"
+            if cat not in category_stats:
+                category_stats[cat] = {"total": 0, "onTime": 0, "good": 0}
+            category_stats[cat]["total"] += 1
+            if o.sla_deadline and o.completed_at and o.completed_at <= o.sla_deadline:
+                category_stats[cat]["onTime"] += 1
+            if o.rating and o.rating >= 4:
+                category_stats[cat]["good"] += 1
+
+            # 接单人统计
+            acc = o.accepted_by or "unassigned"
+            if acc not in acceptor_stats:
+                acceptor_stats[acc] = {"total": 0, "onTime": 0, "good": 0, "avgHours": 0, "totalHours": 0}
+            acceptor_stats[acc]["total"] += 1
+            if o.sla_deadline and o.completed_at and o.completed_at <= o.sla_deadline:
+                acceptor_stats[acc]["onTime"] += 1
+            if o.rating and o.rating >= 4:
+                acceptor_stats[acc]["good"] += 1
+            if o.completed_at and o.created_at:
+                acceptor_stats[acc]["totalHours"] += (o.completed_at - o.created_at).total_seconds() / 3600
+
+        # 汇总接单人平均时长
+        by_acceptor = []
+        for acc_id, stats in acceptor_stats.items():
+            by_acceptor.append({
+                "acceptorId": acc_id,
+                "total": stats["total"],
+                "onTimeRate": round(stats["onTime"] / stats["total"] * 100, 1) if stats["total"] else 0,
+                "goodRate": round(stats["good"] / stats["total"] * 100, 1) if stats["total"] else 0,
+                "avgHours": round(stats["totalHours"] / stats["total"], 1) if stats["total"] else 0,
+            })
+
+        by_category = []
+        for cat, stats in category_stats.items():
+            by_category.append({
+                "category": cat,
+                "total": stats["total"],
+                "onTimeRate": round(stats["onTime"] / stats["total"] * 100, 1) if stats["total"] else 0,
+                "goodRate": round(stats["good"] / stats["total"] * 100, 1) if stats["total"] else 0,
+            })
+
+        return {
+            "onTimeRate": round(on_time_count / total_completed * 100, 1),
+            "avgResponseMinutes": round(total_response_minutes / response_count, 1) if response_count else 0,
+            "avgCompleteHours": round(total_complete_hours / total_completed, 1),
+            "goodRate": round(good_count / total_completed * 100, 1),
+            "byCategory": by_category,
+            "byAcceptor": by_acceptor,
+            "slaBreached": sla_breached,
+            "totalCompleted": total_completed,
+        }

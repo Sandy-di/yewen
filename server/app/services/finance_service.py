@@ -93,6 +93,7 @@ class FinanceService:
                 category=item.category,
                 amount=item.amount,
                 description=item.description,
+                receipt_url=item.receiptUrl or "",
             )
             self.db.add(fi)
 

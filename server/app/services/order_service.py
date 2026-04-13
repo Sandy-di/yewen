@@ -99,6 +99,8 @@ class OrderService:
             sub_category=data.subCategory,
             description=data.description,
             photos=json.dumps(data.photos),
+            video=data.video or "",
+            appointment_time=data.appointmentTime or "",
             status="submitted",
             property_id=default_prop.id if default_prop else None,
             contact_phone=data.contactPhone or user.phone,

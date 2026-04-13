@@ -1,0 +1,37 @@
+<view class="page" wx:if="{{detail}}">
+  <view class="header">
+    <view class="title-row">
+      <text class="title">{{detail.title}}</text>
+      <view class="status-badge status-{{detail.status}}">{{statusMap[detail.status]}}</view>
+    </view>
+    <view class="meta">
+      <text class="tag">{{categoryMap[detail.category] || detail.category}}</text>
+      <text wx:if="{{detail.isImportant}}" class="important">⭐ 重要</text>
+      <text class="time">{{detail.createdAt}}</text>
+    </view>
+  </view>
+
+  <view class="content-card">
+    <text class="content-text">{{detail.content}}</text>
+    <view class="photos" wx:if="{{detail.photos.length}}">
+      <image wx:for="{{detail.photos}}" wx:key="*this" src="{{item}}" mode="aspectFill" class="photo" bindtap="previewPhoto" data-url="{{item}}"></image>
+    </view>
+  </view>
+
+  <view class="replies" wx:if="{{detail.replies.length}}">
+    <view class="section-title">回复记录 ({{detail.replies.length}})</view>
+    <view class="reply-item" wx:for="{{detail.replies}}" wx:key="id">
+      <view class="reply-header">
+        <view class="reply-type type-{{item.replyType}}">{{replyTypeMap[item.replyType] || item.replyType}}</view>
+        <text class="reply-time">{{item.createdAt}}</text>
+      </view>
+      <text class="reply-content">{{item.content}}</text>
+    </view>
+  </view>
+
+  <view class="actions" wx:if="{{canReply}}">
+    <button class="btn-reply" bindtap="showReplyInput" wx:if="{{detail.status !== 'resolved' && detail.status !== 'closed'}}">回复</button>
+    <button class="btn-supervise" bindtap="supervise" wx:if="{{role === 'committee' && detail.status !== 'resolved' && detail.status !== 'closed'}}">督导</button>
+    <button class="btn-resolve" bindtap="resolve" wx:if="{{role === 'committee' && detail.status !== 'resolved' && detail.status !== 'closed'}}">结案</button>
+  </view>
+</view>

@@ -275,6 +275,38 @@ function mockDelay(ms = 500) {
 }
 
 // 模拟API
+const mockComplaints = [
+  {
+    complaintId: 'CP20260410001',
+    title: '楼道灯长期不亮',
+    category: 'service',
+    status: 'replied',
+    isImportant: true,
+    slaDeadline: '2026-04-14 10:00',
+    createdAt: '2026-04-12 10:30',
+    replyCount: 2,
+    content: '3号楼2单元楼道灯已坏超过两周，夜间出行极不方便，存在安全隐患。',
+    photos: [],
+    replies: [
+      { id: 'CR1', userId: 'U002', content: '已安排维修人员明日上门检查', replyType: 'reply', createdAt: '2026-04-12 14:20' },
+      { id: 'CR2', userId: 'U003', content: '请物业本周内解决，业主安全是第一位的', replyType: 'supervise', createdAt: '2026-04-12 16:00' },
+    ],
+  },
+  {
+    complaintId: 'CP20260410002',
+    title: '物业费收费不透明',
+    category: 'fee',
+    status: 'submitted',
+    isImportant: false,
+    slaDeadline: '2026-04-15 08:00',
+    createdAt: '2026-04-13 08:00',
+    replyCount: 0,
+    content: '近期物业费调整未提前公示，账目不清，希望提供详细说明。',
+    photos: [],
+    replies: [],
+  },
+]
+
 const mockApi = {
   // 获取投票列表
   async getVoteList(params = {}) {
@@ -509,7 +541,48 @@ const mockApi = {
   async updateCommunity(communityId, data) {
     await mockDelay()
     return { success: true }
-  }
+  },
+
+  // 投诉列表
+  async getComplaintList(params = {}) {
+    await mockDelay()
+    let list = [...mockComplaints]
+    if (params.status && params.status !== 'all') {
+      list = list.filter(c => c.status === params.status)
+    }
+    return { data: list, total: list.length, page: params.page || 1, pageSize: params.pageSize || 20 }
+  },
+
+  // 投诉详情
+  async getComplaintDetail(complaintId) {
+    await mockDelay()
+    const complaint = mockComplaints.find(c => c.complaintId === complaintId)
+    return complaint || null
+  },
+
+  // 创建投诉
+  async createComplaint(data) {
+    await mockDelay(800)
+    return { success: true, complaintId: 'CP' + Date.now() }
+  },
+
+  // 回复投诉
+  async replyComplaint(complaintId, content, replyType) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 标记投诉重要
+  async markComplaintImportant(complaintId, isImportant) {
+    await mockDelay()
+    return { success: true }
+  },
+
+  // 关闭投诉
+  async closeComplaint(complaintId) {
+    await mockDelay()
+    return { success: true }
+  },
 }
 
 module.exports = {
@@ -517,5 +590,6 @@ module.exports = {
   mockOrders,
   mockFinanceRecords,
   mockAnnouncements,
+  mockComplaints,
   mockApi
 }

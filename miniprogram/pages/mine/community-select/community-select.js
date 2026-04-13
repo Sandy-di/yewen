@@ -67,6 +67,7 @@ Page({
           method: 'PUT',
           header: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           data: { communityId: community.id },
+          timeout: 15000,
           success: (r) => resolve(r),
           fail: (e) => reject(e)
         })

@@ -102,6 +102,8 @@ async def get_order_detail(
         propertyId=order.property_id,
         propertyName=prop_name,
         photos=json.loads(order.photos) if isinstance(order.photos, str) else order.photos,
+        video=order.video or "",
+        appointmentTime=order.appointment_time or "",
         completedAt=order.completed_at,
         completionPhotos=json.loads(order.completion_photos) if isinstance(order.completion_photos, str) else order.completion_photos,
         completionNote=order.completion_note,

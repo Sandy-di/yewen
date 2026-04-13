@@ -31,3 +31,14 @@ async def get_overview(
     service = StatsService(db)
     overview = await service.get_overview(current_user)
     return overview
+
+
+@router.get("/sla")
+async def get_sla_dashboard(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """获取SLA监控看板（按时完成率/响应时长/好评率/分类/人员统计）"""
+    service = StatsService(db)
+    sla = await service.get_sla_dashboard(current_user)
+    return sla

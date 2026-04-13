@@ -17,7 +17,10 @@
     "pages/mine/property/property",
     "pages/mine/settings/settings",
     "pages/mine/role-switch/role-switch",
-    "pages/mine/community-select/community-select"
+    "pages/mine/community-select/community-select",
+    "pages/complaint/list/list",
+    "pages/complaint/detail/detail",
+    "pages/complaint/create/create"
   ],
   "subPackages": [
     {

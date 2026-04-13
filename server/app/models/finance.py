@@ -31,6 +31,7 @@ class FinanceReport(Base):
     submitter = relationship("User", foreign_keys=[submitted_by])
     approver = relationship("User", foreign_keys=[approved_by])
     items = relationship("FinanceItem", back_populates="report", lazy="selectin", cascade="all, delete-orphan")
+    questions = relationship("FinanceQuestion", back_populates="report", lazy="noload", cascade="all, delete-orphan")
 
     def get_attachments(self) -> list[dict]:
         """解析 attachments JSON"""
@@ -53,6 +54,28 @@ class FinanceItem(Base):
     category: Mapped[str] = mapped_column(String(50), nullable=False)
     amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     description: Mapped[str] = mapped_column(String(200), default="")
+    receipt_url: Mapped[str] = mapped_column(String(500), default="")  # 凭证URL（合同/发票扫描件）
 
     # 关系
     report = relationship("FinanceReport", back_populates="items")
+
+
+class FinanceQuestion(Base):
+    """业主对财务条目的提问"""
+    __tablename__ = "finance_questions"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: gen_id("FQ"))
+    report_id: Mapped[str] = mapped_column(String(32), ForeignKey("finance_reports.id"), nullable=False, index=True)
+    item_id: Mapped[str] = mapped_column(String(32), ForeignKey("finance_items.id"), nullable=True)
+    user_id: Mapped[str] = mapped_column(String(32), ForeignKey("users.id"), nullable=False, index=True)
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    answer: Mapped[str] = mapped_column(Text, default="")
+    answered_by: Mapped[str] = mapped_column(String(32), ForeignKey("users.id"), nullable=True)
+    answered_at: Mapped[datetime] = mapped_column(DateTime, nullable=True, default=None)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    # 关系
+    report = relationship("FinanceReport", back_populates="questions")
+    item = relationship("FinanceItem")
+    user = relationship("User", foreign_keys=[user_id])
+    answerer = relationship("User", foreign_keys=[answered_by])

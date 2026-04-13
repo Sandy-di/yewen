@@ -1,0 +1,30 @@
+<view class="page">
+  <view class="form-card">
+    <view class="form-item">
+      <text class="label">标题</text>
+      <input class="input" placeholder="投诉标题" value="{{title}}" bindinput="onTitleInput" />
+    </view>
+    <view class="form-item">
+      <text class="label">分类</text>
+      <picker mode="selector" range="{{categories}}" range-key="label" value="{{categoryIndex}}" bindchange="onCategoryChange">
+        <view class="picker">{{categories[categoryIndex].label}}</view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <text class="label">详细内容</text>
+      <textarea class="textarea" placeholder="请详细描述您的投诉内容..." value="{{content}}" bindinput="onContentInput" maxlength="5000"></textarea>
+    </view>
+    <view class="form-item">
+      <text class="label">图片（可选）</text>
+      <view class="photo-row">
+        <view class="photo-item" wx:for="{{photos}}" wx:key="*this">
+          <image src="{{item}}" mode="aspectFill" class="photo" bindtap="previewPhoto" data-url="{{item}}"></image>
+          <view class="photo-remove" catchtap="removePhoto" data-index="{{index}}">×</view>
+        </view>
+        <view class="photo-add" wx:if="{{photos.length < 6}}" bindtap="choosePhoto">+</view>
+      </view>
+    </view>
+  </view>
+
+  <button class="submit-btn" bindtap="submit" loading="{{submitting}}" disabled="{{submitting}}">提交投诉</button>
+</view>
