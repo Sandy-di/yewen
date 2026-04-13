@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 
 from app.database import get_db
-from app.models import User
+from app.models import User, Meeting
 from app.middleware.auth import get_current_user, require_role
 from app.schemas.meeting import (
     MeetingListOut, MeetingDetailOut, MeetingAttendeeOut, MeetingMinutesOut,
