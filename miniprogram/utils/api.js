@@ -78,16 +78,23 @@ function request(url, options = {}) {
   const method = (options.method || 'GET').toUpperCase()
   const isGet = method === 'GET'
 
+  // GET 请求不能带 Content-Type，否则 callContainer 会把 data 当请求体而非查询参数
+  const baseHeaders = getHeaders()
+  if (isGet) {
+    delete baseHeaders['Content-Type']
+  }
+
   return new Promise((resolve, reject) => {
     wx.cloud.callContainer({
       config: { env: CLOUD_RUN_CONFIG.env },
       path: path,
       method: method,
       data: isGet ? queryData : (options.data || {}),
-      header: { ...getHeaders(), ...options.header },
+      header: { ...baseHeaders, ...options.header },
       serviceName: CLOUD_RUN_CONFIG.serviceName,
       timeout: options.timeout || 15000,
       success(res) {
+        console.log(`[callContainer] ${method} ${path}`, res.statusCode, res.data)
         const data = res.data
         const statusCode = res.statusCode || (data && data.statusCode) || 200
         if (statusCode === 401) {
@@ -108,6 +115,7 @@ function request(url, options = {}) {
         }
       },
       fail(err) {
+        console.error(`[callContainer] ${method} ${path} FAIL`, err)
         reject(new Error(err.errMsg || '网络错误'))
       },
     })
