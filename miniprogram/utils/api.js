@@ -2,14 +2,19 @@
  * api.js — 后端 API 客户端
  * 与 mock-data.js 保持一致的接口签名。
  * 支持分页（page/pageSize）和新接口（上传、社区、统计）。
+ * 正式环境使用 wx.cloud.callContainer 调用云托管服务。
  */
 
 const { mockApi } = require('./mock-data.js')
 
-const DEFAULT_BASE_URL = 'https://yejian-api-246178-8-1421999297.sh.run.tcloudbase.com'
-const BASE_URL = wx.getStorageSync('apiBaseUrl') || DEFAULT_BASE_URL
+// 云托管配置
+const CLOUD_RUN_CONFIG = {
+  env: 'prod-1g48e3i7b1f173d5',   // 云托管环境 ID
+  serviceName: 'yejian-api-001',   // 服务名称
+}
+
 const FORCE_MOCK = !!wx.getStorageSync('forceMockApi')
-const USE_MOCK = FORCE_MOCK || !BASE_URL || /api\.example\.com/i.test(BASE_URL)
+const USE_MOCK = FORCE_MOCK
 
 let hasWarnedMockFallback = false
 
@@ -26,7 +31,7 @@ function shouldFallbackToMock(error) {
 
 async function callWithFallback(methodName, realCall, args = []) {
   if (USE_MOCK) {
-    warnMockFallback('当前仍在使用占位域名或已开启 forceMockApi。')
+    warnMockFallback('已开启 forceMockApi。')
     return mockApi[methodName](...args)
   }
 
@@ -50,17 +55,21 @@ function getHeaders() {
   }
 }
 
-// 封装 wx.request 为 Promise
+// 封装 wx.cloud.callContainer 为 Promise（正式环境）
 function request(url, options = {}) {
   return new Promise((resolve, reject) => {
-    wx.request({
-      url: `${BASE_URL}${url}`,
+    wx.cloud.callContainer({
+      config: { env: CLOUD_RUN_CONFIG.env },
+      path: url,
       method: options.method || 'GET',
       data: options.data || {},
       header: { ...getHeaders(), ...options.header },
+      serviceName: CLOUD_RUN_CONFIG.serviceName,
       timeout: options.timeout || 15000,
       success(res) {
-        if (res.statusCode === 401) {
+        const data = res.data
+        const statusCode = res.statusCode || (data && data.statusCode) || 200
+        if (statusCode === 401) {
           wx.removeStorageSync('token')
           wx.removeStorageSync('userInfo')
           const app = getApp()
@@ -70,10 +79,10 @@ function request(url, options = {}) {
           reject(new Error('登录已过期，请重新登录'))
           return
         }
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data)
+        if (statusCode >= 200 && statusCode < 300) {
+          resolve(data)
         } else {
-          const msg = (res.data && res.data.detail) || '请求失败'
+          const msg = (data && data.detail) || '请求失败'
           reject(new Error(msg))
         }
       },
@@ -262,14 +271,18 @@ const api = {
     }
     return new Promise((resolve, reject) => {
       const token = wx.getStorageSync('token')
-      wx.uploadFile({
-        url: `${BASE_URL}/api/upload`,
-        filePath,
+      wx.cloud.callContainer({
+        config: { env: CLOUD_RUN_CONFIG.env },
+        serviceName: CLOUD_RUN_CONFIG.serviceName,
+        path: '/api/upload',
+        method: 'POST',
+        filePath: filePath,
         name: 'file',
         header: { 'Authorization': token ? `Bearer ${token}` : '' },
         success(res) {
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            const data = JSON.parse(res.data)
+          const data = res.data
+          const statusCode = res.statusCode || (data && data.statusCode) || 200
+          if (statusCode >= 200 && statusCode < 300) {
             resolve({ success: true, url: data.url, filename: data.filename })
           } else {
             reject(new Error('上传失败'))

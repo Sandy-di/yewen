@@ -1,7 +1,17 @@
 // app.js
+
+// 云托管配置
+const CLOUD_RUN_CONFIG = {
+  env: 'prod-1g48e3i7b1f173d5',
+  serviceName: 'yejian-api-001',
+}
+
 App({
   onLaunch() {
-    this.initApiConfig()
+    // 初始化云开发（callContainer 需要）
+    if (wx.cloud) {
+      wx.cloud.init({ env: CLOUD_RUN_CONFIG.env })
+    }
     // 检查登录状态
     this.checkLoginStatus()
     // 获取系统信息
@@ -13,22 +23,7 @@ App({
     currentRole: 'owner', // owner | property | committee
     communityInfo: null,  // 从后端 profile 获取
     systemInfo: null,
-    apiBaseUrl: 'https://yejian-api-246178-8-1421999297.sh.run.tcloudbase.com',
     useMock: false  // 设为 true 使用模拟数据，false 使用真实后端
-  },
-
-  initApiConfig() {
-    const storedBaseUrl = wx.getStorageSync('apiBaseUrl')
-    const forceMock = !!wx.getStorageSync('forceMockApi')
-    const apiBaseUrl = storedBaseUrl || this.globalData.apiBaseUrl
-    const useMock = forceMock || this.isPlaceholderApiBaseUrl(apiBaseUrl)
-
-    this.globalData.apiBaseUrl = apiBaseUrl
-    this.globalData.useMock = useMock
-  },
-
-  isPlaceholderApiBaseUrl(url) {
-    return !url || /api\.example\.com/i.test(url)
   },
 
   isMockToken(token) {
@@ -74,20 +69,19 @@ App({
 
   // 用 code 换取后端 token
   loginWithCode(code) {
-    const baseUrl = this.globalData.apiBaseUrl
-    if (this.globalData.useMock || this.isPlaceholderApiBaseUrl(baseUrl)) {
-      console.warn('当前未配置真实后端域名，使用模拟登录')
-      this.mockLogin()
-      return
-    }
-    wx.request({
-      url: `${baseUrl}/api/auth/login`,
+    wx.cloud.callContainer({
+      config: { env: CLOUD_RUN_CONFIG.env },
+      serviceName: CLOUD_RUN_CONFIG.serviceName,
+      path: '/api/auth/login',
       method: 'POST',
       data: { code },
+      header: { 'Content-Type': 'application/json' },
       timeout: 15000,
       success: (res) => {
-        if (res.statusCode === 200 && res.data.token) {
-          const { token, user_id, role, nickname } = res.data
+        const data = res.data
+        const statusCode = res.statusCode || (data && data.statusCode) || 200
+        if (statusCode === 200 && data.token) {
+          const { token, user_id, role, nickname } = data
           wx.setStorageSync('token', token)
           
           // 登录后拉取完整用户信息
@@ -107,21 +101,24 @@ App({
 
   // 从后端刷新用户信息
   refreshProfile() {
-    const baseUrl = this.globalData.apiBaseUrl
     const token = wx.getStorageSync('token')
     if (!token) return
-    if (this.globalData.useMock || this.isPlaceholderApiBaseUrl(baseUrl) || this.isMockToken(token)) {
+    if (this.globalData.useMock || this.isMockToken(token)) {
       return
     }
 
-    wx.request({
-      url: `${baseUrl}/api/auth/profile`,
+    wx.cloud.callContainer({
+      config: { env: CLOUD_RUN_CONFIG.env },
+      serviceName: CLOUD_RUN_CONFIG.serviceName,
+      path: '/api/auth/profile',
       method: 'GET',
       header: { 'Authorization': `Bearer ${token}` },
       timeout: 10000,
       success: (res) => {
-        if (res.statusCode === 200 && res.data) {
-          const profile = res.data
+        const data = res.data
+        const statusCode = res.statusCode || (data && data.statusCode) || 200
+        if (statusCode === 200 && data) {
+          const profile = data
           const userInfo = {
             userId: profile.userId,
             openid: profile.openid,
