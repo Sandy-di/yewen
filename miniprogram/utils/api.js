@@ -6,7 +6,7 @@
 
 const { mockApi } = require('./mock-data.js')
 
-const DEFAULT_BASE_URL = 'https://api.example.com'
+const DEFAULT_BASE_URL = 'https://yejian-api-246178-8-1421999297.sh.run.tcloudbase.com'
 const BASE_URL = wx.getStorageSync('apiBaseUrl') || DEFAULT_BASE_URL
 const FORCE_MOCK = !!wx.getStorageSync('forceMockApi')
 const USE_MOCK = FORCE_MOCK || !BASE_URL || /api\.example\.com/i.test(BASE_URL)

@@ -7,12 +7,21 @@ from app.config import get_settings
 
 settings = get_settings()
 
-# SQLite 和 PostgreSQL 连接参数不同
+# SQLite 和 PostgreSQL/MySQL 连接参数不同
 connect_args = {}
 engine_kwargs = {}
 
 if "sqlite" in settings.DATABASE_URL:
     connect_args = {"check_same_thread": False}
+elif "mysql" in settings.DATABASE_URL:
+    # MySQL 连接池配置
+    engine_kwargs = {
+        "pool_size": 10,
+        "max_overflow": 20,
+        "pool_timeout": 30,
+        "pool_recycle": 3600,
+        "pool_pre_ping": True,
+    }
 else:
     # PostgreSQL 连接池配置
     engine_kwargs = {

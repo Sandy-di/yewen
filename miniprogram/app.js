@@ -13,7 +13,7 @@ App({
     currentRole: 'owner', // owner | property | committee
     communityInfo: null,  // 从后端 profile 获取
     systemInfo: null,
-    apiBaseUrl: 'https://api.example.com',  // 替换为实际后端地址
+    apiBaseUrl: 'https://yejian-api-246178-8-1421999297.sh.run.tcloudbase.com',
     useMock: false  // 设为 true 使用模拟数据，false 使用真实后端
   },
 
