@@ -3,7 +3,7 @@
 // 云托管配置
 const CLOUD_RUN_CONFIG = {
   env: 'prod-1g48e3i7b1f173d5',
-  serviceName: 'yejian-api-001',
+  serviceName: 'yejian-api',
 }
 
 App({
