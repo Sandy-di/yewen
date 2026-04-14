@@ -56,13 +56,34 @@ function getHeaders() {
 }
 
 // 封装 wx.cloud.callContainer 为 Promise（正式环境）
+// 注意：callContainer 的 path 不支持查询字符串，GET 请求参数需通过 data 传递
 function request(url, options = {}) {
+  // 分离 path 和 query string（兼容旧写法）
+  let path = url
+  let queryData = options.data || {}
+  const qIndex = url.indexOf('?')
+  if (qIndex !== -1) {
+    path = url.substring(0, qIndex)
+    const queryString = url.substring(qIndex + 1)
+    // 解析查询字符串到 queryData
+    for (const pair of queryString.split('&')) {
+      const [key, value] = pair.split('=')
+      if (key) {
+        queryData[decodeURIComponent(key)] = decodeURIComponent(value || '')
+      }
+    }
+  }
+
+  // GET 请求把参数放 data；POST 请求 data 作为请求体
+  const method = (options.method || 'GET').toUpperCase()
+  const isGet = method === 'GET'
+
   return new Promise((resolve, reject) => {
     wx.cloud.callContainer({
       config: { env: CLOUD_RUN_CONFIG.env },
-      path: url,
-      method: options.method || 'GET',
-      data: options.data || {},
+      path: path,
+      method: method,
+      data: isGet ? queryData : (options.data || {}),
       header: { ...getHeaders(), ...options.header },
       serviceName: CLOUD_RUN_CONFIG.serviceName,
       timeout: options.timeout || 15000,
@@ -93,32 +114,18 @@ function request(url, options = {}) {
   })
 }
 
-// 构建查询字符串
-function buildQuery(params = {}) {
-  const parts = []
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null && value !== '') {
-      parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-    }
-  }
-  return parts.length > 0 ? '?' + parts.join('&') : ''
-}
-
-// ============================================================
-// API 接口 — 与 mockApi 签名一致 + 新增接口
-// ============================================================
-
 const api = {
   // ---------- 投票 ----------
   async getVoteList(params = {}) {
     return callWithFallback('getVoteList', () => {
-      const query = buildQuery({
-        status: params.status && params.status !== 'all' ? params.status : undefined,
-        keyword: params.keyword || undefined,
-        page: params.page || 1,
-        pageSize: params.pageSize || 20,
+      return request('/api/votes', {
+        data: {
+          status: params.status && params.status !== 'all' ? params.status : undefined,
+          keyword: params.keyword || undefined,
+          page: params.page || 1,
+          pageSize: params.pageSize || 20,
+        }
       })
-      return request(`/api/votes${query}`)
     }, [params])
   },
 
@@ -153,14 +160,15 @@ const api = {
   // ---------- 报修工单 ----------
   async getOrderList(params = {}) {
     return callWithFallback('getOrderList', () => {
-      const query = buildQuery({
-        status: params.status && params.status !== 'all' ? params.status : undefined,
-        category: params.category || undefined,
-        keyword: params.keyword || undefined,
-        page: params.page || 1,
-        pageSize: params.pageSize || 20,
+      return request('/api/orders', {
+        data: {
+          status: params.status && params.status !== 'all' ? params.status : undefined,
+          category: params.category || undefined,
+          keyword: params.keyword || undefined,
+          page: params.page || 1,
+          pageSize: params.pageSize || 20,
+        }
       })
-      return request(`/api/orders${query}`)
     }, [params])
   },
 
@@ -214,12 +222,13 @@ const api = {
   // ---------- 财务 ----------
   async getFinanceList(params = {}) {
     return callWithFallback('getFinanceList', () => {
-      const query = buildQuery({
-        status: params.status && params.status !== 'all' ? params.status : undefined,
-        page: params.page || 1,
-        pageSize: params.pageSize || 20,
+      return request('/api/finance', {
+        data: {
+          status: params.status && params.status !== 'all' ? params.status : undefined,
+          page: params.page || 1,
+          pageSize: params.pageSize || 20,
+        }
       })
-      return request(`/api/finance${query}`)
     }, [params])
   },
 
@@ -234,13 +243,14 @@ const api = {
   // ---------- 公告 ----------
   async getAnnouncementList(params = {}) {
     return callWithFallback('getAnnouncementList', () => {
-      const query = buildQuery({
-        type: params.type && params.type !== 'all' ? params.type : undefined,
-        keyword: params.keyword || undefined,
-        page: params.page || 1,
-        pageSize: params.pageSize || 20,
+      return request('/api/announcements', {
+        data: {
+          type: params.type && params.type !== 'all' ? params.type : undefined,
+          keyword: params.keyword || undefined,
+          page: params.page || 1,
+          pageSize: params.pageSize || 20,
+        }
       })
-      return request(`/api/announcements${query}`)
     }, [params])
   },
 
@@ -298,11 +308,12 @@ const api = {
   // ---------- 社区管理（新增） ----------
   async getCommunityList(params = {}) {
     return callWithFallback('getCommunityList', () => {
-      const query = buildQuery({
-        page: params.page || 1,
-        pageSize: params.pageSize || 20,
+      return request('/api/communities', {
+        data: {
+          page: params.page || 1,
+          pageSize: params.pageSize || 20,
+        }
       })
-      return request(`/api/communities${query}`)
     }, [params])
   },
 
@@ -394,13 +405,14 @@ const api = {
   // ---------- 用户管理（管理端） ----------
   async getUserList(params = {}) {
     return callWithFallback('getUserList', () => {
-      const query = buildQuery({
-        role: params.role || undefined,
-        keyword: params.keyword || undefined,
-        page: params.page || 1,
-        pageSize: params.pageSize || 20,
+      return request('/api/users/list', {
+        data: {
+          role: params.role || undefined,
+          keyword: params.keyword || undefined,
+          page: params.page || 1,
+          pageSize: params.pageSize || 20,
+        }
       })
-      return request(`/api/users/list${query}`)
     }, [params])
   },
 
@@ -427,11 +439,12 @@ const api = {
   // ---------- 角色变更记录（公示） ----------
   async getRoleLogs(params = {}) {
     return callWithFallback('getRoleLogs', () => {
-      const query = buildQuery({
-        page: params.page || 1,
-        pageSize: params.pageSize || 20,
+      return request('/api/users/role-logs', {
+        data: {
+          page: params.page || 1,
+          pageSize: params.pageSize || 20,
+        }
       })
-      return request(`/api/users/role-logs${query}`)
     }, [params])
   },
 
@@ -469,14 +482,15 @@ const api = {
   // ---------- 投诉建议 ----------
   async getComplaintList(params = {}) {
     return callWithFallback('getComplaintList', () => {
-      const query = buildQuery({
-        status: params.status && params.status !== 'all' ? params.status : undefined,
-        category: params.category || undefined,
-        keyword: params.keyword || undefined,
-        page: params.page || 1,
-        pageSize: params.pageSize || 20,
+      return request('/api/complaints', {
+        data: {
+          status: params.status && params.status !== 'all' ? params.status : undefined,
+          category: params.category || undefined,
+          keyword: params.keyword || undefined,
+          page: params.page || 1,
+          pageSize: params.pageSize || 20,
+        }
       })
-      return request(`/api/complaints${query}`)
     }, [params])
   },
 
