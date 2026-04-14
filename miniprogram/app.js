@@ -141,6 +141,10 @@ App({
           this.globalData.communityInfo = profile.communityName ? { name: profile.communityName, id: profile.communityId } : null
           wx.setStorageSync('userInfo', userInfo)
         }
+        // 回调通知（用于身份切换页面）
+        if (typeof this.refreshProfileCallback === 'function') {
+          this.refreshProfileCallback()
+        }
       },
     })
   },

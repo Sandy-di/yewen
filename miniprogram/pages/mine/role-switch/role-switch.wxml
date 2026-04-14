@@ -1,24 +1,50 @@
 <!-- pages/mine/role-switch/role-switch.wxml -->
 <view class="page-role-switch">
   <view class="container">
+    <!-- 测试模式提示 -->
     <view class="switch-notice">
-      <text>角色由系统根据身份自动分配，您只能切换到已授权的角色视角。</text>
+      <view class="notice-title">🧪 测试模式 — 身份切换</view>
+      <text>点击下方卡片可切换到不同身份的用户，体验完整功能流程。测试数据均为模拟数据，上线后将清除。</text>
     </view>
+
+    <!-- 当前身份 -->
+    <view class="current-identity" wx:if="{{isTestMode}}">
+      <text class="current-label">当前身份</text>
+      <text class="current-value">{{currentRole === 'owner' ? '业主' : currentRole === 'property' ? '物业' : '业委会'}}</text>
+    </view>
+
+    <!-- 身份列表 -->
     <view class="role-list">
       <view 
-        wx:for="{{roles}}" 
-        wx:key="key"
-        class="card role-card {{currentRole === item.key ? 'role-active' : ''}} {{!item.allowed ? 'role-disabled' : ''}}"
-        data-role="{{item.key}}"
-        bindtap="onRoleSelect"
+        wx:for="{{testUsers}}" 
+        wx:key="openid"
+        class="card role-card {{currentOpenid === item.openid ? 'role-active' : ''}}"
       >
         <view class="role-icon">{{item.icon}}</view>
         <view class="role-info">
           <view class="role-name">{{item.label}}</view>
           <view class="role-desc">{{item.desc}}</view>
         </view>
-        <view class="role-check" wx:if="{{currentRole === item.key}}">✓</view>
-        <view class="role-lock" wx:if="{{!item.allowed}}">🔒</view>
+        <view class="role-check" wx:if="{{currentOpenid === item.openid}}">✓</view>
+        <button
+          wx:if="{{currentOpenid !== item.openid}}"
+          class="switch-btn"
+          size="mini"
+          loading="{{switching}}"
+          data-openid="{{item.openid}}"
+          data-label="{{item.label}}"
+          bindtap="{{isTestMode ? 'onSwitchUser' : 'onDevLogin'}}"
+        >切换</button>
+      </view>
+    </view>
+
+    <!-- 操作提示 -->
+    <view class="tips-section">
+      <view class="tips-title">💡 测试指引</view>
+      <view class="tips-list">
+        <view class="tip-item">1. 业主身份：提交报修、参与投票、查看公示</view>
+        <view class="tip-item">2. 物业身份：处理工单、提交财务报表</view>
+        <view class="tip-item">3. 业委会身份：发起投票、审批财务、发布公告</view>
       </view>
     </view>
   </view>

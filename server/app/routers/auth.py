@@ -50,11 +50,47 @@ async def login(request: Request, req: LoginRequest, db: AsyncSession = Depends(
 @router.post("/dev-token", response_model=LoginResponse, include_in_schema=True)
 async def dev_token(openid: str, db: AsyncSession = Depends(get_db)):
     """
-    【开发模式】直接用 openid 获取 token。
-    仅在 DEBUG=True 时可用，方便本地测试种子数据用户。
+    【测试模式】直接用 openid 获取 token。
+    在 DEBUG=True 或 TEST_MODE=True 时可用，方便测试种子数据用户。
+    种子数据 openid:
+      - oDev_Owner_001（业主）
+      - oDev_Property_001（物业）
+      - oDev_Committee_001（业委会）
     """
     settings = get_settings()
-    if not settings.DEBUG:
+    if not settings.DEBUG and not settings.TEST_MODE:
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    result = await db.execute(select(User).where(User.openid == openid))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail=f"用户不存在: {openid}")
+
+    token = create_token(user.id, user.role)
+    return LoginResponse(
+        token=token,
+        user_id=user.id,
+        role=user.role,
+        nickname=user.nickname,
+        is_new=False,
+    )
+
+
+@router.post("/switch-role", response_model=LoginResponse, include_in_schema=True)
+async def switch_role(
+    openid: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    【测试模式】切换身份 — 通过 openid 切换到不同角色的用户。
+    在 TEST_MODE=True 时可用。
+    种子数据 openid:
+      - oDev_Owner_001（业主：张先生）
+      - oDev_Property_001（物业：物业服务中心）
+      - oDev_Committee_001（业委会：张主任）
+    """
+    settings = get_settings()
+    if not settings.TEST_MODE:
         raise HTTPException(status_code=404, detail="Not Found")
 
     result = await db.execute(select(User).where(User.openid == openid))

@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "./uploads"
     MAX_UPLOAD_SIZE_MB: int = 10
 
+    # 测试模式（开启后允许 dev-token 和身份切换接口）
+    TEST_MODE: bool = False
+
     model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",

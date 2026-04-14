@@ -19,6 +19,7 @@ from app.models import (
     RepairOrder, OrderTimeline,
     FinanceReport, FinanceItem,
     Announcement, AnnouncementRead,
+    Complaint, ComplaintReply,
     gen_id,
 )
 
@@ -362,6 +363,67 @@ async def seed():
         session.add_all(announcements)
         await session.flush()
         print(f"  ✅ 公告: {len(announcements)}条")
+
+        # ===== 8. 投诉建议 =====
+        complaint1 = Complaint(
+            community_id=community.id,
+            user_id=owner.id,
+            title="地下车库照明不足",
+            content="B区地下车库多盏灯已损坏超过两周，光线昏暗存在安全隐患，尤其夜间通行不便。请尽快安排维修。",
+            category="service",
+            status="replied",
+            is_important=False,
+            sla_hours=48,
+            sla_deadline=datetime(2026, 4, 13, 10, 0),
+        )
+        complaint2 = Complaint(
+            community_id=community.id,
+            user_id=owner.id,
+            title="公共区域噪音扰民",
+            content="近期夜间（22:00后）有业主在小区花园区域大声喧哗、播放音乐，严重影响周边住户休息。希望物业加强巡逻管理。",
+            category="environment",
+            status="submitted",
+            is_important=True,
+            sla_hours=48,
+            sla_deadline=datetime(2026, 4, 16, 9, 0),
+        )
+        complaint3 = Complaint(
+            community_id=community.id,
+            user_id=owner.id,
+            title="物业费收支不透明",
+            content="2025年第四季度的财务公示迟迟未发布，业主无法了解公共收益使用情况。要求业委会督促物业尽快公示。",
+            category="fee",
+            status="resolved",
+            is_important=True,
+            resolved_at=datetime(2026, 4, 10, 16, 0),
+        )
+        session.add_all([complaint1, complaint2, complaint3])
+        await session.flush()
+
+        # 投诉回复
+        replies = [
+            ComplaintReply(
+                complaint_id=complaint1.id,
+                user_id=property_staff.id,
+                content="已安排电工师傅明天上午检修B区车库照明，预计明晚恢复正常。给您带来不便敬请谅解。",
+                reply_type="reply",
+            ),
+            ComplaintReply(
+                complaint_id=complaint3.id,
+                user_id=committee.id,
+                content="已督促物业提交Q4财务报表，预计本周内完成审批并公示。",
+                reply_type="supervise",
+            ),
+            ComplaintReply(
+                complaint_id=complaint3.id,
+                user_id=property_staff.id,
+                content="Q4财务报表已完成提交，正在等待业委会审批，审批通过后将第一时间公示。",
+                reply_type="reply",
+            ),
+        ]
+        session.add_all(replies)
+        await session.flush()
+        print(f"  ✅ 投诉: 3条 + 回复")
 
         await session.commit()
         print("\n🎉 种子数据填充完成！")
