@@ -71,11 +71,13 @@ App({
   loginWithCode(code) {
     wx.cloud.callContainer({
       config: { env: CLOUD_RUN_CONFIG.env },
-      serviceName: CLOUD_RUN_CONFIG.serviceName,
       path: '/api/auth/login',
       method: 'POST',
       data: { code },
-      header: { 'Content-Type': 'application/json' },
+      header: {
+        'Content-Type': 'application/json',
+        'X-WX-SERVICE': CLOUD_RUN_CONFIG.serviceName,
+      },
       timeout: 15000,
       success: (res) => {
         const data = res.data
@@ -109,10 +111,12 @@ App({
 
     wx.cloud.callContainer({
       config: { env: CLOUD_RUN_CONFIG.env },
-      serviceName: CLOUD_RUN_CONFIG.serviceName,
       path: '/api/auth/profile',
       method: 'GET',
-      header: { 'Authorization': `Bearer ${token}` },
+      header: {
+        'Authorization': `Bearer ${token}`,
+        'X-WX-SERVICE': CLOUD_RUN_CONFIG.serviceName,
+      },
       timeout: 10000,
       success: (res) => {
         const data = res.data

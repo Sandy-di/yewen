@@ -84,6 +84,9 @@ function request(url, options = {}) {
     delete baseHeaders['Content-Type']
   }
 
+  // 服务名必须通过 X-WX-SERVICE header 传递
+  baseHeaders['X-WX-SERVICE'] = CLOUD_RUN_CONFIG.serviceName
+
   return new Promise((resolve, reject) => {
     wx.cloud.callContainer({
       config: { env: CLOUD_RUN_CONFIG.env },
@@ -91,7 +94,6 @@ function request(url, options = {}) {
       method: method,
       data: isGet ? queryData : (options.data || {}),
       header: { ...baseHeaders, ...options.header },
-      serviceName: CLOUD_RUN_CONFIG.serviceName,
       timeout: options.timeout || 15000,
       success(res) {
         console.log(`[callContainer] ${method} ${path}`, res.statusCode, res.data)
@@ -291,12 +293,14 @@ const api = {
       const token = wx.getStorageSync('token')
       wx.cloud.callContainer({
         config: { env: CLOUD_RUN_CONFIG.env },
-        serviceName: CLOUD_RUN_CONFIG.serviceName,
         path: '/api/upload',
         method: 'POST',
         filePath: filePath,
         name: 'file',
-        header: { 'Authorization': token ? `Bearer ${token}` : '' },
+        header: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'X-WX-SERVICE': CLOUD_RUN_CONFIG.serviceName,
+        },
         success(res) {
           const data = res.data
           const statusCode = res.statusCode || (data && data.statusCode) || 200
