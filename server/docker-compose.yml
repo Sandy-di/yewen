@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  # Nginx 反向代理 + SSL 终止
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro  # SSL 证书
+    depends_on:
+      - api
+    restart: unless-stopped
+
   # PostgreSQL 数据库
   db:
     image: postgres:15-alpine
@@ -8,8 +21,6 @@ services:
       POSTGRES_DB: yewen
       POSTGRES_USER: yewen
       POSTGRES_PASSWORD: yewen_dev_2026
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -17,18 +28,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # API 服务
   api:
     build: .
-    ports:
-      - "8000:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://yewen:yewen_dev_2026@db:5432/yewen
       - JWT_SECRET=${JWT_SECRET:-yewen-jwt-secret-change-in-production}
       - WX_APPID=${WX_APPID:-}
       - WX_SECRET=${WX_SECRET:-}
-      - DEBUG=true
+      - DEBUG=false
       - CORS_ORIGINS=*
       - UPLOAD_DIR=/app/uploads
     volumes:
@@ -37,7 +47,8 @@ services:
       db:
         condition: service_healthy
     command: >
-      sh -c "python seed.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+      sh -c "python seed.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    restart: unless-stopped
 
 volumes:
   pgdata:

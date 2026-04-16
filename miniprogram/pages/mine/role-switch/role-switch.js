@@ -1,15 +1,79 @@
 // pages/mine/role-switch/role-switch.js
-// 测试模式：通过切换 openid 真正切换到不同身份的用户
+// 角色切换页面 — 支持一键切换三个测试身份
 
-const CLOUD_RUN_CONFIG = {
-  env: 'prod-1g48e3i7b1f173d5',
-  serviceName: 'yejian-api',
-}
+const { API_BASE_URL } = require('../../../utils/config')
 
 const TEST_USERS = [
-  { openid: 'oDev_Owner_001', label: '业主', icon: '🏠', desc: '张先生 — 查看投票、参与投票、发起报修、查看公示', role: 'owner' },
-  { openid: 'oDev_Property_001', label: '物业工作人员', icon: '🔧', desc: '物业服务中心 — 接收工单、更新工单状态、上报财务报表', role: 'property' },
-  { openid: 'oDev_Committee_001', label: '业委会成员', icon: '📋', desc: '张主任 — 业主全部功能 + 发起投票、审批财务、发布公告', role: 'committee' },
+  {
+    openid: 'oDev_Owner_001',
+    label: '业主',
+    name: '张先生',
+    icon: '🏠',
+    desc: '查看投票、参与投票、发起报修、查看公示',
+    role: 'owner',
+    mockUser: {
+      userId: 'U20260410001',
+      openid: 'oDev_Owner_001',
+      nickname: '张先生',
+      phone: '138****5678',
+      avatar: '',
+      role: 'owner',
+      verifiedLevel: 2,
+      communityId: 'C001',
+      communityName: '黑金时代',
+      communityAddress: '长沙市天心区暮云街道云塘社区',
+      identities: { isOwner: true, isProperty: false, isCommittee: false },
+      properties: [
+        { propertyId: 'P20260410001', building: '3栋', unit: '1单元', roomNo: '502', usableArea: 89.5, isDefault: true }
+      ]
+    }
+  },
+  {
+    openid: 'oDev_Property_001',
+    label: '物业',
+    name: '物业服务中心',
+    icon: '🔧',
+    desc: '接收工单、更新工单状态、上报财务报表',
+    role: 'property',
+    mockUser: {
+      userId: 'U20260410002',
+      openid: 'oDev_Property_001',
+      nickname: '物业服务中心',
+      phone: '139****1234',
+      avatar: '',
+      role: 'property',
+      verifiedLevel: 3,
+      communityId: 'C001',
+      communityName: '黑金时代',
+      communityAddress: '长沙市天心区暮云街道云塘社区',
+      identities: { isOwner: false, isProperty: true, isCommittee: false },
+      properties: []
+    }
+  },
+  {
+    openid: 'oDev_Committee_001',
+    label: '业委会',
+    name: '张主任',
+    icon: '📋',
+    desc: '业主全部功能 + 发起投票、审批财务、发布公告',
+    role: 'committee',
+    mockUser: {
+      userId: 'U20260410003',
+      openid: 'oDev_Committee_001',
+      nickname: '张主任',
+      phone: '137****8899',
+      avatar: '',
+      role: 'committee',
+      verifiedLevel: 4,
+      communityId: 'C001',
+      communityName: '黑金时代',
+      communityAddress: '长沙市天心区暮云街道云塘社区',
+      identities: { isOwner: true, isProperty: false, isCommittee: true },
+      properties: [
+        { propertyId: 'P20260410002', building: '1栋', unit: '2单元', roomNo: '101', usableArea: 120.0, isDefault: true }
+      ]
+    }
+  }
 ]
 
 Page({
@@ -17,144 +81,87 @@ Page({
     currentOpenid: '',
     currentRole: '',
     testUsers: TEST_USERS,
-    isTestMode: false,
     switching: false,
   },
 
   onLoad() {
+    this.syncCurrentState()
+  },
+
+  onShow() {
+    this.syncCurrentState()
+  },
+
+  syncCurrentState() {
     const app = getApp()
     const userInfo = app.globalData.userInfo
-    const isTestMode = userInfo && userInfo.openid && userInfo.openid.startsWith('oDev_')
     this.setData({
       currentOpenid: userInfo?.openid || '',
       currentRole: app.globalData.currentRole || '',
-      isTestMode,
     })
   },
 
-  async onSwitchUser(e) {
-    const { openid, label } = e.currentTarget.dataset
+  onSwitchUser(e) {
+    const { openid, label, role } = e.currentTarget.dataset
+    const app = getApp()
+
+    // 已是当前身份则忽略
     if (openid === this.data.currentOpenid) return
     if (this.data.switching) return
 
-    this.setData({ switching: true })
+    // 角色切换是测试功能，始终先本地切换
+    const testUser = TEST_USERS.find(u => u.openid === openid)
+    if (!testUser) return
 
-    try {
-      const res = await new Promise((resolve, reject) => {
-        wx.cloud.callContainer({
-          config: { env: CLOUD_RUN_CONFIG.env },
-          path: '/api/auth/switch-role',
-          method: 'POST',
-          data: { openid },
-          header: {
-            'Content-Type': 'application/json',
-            'X-WX-SERVICE': CLOUD_RUN_CONFIG.serviceName,
-          },
-          timeout: 10000,
-          success(res) {
-            const data = res.data
-            const statusCode = res.statusCode || (data && data.statusCode) || 200
-            if (statusCode >= 200 && statusCode < 300) {
-              resolve(data)
-            } else {
-              reject(new Error((data && data.detail) || '切换失败'))
-            }
-          },
-          fail(err) {
-            reject(new Error(err.errMsg || '网络错误'))
-          },
-        })
-      })
+    // 1. 立即更新本地状态
+    app.globalData.userInfo = { ...testUser.mockUser }
+    app.globalData.currentRole = testUser.role
+    app.globalData.communityInfo = testUser.mockUser.communityName
+      ? { name: testUser.mockUser.communityName, id: testUser.mockUser.communityId, address: testUser.mockUser.communityAddress }
+      : null
+    wx.setStorageSync('userInfo', app.globalData.userInfo)
+    wx.setStorageSync('token', 'mock_token_' + Date.now())
 
-      // 保存新 token
-      wx.setStorageSync('token', res.token)
+    this.setData({
+      currentOpenid: openid,
+      currentRole: testUser.role,
+      switching: false,
+    })
 
-      // 刷新用户信息
-      const app = getApp()
-      await new Promise((resolve) => {
-        app.refreshProfileCallback = () => {
-          delete app.refreshProfileCallback
-          resolve()
-        }
-        app.refreshProfile()
-        // 超时保护
-        setTimeout(resolve, 3000)
-      })
+    wx.showToast({ title: `已切换为${label}（${testUser.name}）`, icon: 'success' })
 
-      const userInfo = app.globalData.userInfo
-      this.setData({
-        currentOpenid: userInfo?.openid || openid,
-        currentRole: app.globalData.currentRole,
-        switching: false,
-      })
-
-      wx.showToast({ title: `已切换为${label}`, icon: 'success' })
-    } catch (err) {
-      console.error('身份切换失败', err)
-      wx.showToast({ title: err.message || '切换失败', icon: 'none' })
-      this.setData({ switching: false })
-    }
+    // 2. 后台尝试同步后端（不阻塞 UI）
+    this.tryBackendSwitch(openid)
   },
 
-  // 使用 dev-token 登录（首次进入测试模式）
-  async onDevLogin(e) {
-    const { openid, label } = e.currentTarget.dataset
-    if (this.data.switching) return
+  // 后台同步后端（静默失败）
+  tryBackendSwitch(openid) {
+    const app = getApp()
+    const token = wx.getStorageSync('token')
+    if (app.globalData.useMock || app.isMockToken(token)) return
 
-    this.setData({ switching: true })
+    const isTestMode = app.globalData.userInfo?.openid?.startsWith('oDev_')
 
-    try {
-      const res = await new Promise((resolve, reject) => {
-        wx.cloud.callContainer({
-          config: { env: CLOUD_RUN_CONFIG.env },
-          path: '/api/auth/dev-token',
-          method: 'POST',
-          data: { openid },
-          header: {
-            'Content-Type': 'application/json',
-            'X-WX-SERVICE': CLOUD_RUN_CONFIG.serviceName,
-          },
-          timeout: 10000,
-          success(res) {
-            const data = res.data
-            const statusCode = res.statusCode || (data && data.statusCode) || 200
-            if (statusCode >= 200 && statusCode < 300) {
-              resolve(data)
-            } else {
-              reject(new Error((data && data.detail) || '登录失败'))
-            }
-          },
-          fail(err) {
-            reject(new Error(err.errMsg || '网络错误'))
-          },
-        })
-      })
-
-      wx.setStorageSync('token', res.token)
-
-      const app = getApp()
-      await new Promise((resolve) => {
-        app.refreshProfileCallback = () => {
-          delete app.refreshProfileCallback
-          resolve()
+    wx.request({
+      url: `${API_BASE_URL}${isTestMode ? '/api/auth/switch-role' : '/api/auth/dev-token'}`,
+      method: 'POST',
+      data: { openid },
+      header: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      timeout: 8000,
+      success(res) {
+        const data = res.data
+        const statusCode = res.statusCode || 200
+        if (statusCode >= 200 && statusCode < 300 && data && data.token) {
+          wx.setStorageSync('token', data.token)
+          console.log('[角色切换] 后端同步成功')
         }
-        app.refreshProfile()
-        setTimeout(resolve, 3000)
-      })
-
-      const userInfo = app.globalData.userInfo
-      this.setData({
-        currentOpenid: userInfo?.openid || openid,
-        currentRole: app.globalData.currentRole,
-        isTestMode: true,
-        switching: false,
-      })
-
-      wx.showToast({ title: `已登录为${label}`, icon: 'success' })
-    } catch (err) {
-      console.error('测试登录失败', err)
-      wx.showToast({ title: err.message || '登录失败', icon: 'none' })
-      this.setData({ switching: false })
-    }
+      },
+      fail(err) {
+        console.warn('[角色切换] 后端同步跳过（不可用）')
+      },
+    })
   },
 })

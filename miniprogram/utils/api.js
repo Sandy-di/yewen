@@ -1,20 +1,17 @@
 /**
  * api.js — 后端 API 客户端
+ * 使用 wx.request 发送 HTTP 请求，不再依赖微信云托管。
  * 与 mock-data.js 保持一致的接口签名。
- * 支持分页（page/pageSize）和新接口（上传、社区、统计）。
- * 正式环境使用 wx.cloud.callContainer 调用云托管服务。
  */
 
+const { API_BASE_URL } = require('./config.js')
 const { mockApi } = require('./mock-data.js')
-
-// 云托管配置
-const CLOUD_RUN_CONFIG = {
-  env: 'prod-1g48e3i7b1f173d5',   // 云托管环境 ID
-  serviceName: 'yejian-api',       // 服务名称
-}
 
 const FORCE_MOCK = !!wx.getStorageSync('forceMockApi')
 const USE_MOCK = FORCE_MOCK
+
+// 后端可用性标记：一旦检测到后端不可用，后续请求直接走 mock，避免重复等待超时
+let backendUnavailable = false
 
 let hasWarnedMockFallback = false
 
@@ -24,21 +21,35 @@ function warnMockFallback(reason) {
   console.warn('API 已回退到本地 mock 数据：' + reason)
 }
 
+function isMockToken() {
+  const token = wx.getStorageSync('token')
+  return typeof token === 'string' && token.indexOf('mock_token_') === 0
+}
+
+function shouldUseMock() {
+  return USE_MOCK || isMockToken() || backendUnavailable
+}
+
 function shouldFallbackToMock(error) {
   const message = String((error && error.message) || error || '')
-  return /url not in domain list|request:fail|network|timeout|fail/i.test(message)
+  return /url not in domain list|request:fail|network|timeout|fail|401|403|认证|登录已过期/i.test(message)
 }
 
 async function callWithFallback(methodName, realCall, args = []) {
-  if (USE_MOCK) {
-    warnMockFallback('已开启 forceMockApi。')
+  if (shouldUseMock()) {
+    if (USE_MOCK) warnMockFallback('已开启 forceMockApi。')
+    else if (isMockToken()) warnMockFallback('当前为测试模式（mock token）。')
+    else warnMockFallback('后端不可用，已自动切换到 mock 数据。')
     return mockApi[methodName](...args)
   }
 
   try {
-    return await realCall()
+    const result = await realCall()
+    backendUnavailable = false
+    return result
   } catch (error) {
     if (mockApi[methodName] && shouldFallbackToMock(error)) {
+      backendUnavailable = true
       warnMockFallback((error && error.message) || '请求失败')
       return mockApi[methodName](...args)
     }
@@ -55,51 +66,41 @@ function getHeaders() {
   }
 }
 
-// 封装 wx.cloud.callContainer 为 Promise（正式环境）
-// 注意：callContainer 的 path 不支持查询字符串，GET 请求参数需通过 data 传递
-function request(url, options = {}) {
-  // 分离 path 和 query string（兼容旧写法）
-  let path = url
-  let queryData = options.data || {}
-  const qIndex = url.indexOf('?')
-  if (qIndex !== -1) {
-    path = url.substring(0, qIndex)
-    const queryString = url.substring(qIndex + 1)
-    // 解析查询字符串到 queryData
-    for (const pair of queryString.split('&')) {
-      const [key, value] = pair.split('=')
-      if (key) {
-        queryData[decodeURIComponent(key)] = decodeURIComponent(value || '')
-      }
-    }
-  }
-
-  // GET 请求把参数放 data；POST 请求 data 作为请求体
+/**
+ * 封装 wx.request 为 Promise
+ * @param {string} path - 请求路径，如 '/api/votes'
+ * @param {object} options - 请求选项
+ */
+function request(path, options = {}) {
   const method = (options.method || 'GET').toUpperCase()
-  const isGet = method === 'GET'
+  const url = `${API_BASE_URL}${path}`
 
-  // GET 请求不能带 Content-Type，否则 callContainer 会把 data 当请求体而非查询参数
-  const baseHeaders = getHeaders()
-  if (isGet) {
-    delete baseHeaders['Content-Type']
+  const header = { ...getHeaders(), ...options.header }
+
+  // GET 请求不带 Content-Type（避免某些服务器把 data 当请求体）
+  if (method === 'GET') {
+    delete header['Content-Type']
   }
-
-  // 服务名必须通过 X-WX-SERVICE header 传递
-  baseHeaders['X-WX-SERVICE'] = CLOUD_RUN_CONFIG.serviceName
 
   return new Promise((resolve, reject) => {
-    wx.cloud.callContainer({
-      config: { env: CLOUD_RUN_CONFIG.env },
-      path: path,
-      method: method,
-      data: isGet ? queryData : (options.data || {}),
-      header: { ...baseHeaders, ...options.header },
+    wx.request({
+      url,
+      method,
+      data: options.data || {},
+      header,
       timeout: options.timeout || 15000,
+      dataType: 'json',
       success(res) {
-        console.log(`[callContainer] ${method} ${path}`, res.statusCode, res.data)
+        console.log(`[request] ${method} ${path}`, res.statusCode, res.data)
         const data = res.data
-        const statusCode = res.statusCode || (data && data.statusCode) || 200
+        const statusCode = res.statusCode || 200
+
         if (statusCode === 401) {
+          // mock token 不触发重新登录，直接走 mock 降级
+          if (isMockToken()) {
+            reject(new Error('登录已过期'))
+            return
+          }
           wx.removeStorageSync('token')
           wx.removeStorageSync('userInfo')
           const app = getApp()
@@ -109,6 +110,7 @@ function request(url, options = {}) {
           reject(new Error('登录已过期，请重新登录'))
           return
         }
+
         if (statusCode >= 200 && statusCode < 300) {
           resolve(data)
         } else {
@@ -117,7 +119,7 @@ function request(url, options = {}) {
         }
       },
       fail(err) {
-        console.error(`[callContainer] ${method} ${path} FAIL`, err)
+        console.error(`[request] ${method} ${path} FAIL`, err)
         reject(new Error(err.errMsg || '网络错误'))
       },
     })
@@ -283,7 +285,7 @@ const api = {
     }, [level, data])
   },
 
-  // ---------- 文件上传（新增） ----------
+  // ---------- 文件上传 ----------
   async uploadFile(filePath) {
     if (USE_MOCK) {
       warnMockFallback('文件上传使用模拟模式')
@@ -291,19 +293,16 @@ const api = {
     }
     return new Promise((resolve, reject) => {
       const token = wx.getStorageSync('token')
-      wx.cloud.callContainer({
-        config: { env: CLOUD_RUN_CONFIG.env },
-        path: '/api/upload',
-        method: 'POST',
+      wx.uploadFile({
+        url: `${API_BASE_URL}/api/upload`,
         filePath: filePath,
         name: 'file',
         header: {
           'Authorization': token ? `Bearer ${token}` : '',
-          'X-WX-SERVICE': CLOUD_RUN_CONFIG.serviceName,
         },
         success(res) {
-          const data = res.data
-          const statusCode = res.statusCode || (data && data.statusCode) || 200
+          const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
+          const statusCode = res.statusCode || 200
           if (statusCode >= 200 && statusCode < 300) {
             resolve({ success: true, url: data.url, filename: data.filename })
           } else {
@@ -317,7 +316,7 @@ const api = {
     })
   },
 
-  // ---------- 社区管理（新增） ----------
+  // ---------- 社区管理 ----------
   async getCommunityList(params = {}) {
     return callWithFallback('getCommunityList', () => {
       return request('/api/communities', {
@@ -337,7 +336,7 @@ const api = {
     }
   },
 
-  // ---------- 数据统计（新增） ----------
+  // ---------- 数据统计 ----------
   async getDashboard() {
     return callWithFallback('getDashboard', () => request('/api/stats/dashboard'), [])
   },
@@ -414,7 +413,7 @@ const api = {
     }, [orderId])
   },
 
-  // ---------- 用户管理（管理端） ----------
+  // ---------- 用户管理 ----------
   async getUserList(params = {}) {
     return callWithFallback('getUserList', () => {
       return request('/api/users/list', {
@@ -448,7 +447,7 @@ const api = {
     }, [userId, isActive])
   },
 
-  // ---------- 角色变更记录（公示） ----------
+  // ---------- 角色变更记录 ----------
   async getRoleLogs(params = {}) {
     return callWithFallback('getRoleLogs', () => {
       return request('/api/users/role-logs', {

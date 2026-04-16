@@ -1,5 +1,6 @@
 // pages/mine/community-select/community-select.js
 const api = require('../../../utils/api')
+const { API_BASE_URL } = require('../../../utils/config')
 
 Page({
   data: {
@@ -63,7 +64,7 @@ Page({
 
       const res = await new Promise((resolve, reject) => {
         wx.request({
-          url: `${app.globalData.apiBaseUrl}/api/users/community/bind`,
+          url: `${API_BASE_URL}/api/users/community/bind`,
           method: 'PUT',
           header: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           data: { communityId: community.id },

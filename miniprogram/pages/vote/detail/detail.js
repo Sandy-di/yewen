@@ -138,5 +138,21 @@ Page({
       hideLoading()
       showToast('存证验证通过，数据未被篡改', 'success')
     }, 1000)
+  },
+
+  onShareAppMessage() {
+    const vote = this.data.vote
+    const statusText = vote?.status === 'active' ? '进行中，快来参与投票' : '已结束'
+    return {
+      title: vote ? `${vote.title} - ${statusText}` : '投票详情',
+      path: `/pages/vote/detail/detail?voteId=${this.data.voteId}`
+    }
+  },
+
+  onShareTimeline() {
+    const vote = this.data.vote
+    return {
+      title: vote ? vote.title : '投票详情'
+    }
   }
 })

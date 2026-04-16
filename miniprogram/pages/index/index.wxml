@@ -15,6 +15,7 @@
     <view class="community-header-grid"></view>
     <view class="community-info">
       <view class="community-name">{{communityName}}</view>
+      <view class="community-address" wx:if="{{communityAddress}}">{{communityAddress}}</view>
       <view class="community-stats">
         <text class="stat-item glow-number">512</text>
         <text class="stat-unit">户</text>

@@ -63,10 +63,18 @@ Page({
     }, 1000)
   },
 
-  onShareResult() {
+  onShareAppMessage() {
+    const vote = this.data.vote
     return {
-      title: this.data.vote.title + ' - 投票结果',
+      title: (vote ? vote.title : '投票') + ' - 投票结果',
       path: `/pages/vote/result/result?voteId=${this.data.voteId}`
+    }
+  },
+
+  onShareTimeline() {
+    const vote = this.data.vote
+    return {
+      title: (vote ? vote.title : '投票') + ' - 投票结果'
     }
   }
 })

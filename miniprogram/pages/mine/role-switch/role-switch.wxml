@@ -1,51 +1,60 @@
 <!-- pages/mine/role-switch/role-switch.wxml -->
 <view class="page-role-switch">
   <view class="container">
-    <!-- 测试模式提示 -->
-    <view class="switch-notice">
-      <view class="notice-title">🧪 测试模式 — 身份切换</view>
-      <text>点击下方卡片可切换到不同身份的用户，体验完整功能流程。测试数据均为模拟数据，上线后将清除。</text>
-    </view>
-
     <!-- 当前身份 -->
-    <view class="current-identity" wx:if="{{isTestMode}}">
-      <text class="current-label">当前身份</text>
-      <text class="current-value">{{currentRole === 'owner' ? '业主' : currentRole === 'property' ? '物业' : '业委会'}}</text>
+    <view class="current-banner">
+      <view class="current-icon">{{currentRole === 'owner' ? '🏠' : currentRole === 'property' ? '🔧' : '📋'}}</view>
+      <view class="current-info">
+        <view class="current-label">当前身份</view>
+        <view class="current-name">
+          {{currentRole === 'owner' ? '业主（张先生）' : currentRole === 'property' ? '物业（物业服务中心）' : '业委会（张主任）'}}
+        </view>
+      </view>
     </view>
 
-    <!-- 身份列表 -->
-    <view class="role-list">
-      <view 
-        wx:for="{{testUsers}}" 
-        wx:key="openid"
-        class="card role-card {{currentOpenid === item.openid ? 'role-active' : ''}}"
-      >
-        <view class="role-icon">{{item.icon}}</view>
-        <view class="role-info">
-          <view class="role-name">{{item.label}}</view>
-          <view class="role-desc">{{item.desc}}</view>
-        </view>
-        <view class="role-check" wx:if="{{currentOpenid === item.openid}}">✓</view>
-        <button
-          wx:if="{{currentOpenid !== item.openid}}"
-          class="switch-btn"
-          size="mini"
-          loading="{{switching}}"
+    <!-- 一键切换 -->
+    <view class="switch-section">
+      <view class="section-title">选择测试身份</view>
+      <view class="role-list">
+        <view
+          wx:for="{{testUsers}}"
+          wx:key="openid"
+          class="role-card {{currentOpenid === item.openid ? 'role-active' : ''}}"
           data-openid="{{item.openid}}"
           data-label="{{item.label}}"
-          bindtap="{{isTestMode ? 'onSwitchUser' : 'onDevLogin'}}"
-        >切换</button>
+          data-role="{{item.role}}"
+          bindtap="onSwitchUser"
+        >
+          <view class="role-card-inner">
+            <view class="role-icon">{{item.icon}}</view>
+            <view class="role-info">
+              <view class="role-name">{{item.label}}（{{item.name}}）</view>
+              <view class="role-desc">{{item.desc}}</view>
+            </view>
+            <view class="role-status" wx:if="{{currentOpenid === item.openid}}">
+              <view class="status-dot"></view>
+              <text>当前</text>
+            </view>
+            <view class="role-switch-hint" wx:else>
+              <text>点击切换</text>
+            </view>
+          </view>
+          <view class="role-loading" wx:if="{{switching && currentOpenid !== item.openid}}">
+            <view class="loading-bar"></view>
+          </view>
+        </view>
       </view>
     </view>
 
     <!-- 操作提示 -->
     <view class="tips-section">
-      <view class="tips-title">💡 测试指引</view>
+      <view class="tips-title">测试指引</view>
       <view class="tips-list">
-        <view class="tip-item">1. 业主身份：提交报修、参与投票、查看公示</view>
-        <view class="tip-item">2. 物业身份：处理工单、提交财务报表</view>
-        <view class="tip-item">3. 业委会身份：发起投票、审批财务、发布公告</view>
+        <view class="tip-item">🏠 业主：提交报修、参与投票、查看公示</view>
+        <view class="tip-item">🔧 物业：处理工单、提交财务报表</view>
+        <view class="tip-item">📋 业委会：发起投票、审批财务、发布公告</view>
       </view>
+      <view class="tips-note">切换后返回上一页面即可体验不同角色的功能</view>
     </view>
   </view>
 </view>

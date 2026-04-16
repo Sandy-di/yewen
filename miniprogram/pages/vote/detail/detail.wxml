@@ -119,6 +119,11 @@
     <view class="btn btn-error btn-block" bindtap="onRevokeVote">撤销投票</view>
   </view>
 
+  <!-- 分享操作（已结束投票显示） -->
+  <view class="bottom-actions" wx:if="{{vote.status === 'ended'}}">
+    <button class="btn btn-primary btn-block share-btn-fix" open-type="share">分享投票结果</button>
+  </view>
+
   <!-- 投票确认弹窗 -->
   <view class="modal-mask" wx:if="{{showVoteModal}}" bindtap="onCancelVote">
     <view class="modal-content" catchtap>

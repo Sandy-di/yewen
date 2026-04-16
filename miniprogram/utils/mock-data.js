@@ -351,7 +351,23 @@ const mockApi = {
   // 提交报修
   async submitRepair(data) {
     await mockDelay(800)
-    return { success: true, orderId: 'WR' + Date.now() }
+    const newOrder = {
+      orderId: 'WR' + Date.now(),
+      category: data.category || 'other',
+      subCategory: data.subCategory || '',
+      description: data.description || '',
+      photos: data.photos || [],
+      status: 'submitted',
+      propertyId: 'P20260410001',
+      propertyName: '3栋1单元502',
+      contactPhone: data.contactPhone || '',
+      createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      timeline: [
+        { time: new Date().toTimeString().substring(0, 5), content: '业主提交报修', type: 'submitted' }
+      ]
+    }
+    mockOrders.unshift(newOrder)
+    return { success: true, orderId: newOrder.orderId }
   },
 
   // 获取财务报表列表
@@ -453,7 +469,8 @@ const mockApi = {
   async getOverview() {
     await mockDelay()
     return {
-      communityName: '',
+      communityName: '黑金时代',
+      communityAddress: '长沙市天心区暮云街道云塘社区',
       totalUnits: 0,
       totalArea: 0,
       totalOwners: 0,

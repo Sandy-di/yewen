@@ -9,7 +9,9 @@ Page({
       description: '',
       verificationLevel: 2,
       voteType: 'double_majority',
+      startDate: '',
       startTime: '',
+      endDate: '',
       endTime: '',
       options: [
         { id: 'opt1', label: '' },
@@ -29,8 +31,6 @@ Page({
     submitting: false,
     showVerifyPicker: false,
     showTypePicker: false,
-    showStartPicker: false,
-    showEndPicker: false,
     minDate: '',
     maxDate: ''
   },
@@ -85,17 +85,20 @@ Page({
     }
   },
 
+  onStartDateChange(e) {
+    this.setData({ 'form.startDate': e.detail.value })
+  },
+
   onStartTimeChange(e) {
-    this.setData({ 'form.startTime': e.detail.value, showStartPicker: false })
+    this.setData({ 'form.startTime': e.detail.value })
+  },
+
+  onEndDateChange(e) {
+    this.setData({ 'form.endDate': e.detail.value })
   },
 
   onEndTimeChange(e) {
-    const endTime = e.detail.value
-    if (this.data.form.startTime && endTime <= this.data.form.startTime) {
-      showToast('结束时间必须晚于开始时间')
-      return
-    }
-    this.setData({ 'form.endTime': endTime, showEndPicker: false })
+    this.setData({ 'form.endTime': e.detail.value })
   },
 
   onOptionInput(e) {
@@ -142,15 +145,18 @@ Page({
       showToast('标题不超过100字')
       return
     }
-    if (!form.startTime) {
-      showToast('请选择开始时间')
+    if (!form.startDate || !form.startTime) {
+      showToast('请选择开始日期和时间')
       return
     }
-    if (!form.endTime) {
-      showToast('请选择结束时间')
+    if (!form.endDate || !form.endTime) {
+      showToast('请选择结束日期和时间')
       return
     }
-    if (form.endTime <= form.startTime) {
+    // 组合完整时间并比较
+    const startFull = `${form.startDate} ${form.startTime}`
+    const endFull = `${form.endDate} ${form.endTime}`
+    if (endFull <= startFull) {
       showToast('结束时间必须晚于开始时间')
       return
     }
@@ -164,7 +170,12 @@ Page({
     showLoading('正在提交...')
 
     try {
-      const res = await api.createVote(form)
+      const submitData = {
+        ...form,
+        startTime: `${form.startDate} ${form.startTime}`,
+        endTime: `${form.endDate} ${form.endTime}`,
+      }
+      const res = await api.createVote(submitData)
       hideLoading()
       if (res.success) {
         showToast('投票已发起', 'success')

@@ -213,3 +213,16 @@
 .bottom-actions .btn {
   flex: 1;
 }
+
+.bottom-actions .share-btn-fix {
+  flex: 1;
+  padding: 0;
+  margin: 0;
+  line-height: inherit;
+  background: transparent;
+  border: 1rpx solid rgba(148, 163, 184, 0.3);
+}
+
+.bottom-actions .share-btn-fix::after {
+  border: none;
+}

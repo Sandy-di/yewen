@@ -113,4 +113,11 @@
       </view>
     </view>
   </view>
+
+  <!-- 底部分享 -->
+  <view class="share-bar">
+    <button class="share-btn" open-type="share">
+      📤 分享财务公示
+    </button>
+  </view>
 </view>

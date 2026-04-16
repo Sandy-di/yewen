@@ -8,17 +8,17 @@
     <view class="overview-grid">
       <view class="overview-item">
         <view class="overview-label">收入</view>
-        <view class="overview-value glow-number">{{summary.totalIncomeFormatted}}</view>
+        <view class="overview-value glow-number">{{summary.totalIncomeCompact}}</view>
       </view>
       <view class="overview-divider"></view>
       <view class="overview-item">
         <view class="overview-label">支出</view>
-        <view class="overview-value glow-number">{{summary.totalExpenseFormatted}}</view>
+        <view class="overview-value glow-number">{{summary.totalExpenseCompact}}</view>
       </view>
       <view class="overview-divider"></view>
       <view class="overview-item">
         <view class="overview-label">结余</view>
-        <view class="overview-value glow-number">{{summary.balanceFormatted}}</view>
+        <view class="overview-value glow-number">{{summary.balanceCompact}}</view>
       </view>
     </view>
   </view>

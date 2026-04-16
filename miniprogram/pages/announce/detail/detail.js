@@ -28,5 +28,11 @@ Page({
       title: this.data.announcement?.title || '社区公告',
       path: `/pages/announce/detail/detail?id=${this.data.id}`
     }
+  },
+
+  onShareTimeline() {
+    return {
+      title: this.data.announcement?.title || '社区公告'
+    }
   }
 })

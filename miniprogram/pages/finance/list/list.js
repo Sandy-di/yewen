@@ -2,6 +2,20 @@
 const api = require('../../../utils/api')
 const { formatMoney, getTagClass } = require('../../../utils/util')
 
+// 紧凑金额格式：¥12.86万 / ¥1,234
+function formatMoneyCompact(amount) {
+  if (amount === null || amount === undefined) return '--'
+  const abs = Math.abs(amount)
+  const sign = amount < 0 ? '-' : ''
+  if (abs >= 100000000) {
+    return sign + '¥' + (abs / 100000000).toFixed(2) + '亿'
+  }
+  if (abs >= 10000) {
+    return sign + '¥' + (abs / 10000).toFixed(2) + '万'
+  }
+  return sign + '¥' + abs.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 Page({
   data: {
     financeList: [],
@@ -55,8 +69,11 @@ Page({
           balance: latestReport.balance,
           totalIncomeFormatted: formatMoney(latestReport.totalIncome),
           totalExpenseFormatted: formatMoney(latestReport.totalExpense),
-          balanceFormatted: formatMoney(latestReport.balance)
-        } : { totalIncome: 0, totalExpense: 0, balance: 0 },
+          balanceFormatted: formatMoney(latestReport.balance),
+          totalIncomeCompact: formatMoneyCompact(latestReport.totalIncome),
+          totalExpenseCompact: formatMoneyCompact(latestReport.totalExpense),
+          balanceCompact: formatMoneyCompact(latestReport.balance)
+        } : { totalIncome: 0, totalExpense: 0, balance: 0, totalIncomeCompact: '--', totalExpenseCompact: '--', balanceCompact: '--' },
         announcements: announceRes.data.slice(0, 3)
       })
     } catch (e) {

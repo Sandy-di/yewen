@@ -5,44 +5,58 @@
   background: var(--bg-page);
 }
 
-.switch-notice {
-  padding: 22rpx 24rpx;
-  margin-bottom: var(--space-lg);
-  border: 1rpx solid rgba(194, 154, 99, 0.16);
-  border-radius: var(--radius-sm);
-  background: linear-gradient(180deg, #FFFFFF 0%, #FBF5EC 100%);
-  font-size: 24rpx;
-  line-height: 1.7;
-  color: var(--warning);
-  box-shadow: var(--shadow-sm);
-}
-
-.notice-title {
-  font-size: 28rpx;
-  font-weight: 700;
-  margin-bottom: 8rpx;
-  display: block;
-}
-
-.current-identity {
+/* 当前身份横幅 */
+.current-banner {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  padding: 16rpx 20rpx;
-  margin-bottom: var(--space-md);
+  gap: 24rpx;
+  margin: var(--space-lg);
+  padding: 32rpx var(--space-lg);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 100%);
+  border: 1rpx solid rgba(102, 125, 150, 0.18);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md), var(--shadow-inset);
+}
+
+.current-icon {
+  width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  border-radius: var(--radius-md);
   background: var(--primary-light);
-  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.current-info {
+  flex: 1;
 }
 
 .current-label {
-  font-size: 26rpx;
-  color: var(--text-secondary);
+  font-size: 22rpx;
+  color: var(--text-muted);
+  margin-bottom: 4rpx;
 }
 
-.current-value {
-  font-size: 28rpx;
+.current-name {
+  font-size: 32rpx;
   font-weight: 700;
   color: var(--primary-strong);
+}
+
+/* 切换区域 */
+.switch-section {
+  margin: 0 var(--space-lg);
+}
+
+.section-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  padding-left: 4rpx;
 }
 
 .role-list {
@@ -52,65 +66,133 @@
 }
 
 .role-card {
-  display: flex;
-  align-items: center;
-  gap: 20rpx;
+  position: relative;
+  overflow: hidden;
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.role-card:active {
+  transform: scale(0.98);
 }
 
 .role-active {
-  border-color: rgba(102, 125, 150, 0.22);
-  box-shadow: 0 14rpx 28rpx rgba(102, 125, 150, 0.10), inset 0 1rpx 0 rgba(255, 255, 255, 0.96);
+  border-color: rgba(102, 125, 150, 0.32);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 100%);
+  box-shadow: var(--shadow-md), inset 0 1rpx 0 rgba(255, 255, 255, 0.96);
+}
+
+.role-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 28rpx 24rpx;
 }
 
 .role-icon {
-  font-size: 48rpx;
-  line-height: 1;
+  width: 80rpx;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card-muted);
+  flex-shrink: 0;
+}
+
+.role-active .role-icon {
+  background: var(--primary-light);
 }
 
 .role-info {
   flex: 1;
+  min-width: 0;
 }
 
 .role-name {
-  margin-bottom: 6rpx;
   font-size: 30rpx;
   font-weight: 700;
   color: var(--text-primary);
+  margin-bottom: 6rpx;
 }
 
 .role-desc {
-  font-size: 24rpx;
-  line-height: 1.7;
+  font-size: 22rpx;
+  line-height: 1.6;
   color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.role-check {
-  font-size: 30rpx;
-  font-weight: 700;
+.role-status {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-shrink: 0;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: var(--primary-light);
+  font-size: 22rpx;
+  font-weight: 600;
   color: var(--primary-strong);
 }
 
-.switch-btn {
-  font-size: 24rpx !important;
-  padding: 0 24rpx !important;
-  height: 56rpx !important;
-  line-height: 56rpx !important;
-  background: var(--primary-light) !important;
-  color: var(--primary-strong) !important;
-  border: none !important;
-  border-radius: var(--radius-sm) !important;
+.status-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: var(--primary);
 }
 
+.role-switch-hint {
+  flex-shrink: 0;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: var(--bg-card-muted);
+  font-size: 22rpx;
+  color: var(--text-muted);
+}
+
+/* 加载条 */
+.role-loading {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: var(--bg-card-muted);
+}
+
+.loading-bar {
+  height: 100%;
+  width: 40%;
+  background: var(--primary);
+  border-radius: 2rpx;
+  animation: loading-slide 1s ease-in-out infinite;
+}
+
+@keyframes loading-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* 提示区域 */
 .tips-section {
-  margin-top: var(--space-xl);
+  margin: var(--space-xl) var(--space-lg);
   padding: 24rpx;
-  background: #fff;
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
+  background: var(--bg-card);
+  border: 1rpx solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
 }
 
 .tips-title {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 16rpx;
@@ -119,11 +201,20 @@
 .tips-list {
   display: flex;
   flex-direction: column;
-  gap: 12rpx;
+  gap: 10rpx;
 }
 
 .tip-item {
   font-size: 24rpx;
   color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.tips-note {
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid rgba(148, 163, 184, 0.12);
+  font-size: 22rpx;
+  color: var(--text-muted);
   line-height: 1.6;
 }

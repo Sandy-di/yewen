@@ -81,25 +81,51 @@
     <!-- 投票时间 -->
     <view class="card">
       <view class="form-group">
-        <view class="form-label"><text class="required">*</text> 开始时间</view>
-        <view class="form-picker" bindtap="togglePicker" data-type="Start">
-          <view class="form-picker-value {{form.startTime ? '' : 'form-picker-placeholder'}}">
-            {{form.startTime || '请选择开始时间'}}
+        <view class="form-label"><text class="required">*</text> 开始日期</view>
+        <picker mode="date" value="{{form.startDate}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onStartDateChange">
+          <view class="form-picker">
+            <view class="form-picker-value {{form.startDate ? '' : 'form-picker-placeholder'}}">
+              {{form.startDate || '请选择开始日期'}}
+            </view>
+            <view class="form-picker-arrow">📅</view>
           </view>
-          <view class="form-picker-arrow">📅</view>
-        </view>
-        <picker mode="date" value="{{form.startTime}}" start="{{minDate}}" bindchange="onStartTimeChange" wx:if="{{showStartPicker}}">
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 开始时间</view>
+        <picker mode="time" value="{{form.startTime}}" bindchange="onStartTimeChange">
+          <view class="form-picker">
+            <view class="form-picker-value {{form.startTime ? '' : 'form-picker-placeholder'}}">
+              {{form.startTime || '请选择开始时间'}}
+            </view>
+            <view class="form-picker-arrow">🕐</view>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <view class="form-label"><text class="required">*</text> 结束日期</view>
+        <picker mode="date" value="{{form.endDate}}" start="{{form.startDate || minDate}}" end="{{maxDate}}" bindchange="onEndDateChange">
+          <view class="form-picker">
+            <view class="form-picker-value {{form.endDate ? '' : 'form-picker-placeholder'}}">
+              {{form.endDate || '请选择结束日期'}}
+            </view>
+            <view class="form-picker-arrow">📅</view>
+          </view>
         </picker>
       </view>
 
       <view class="form-group">
         <view class="form-label"><text class="required">*</text> 结束时间</view>
-        <view class="form-picker" bindtap="togglePicker" data-type="End">
-          <view class="form-picker-value {{form.endTime ? '' : 'form-picker-placeholder'}}">
-            {{form.endTime || '请选择结束时间'}}
+        <picker mode="time" value="{{form.endTime}}" bindchange="onEndTimeChange">
+          <view class="form-picker">
+            <view class="form-picker-value {{form.endTime ? '' : 'form-picker-placeholder'}}">
+              {{form.endTime || '请选择结束时间'}}
+            </view>
+            <view class="form-picker-arrow">🕐</view>
           </view>
-          <view class="form-picker-arrow">📅</view>
-        </view>
+        </picker>
       </view>
     </view>
 

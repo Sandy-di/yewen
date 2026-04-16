@@ -36,9 +36,11 @@ Page({
     const app = getApp()
     const role = app.globalData.currentRole || 'owner'
     const communityName = app.globalData.communityInfo?.name || app.globalData.userInfo?.communityName || ''
+    const communityAddress = app.globalData.communityInfo?.address || app.globalData.userInfo?.communityAddress || ''
     const updates = {}
     if (this.data.currentRole !== role) updates.currentRole = role
     if (this.data.communityName !== communityName) updates.communityName = communityName
+    if (this.data.communityAddress !== communityAddress) updates.communityAddress = communityAddress
     if (Object.keys(updates).length > 0) this.setData(updates)
   },
 
@@ -122,5 +124,22 @@ Page({
       return
     }
     wx.navigateTo({ url: '/pages/vote/create/create' })
+  },
+
+  onShareAppMessage() {
+    const app = getApp()
+    const communityName = app.globalData.communityInfo?.name || '社区'
+    return {
+      title: `${communityName} - 业主投票与社区公示`,
+      path: '/pages/index/index'
+    }
+  },
+
+  onShareTimeline() {
+    const app = getApp()
+    const communityName = app.globalData.communityInfo?.name || '社区'
+    return {
+      title: `${communityName} - 业主投票与社区公示`
+    }
   }
 })

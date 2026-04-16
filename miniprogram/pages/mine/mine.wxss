@@ -213,3 +213,28 @@
   font-size: 26rpx;
   color: var(--text-primary);
 }
+
+.community-share-row {
+  margin-top: 18rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid rgba(152, 162, 179, 0.14);
+}
+
+.community-share-btn {
+  width: 100%;
+  height: 76rpx;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--gradient-primary);
+  color: var(--text-inverse);
+  font-size: 26rpx;
+  font-weight: 600;
+  box-shadow: 0 10rpx 20rpx rgba(102, 125, 150, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.community-share-btn::after {
+  border: none;
+}

@@ -77,6 +77,13 @@
       <text class="community-label">所属小区</text>
       <text class="community-value">{{communityName}}</text>
     </view>
+    <view class="community-info-row" wx:if="{{communityAddress}}" style="margin-top:8rpx;">
+      <text class="community-label">地址</text>
+      <text class="community-value" style="font-size:24rpx;color:var(--text-secondary);">{{communityAddress}}</text>
+    </view>
+    <view class="community-share-row">
+      <button class="community-share-btn" open-type="share">📤 邀请邻居加入</button>
+    </view>
   </view>
 
   <!-- 未绑定社区提示 -->

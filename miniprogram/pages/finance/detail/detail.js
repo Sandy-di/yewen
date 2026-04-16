@@ -126,5 +126,20 @@ Page({
         success: () => wx.showToast({ title: '链接已复制', icon: 'success' })
       })
     }
+  },
+
+  onShareAppMessage() {
+    const report = this.data.report
+    return {
+      title: report ? `${report.month} 财务公示` : '财务公示详情',
+      path: `/pages/finance/detail/detail?reportId=${this.data.reportId}`
+    }
+  },
+
+  onShareTimeline() {
+    const report = this.data.report
+    return {
+      title: report ? `${report.month} 财务公示` : '财务公示详情'
+    }
   }
 })

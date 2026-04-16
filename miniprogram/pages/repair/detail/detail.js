@@ -141,5 +141,20 @@ Page({
 
   onCloseModal() {
     this.setData({ showRatingModal: false, showReworkModal: false })
+  },
+
+  onShareAppMessage() {
+    const order = this.data.order
+    return {
+      title: order ? `报修工单 ${order.orderId} - ${order.subCategory || ''}` : '报修详情',
+      path: `/pages/repair/detail/detail?orderId=${this.data.orderId}`
+    }
+  },
+
+  onShareTimeline() {
+    const order = this.data.order
+    return {
+      title: order ? `报修工单 ${order.orderId}` : '报修详情'
+    }
   }
 })

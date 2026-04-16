@@ -121,6 +121,7 @@
     <view class="btn btn-success" wx:if="{{order.status === 'pending_check'}}" bindtap="onAccept">验收通过</view>
     <view class="btn btn-warning" wx:if="{{order.status === 'pending_check'}}" bindtap="onShowRework">申请复修</view>
     <view class="btn btn-primary" wx:if="{{order.status === 'completed' && !order.rating}}" bindtap="onShowRating">评价</view>
+    <button class="btn btn-ghost share-btn-fix" open-type="share">分享工单</button>
   </view>
 
   <!-- 评价弹窗 -->

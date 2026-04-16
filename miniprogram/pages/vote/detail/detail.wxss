@@ -305,3 +305,15 @@
 .skeleton-page {
   padding: var(--space-md) var(--space-lg);
 }
+
+.share-btn-fix {
+  padding: 0;
+  margin: 0;
+  line-height: inherit;
+  background: transparent;
+  border: none;
+}
+
+.share-btn-fix::after {
+  border: none;
+}

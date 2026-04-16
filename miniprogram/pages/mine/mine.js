@@ -53,6 +53,7 @@ Page({
         verifiedLevel: userInfo.verifiedLevel || 1,
         verifyLabel: verifyInfo.label,
         communityName: userInfo.communityName || app.globalData.communityInfo?.name || '',
+        communityAddress: userInfo.communityAddress || app.globalData.communityInfo?.address || '',
         properties: userInfo.properties || []
       })
     }
@@ -91,5 +92,22 @@ Page({
 
   onBindCommunity() {
     wx.navigateTo({ url: '/pages/mine/community-select/community-select' })
+  },
+
+  onShareAppMessage() {
+    const app = getApp()
+    const communityName = app.globalData.communityInfo?.name || '社区'
+    return {
+      title: `${communityName} - 邀请你加入业主社区`,
+      path: '/pages/index/index'
+    }
+  },
+
+  onShareTimeline() {
+    const app = getApp()
+    const communityName = app.globalData.communityInfo?.name || '社区'
+    return {
+      title: `${communityName} - 业主投票与社区公示`
+    }
   }
 })

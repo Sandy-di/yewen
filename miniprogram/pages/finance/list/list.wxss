@@ -10,7 +10,7 @@
   position: relative;
   overflow: hidden;
   margin: var(--space-md) var(--space-lg) 0;
-  padding: 34rpx var(--space-lg) 30rpx;
+  padding: 34rpx 28rpx 30rpx;
   border: 1rpx solid rgba(148, 163, 184, 0.16);
   border-radius: var(--radius-lg);
   background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FA 100%);
@@ -49,11 +49,14 @@
 .overview-grid {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .overview-item {
   flex: 1;
   text-align: center;
+  min-width: 0;
+  padding: 0 8rpx;
 }
 
 .overview-label {
@@ -63,9 +66,10 @@
 }
 
 .overview-value {
-  font-size: 38rpx;
+  font-size: 30rpx;
   font-weight: 600;
   color: var(--text-primary);
+  word-break: break-all;
 }
 
 .overview-divider {
