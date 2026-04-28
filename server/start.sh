@@ -32,4 +32,4 @@ echo "   文档: http://localhost:8000/docs"
 echo "   按 Ctrl+C 停止"
 echo ""
 
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
